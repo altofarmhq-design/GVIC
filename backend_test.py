@@ -4,7 +4,7 @@ from datetime import datetime, timezone, timedelta
 import json
 
 class TaskManagerAPITester:
-    def __init__(self, base_url="https://priority-tracker-243.preview.emergentagent.com"):
+    def __init__(self, base_url="https://patentforge.preview.emergentagent.com"):
         self.base_url = base_url
         self.tests_run = 0
         self.tests_passed = 0
