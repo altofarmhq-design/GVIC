@@ -66,7 +66,7 @@ class Task(BaseModel):
     updated_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 class TaskCreate(BaseModel):
-    title: str
+    title: str = Field(..., min_length=1, description="Task title (required)")
     description: str = ""
     status: TaskStatus = TaskStatus.TODO
     priority: TaskPriority = TaskPriority.MEDIUM
