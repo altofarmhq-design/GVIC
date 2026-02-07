@@ -1,73 +1,118 @@
-# TaskFlow - Notion Style Task Manager
+# 시그널 자산화 통합 플랫폼 - 특허 포트폴리오 PRD
 
-## Original Problem Statement
-Build a Notion-style task manager where users can add, edit, complete, and delete tasks. Include categories or priorities, due dates, and a dashboard showing tasks by status.
+## 원본 요청 (Original Problem Statement)
 
-## User Choices
-- No authentication (single user)
-- Basic features: title, description, status, due date, priority
-- Both Kanban board and List views
-- User-customizable categories
+사용자의 초기 요청은 Notion 스타일 작업 관리자를 구축하는 것이었으나, MVP 완료 후 새로운 작업으로 전환되었습니다.
 
-## Architecture
+현재 활성화된 문제 설명은 사용자가 제공한 10개의 특허 문서(A-J)를 분석하는 것입니다. 핵심 목표는 다음과 같습니다:
+1. "결이론"(가치 분배 이론)에 기반한 통합 시스템을 설명하는 특허 분석 및 이해
+2. 사용자의 비전을 반영하여 시스템을 "시그널 자산화 통합 플랫폼"으로 재구성
+3. 주관적이고 한국 특화된 용어를 국제 특허 출원에 적합한 표준 기술 용어로 일반화
+4. 원본 특허의 특허성 평가 및 통합/분할 전략 제안
+5. 사용자 승인에 따라 10개 특허를 6개로 통합
+6. 한국 특허 출원 형식으로 6개 통합 특허 문서 생성
+7. 6개 특허 각각에 대한 상세 특허성 평가 및 통합 시스템의 전체적 평가 제공
 
-### Backend (FastAPI + MongoDB)
-- **server.py**: Main API server with CRUD endpoints
-- **Collections**: tasks, categories
-- **Endpoints**: /api/tasks, /api/categories, /api/tasks/stats/overview
+---
 
-### Frontend (React + Tailwind + Shadcn/UI)
-- **Dashboard**: Task stats, progress, upcoming tasks
-- **Kanban Board**: Drag & drop columns (To Do, In Progress, Done)
-- **List View**: Sortable table with filters
-- **Task Modal**: Create/edit tasks with calendar picker
-- **Category Manager**: Custom categories with colors
+## 완료된 작업 (Completed Work)
 
-## What's Been Implemented (Feb 7, 2026)
+### Phase 1: 분석 및 전략 수립
+- ✅ 10개 원본 특허(A-J) 분석 완료
+- ✅ "결이론" 및 "시그널 자산화" 핵심 개념 구조화
+- ✅ 국제 출원을 위한 용어 일반화 전략 개발
+- ✅ 10개 특허 통합 → 6개 특허 포트폴리오 전략 수립 및 승인
+- ✅ 핵심 프레임워크 청구 + 입출력 계층 명세서 기재 전략 확정
 
-### Core Features ✅
-- [x] Task CRUD operations (create, read, update, delete)
-- [x] Task status management (To Do, In Progress, Done)
-- [x] Priority levels (Low, Medium, High, Urgent)
-- [x] Due date with calendar picker
-- [x] Custom categories with color selection
-- [x] Dashboard with task statistics
-- [x] Kanban board with drag & drop
-- [x] List view with search and filters
-- [x] Responsive design (desktop + mobile)
-- [x] Notion-style UI (Newsreader + Inter fonts)
+### Phase 2: 특허 문서 생성
+- ✅ 특허 1 (H): 운영 경계 조건 기반의 전역 수렴 제어 시스템
+- ✅ 특허 2 (AEG): 신호 자산화 통합 플랫폼
+- ✅ 특허 3 (BC): 재귀적 모듈화 기반의 데이터 처리 시스템
+- ✅ 특허 4 (DI): 비적합 데이터 자산화 시스템
+- ✅ 특허 5 (F): 가중 분배 모델 기반의 다영역 자원 배분 시스템
+- ✅ 특허 6 (J): 다중 도메인 통합 인터페이스 시스템
 
-### API Endpoints
-- GET/POST /api/tasks - List/Create tasks
-- GET/PUT/DELETE /api/tasks/{id} - Task operations
-- GET /api/tasks/stats/overview - Dashboard statistics
-- GET/POST /api/categories - List/Create categories
-- PUT/DELETE /api/categories/{id} - Category operations
+### Phase 3: 특허성 평가
+- ✅ 6개 특허 개별 특허성 평가 완료
+- ✅ 통합 시스템 전체 평가 완료
 
-## Prioritized Backlog
+---
 
-### P0 (Critical) - Done ✅
-- Task CRUD
-- Kanban board
-- List view
-- Category management
+## 특허 포트폴리오 구조
 
-### P1 (Important)
-- [ ] Subtasks support
-- [ ] Task comments
-- [ ] Due date reminders/notifications
-- [ ] Keyboard shortcuts
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    시그널 자산화 통합 플랫폼 특허 포트폴리오                 │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   특허 6 (J)   [입력 계층]   다중 도메인 통합 인터페이스                   │
+│        ↓                                                               │
+│   특허 2 (AEG) [핵심 엔진]   신호 자산화 통합 플랫폼                      │
+│        ↓                                                               │
+│   특허 3 (BC)  [처리 구조]   재귀적 모듈화                               │
+│   특허 4 (DI)  [예외 처리]   비적합 데이터 자산화                         │
+│        ↓                                                               │
+│   특허 5 (F)   [제어/배분]   가중 분배 모델                              │
+│   특허 1 (H)   [동기화]      전역 수렴 제어                              │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+```
 
-### P2 (Nice to Have)
-- [ ] Dark mode toggle
-- [ ] Task archiving
-- [ ] Export tasks to CSV
-- [ ] Recurring tasks
-- [ ] Tags system
-- [ ] Activity log
+---
 
-## Tech Stack
-- **Frontend**: React 19, Tailwind CSS, Shadcn/UI, lucide-react
-- **Backend**: FastAPI, Motor (async MongoDB driver)
-- **Database**: MongoDB
-- **Fonts**: Newsreader (headings), Inter (body)
+## 특허성 평가 요약
+
+| 특허 | 명칭 | 등록 가능성 | 핵심 강점 |
+|-----|------|-----------|---------|
+| 1 (H) | 전역 수렴 제어 시스템 | 85% | 수리적 경계 조건 + 자동 복구 |
+| 2 (AEG) | 신호 자산화 플랫폼 | 90% | "신호→자산" 개념적 혁신 |
+| 3 (BC) | 재귀적 모듈화 | 75% | 재귀적 문법 정의 |
+| 4 (DI) | 비적합 데이터 자산화 | 95% | "폐기물 자산화" 역발상 |
+| 5 (F) | 가중 분배 모델 | 70% | 폐쇄 루프 배분 시스템 |
+| 6 (J) | 다중 도메인 통합 | 70% | CDM + 시맨틱 매핑 |
+
+---
+
+## 핵심 기술 용어 매핑
+
+| 원본 한국어 | 일반화된 기술 용어 | 영문 |
+|-----------|-----------------|-----|
+| 결이론 | 가중 분배 모델 | Weighted Distribution Model |
+| 독소 | 비적합 데이터 | Non-Conforming Data |
+| 정화 | 정규화 | Normalization |
+| 5:3:2 비율 | 기설정된 수렴 비율 | Predefined Convergence Ratio |
+| 결국가 | 전역 수렴 제어 시스템 | Global Convergence Control System |
+
+---
+
+## 파일 위치
+
+모든 특허 문서: `/app/patents/`
+- 특허1_H_전역수렴제어시스템.md
+- 특허2_AEG_신호자산화통합플랫폼.md
+- 특허3_BC_재귀적모듈화처리시스템.md
+- 특허4_DI_비적합데이터자산화시스템.md
+- 특허5_F_가중분배모델기반자원배분시스템.md
+- 특허6_J_다중도메인통합인터페이스시스템.md
+
+---
+
+## 권고 사항
+
+1. **선행기술 조사**: 특허 3, 5, 6은 출원 전 면밀한 선행기술 조사 권고
+2. **PCT 출원**: 특허 2, 4는 등록 가능성이 높아 국제 출원 권고
+3. **심사 대응 준비**: 차별화 논거 준비
+4. **클레임 분할**: 필요시 독립항 분할 출원 검토
+
+---
+
+## 다음 단계 (Next Steps)
+
+- [ ] 사용자 피드백에 따른 문서 수정
+- [ ] 필요시 추가 실시예 보강
+- [ ] 출원 대리인 선정 및 출원 진행
+- [ ] PCT 국제 출원 전략 수립
+
+---
+
+*마지막 업데이트: 2025년 12월*
