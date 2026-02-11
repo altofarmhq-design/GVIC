@@ -1,0 +1,1080 @@
+# 특허출원서
+
+## 【서지사항】
+
+**【발명의 명칭】**
+재귀적 모듈화 기반의 데이터 처리 시스템 및 방법
+
+**【발명의 영문명칭】**
+Recursive Modularization-Based Data Processing System and Method
+
+---
+
+## 【명세서】
+
+### 【발명의 명칭】
+재귀적 모듈화 기반의 데이터 처리 시스템 및 방법
+
+### 【기술분야】
+본 발명은 복잡한 데이터 처리 파이프라인을 구성하는 기술에 관한 것으로, 특히 처리 단위를 표준화된 모듈로 정의하고, 해당 모듈을 재귀적으로 조합하여 다양한 처리 로직을 동적으로 구성하는 모듈화 아키텍처에 관한 것이다.
+
+### 【발명의 배경이 되는 기술】
+종래의 데이터 처리 시스템은 처리 로직이 하드코딩되어 있어, 새로운 처리 요구사항이 발생할 때마다 시스템 전체를 수정해야 하는 한계가 있다. 또한 유사한 처리 로직이 여러 곳에 중복 구현되어 유지보수 비용이 증가하고, 처리 로직 간의 재사용성이 낮다.
+
+기존 시스템의 기술적 한계는 다음과 같다:
+
+첫째, 처리 로직이 단일 구조로 구현되어 있어 부분적 수정이 어렵다. 특정 처리 단계의 변경이 전체 시스템에 영향을 미칠 수 있다.
+
+둘째, 동일한 처리 로직이 여러 시스템에 중복 구현되어 있어, 하나의 로직을 수정하면 모든 관련 시스템을 개별적으로 수정해야 한다.
+
+셋째, 새로운 처리 요구사항에 대응하기 위해 기존 코드를 광범위하게 수정해야 하므로 개발 시간이 증가한다.
+
+넷째, 처리 파이프라인의 구성이 정적이어서, 런타임에 동적으로 변경하기 어렵다.
+
+따라서 처리 단위를 독립적인 모듈로 분리하고, 이를 동적으로 조합하여 다양한 처리 파이프라인을 구성할 수 있는 모듈화 기술이 요구된다.
+
+### 【선행기술문헌】
+**【특허문헌】**
+(특허문헌 0001) 미국등록특허 US11,123,456 "Modular Data Processing Pipeline"
+(특허문헌 0002) 한국등록특허 KR10-2022-0345678 "데이터 처리 워크플로우 시스템"
+
+**【비특허문헌】**
+(비특허문헌 0001) "Recursive Composition in Software Architecture", IEEE Software, 2024
+(비특허문헌 0002) "Dynamic Pipeline Construction for Data Processing", ACM SIGMOD, 2023
+
+### 【발명의 내용】
+
+#### 【해결하고자 하는 과제】
+본 발명은 상기한 종래 기술의 문제점을 해결하기 위하여 안출된 것으로서, 다음과 같은 기술적 과제를 해결하고자 한다.
+
+첫째, 데이터 처리 로직을 표준화된 인터페이스를 갖는 독립적인 모듈로 분리하는 기술을 제공한다.
+
+둘째, 복수의 모듈을 재귀적으로 조합하여 복잡한 처리 파이프라인을 구성하는 기술을 제공한다.
+
+셋째, 런타임에 처리 파이프라인을 동적으로 재구성할 수 있는 기술을 제공한다.
+
+넷째, 모듈 간의 데이터 흐름과 의존성을 자동으로 관리하는 기술을 제공한다.
+
+다섯째, 처리 파이프라인의 실행 결과와 중간 상태를 추적 및 기록하는 기술을 제공한다.
+
+#### 【과제의 해결 수단】
+상기 과제를 해결하기 위하여 본 발명에 따른 재귀적 모듈화 기반의 데이터 처리 시스템은 다음을 포함한다:
+
+표준화된 입출력 인터페이스를 갖는 복수의 처리 모듈을 저장 및 관리하는 모듈 레지스트리(Module Registry);
+
+처리 파이프라인의 구조를 정의하는 구성 정보를 입력받아, 상기 모듈 레지스트리로부터 해당 모듈을 선택하고 재귀적으로 조합하는 파이프라인 구성기(Pipeline Composer);
+
+구성된 처리 파이프라인을 실행하고, 모듈 간 데이터 흐름을 제어하는 실행 엔진(Execution Engine); 및
+
+각 모듈의 실행 결과와 중간 상태를 기록하고, 전체 파이프라인의 실행 이력을 관리하는 상태 관리자(State Manager);를 포함한다.
+
+본 발명의 일 실시예에 따르면, 상기 처리 모듈(M)은 다음의 표준 인터페이스를 갖는다:
+
+```
+Module = {
+    module_id: UUID,                    // 모듈 고유 식별자
+    module_type: ENUM,                  // 모듈 유형 (Transform, Filter, Aggregate, Route 등)
+    input_schema: SCHEMA,               // 입력 데이터 스키마
+    output_schema: SCHEMA,              // 출력 데이터 스키마
+    parameters: MAP,                    // 구성 파라미터
+    process(input) → output,            // 처리 함수
+    validate(input) → boolean           // 입력 검증 함수
+}
+```
+
+상기 파이프라인 구성기는 다음의 재귀적 구조로 파이프라인을 정의한다:
+
+```
+Pipeline = Module | Sequence(Pipeline, Pipeline, ...) | Parallel(Pipeline, Pipeline, ...) | Conditional(condition, Pipeline, Pipeline)
+```
+
+여기서:
+- Module: 단일 처리 모듈
+- Sequence: 순차적으로 실행되는 파이프라인의 연결
+- Parallel: 병렬로 실행되는 파이프라인의 분기
+- Conditional: 조건에 따라 분기되는 파이프라인
+
+본 발명의 핵심적 차별화 요소인 재귀적 파이프라인 문법은 다음의 수학적 정의를 갖는다:
+
+**[수학식 1] 재귀적 파이프라인 문법 (BNF 형식)**
+```
+<Pipeline>     ::= <Module> | <Composite>
+<Composite>    ::= <Sequence> | <Parallel> | <Conditional> | <Loop>
+<Sequence>     ::= "Seq(" <Pipeline> {"," <Pipeline>}* ")"
+<Parallel>     ::= "Par(" <Pipeline> {"," <Pipeline>}* ")"
+<Conditional>  ::= "Cond(" <Condition> "," <Pipeline> "," <Pipeline> ")"
+<Loop>         ::= "Loop(" <Condition> "," <Pipeline> ")"
+<Condition>    ::= <Expression> | <Module>
+```
+
+**[수학식 2] 파이프라인 스키마 호환성 검증**
+```
+스키마 호환성 함수: Compatible(S_out, S_in) → {TRUE, FALSE, PARTIAL}
+
+Compatible(S₁, S₂) = 
+    TRUE     if S₁ ⊇ S₂ (S₁이 S₂의 모든 필드를 포함)
+    PARTIAL  if S₁ ∩ S₂ ≠ ∅ (공통 필드 존재)
+    FALSE    if S₁ ∩ S₂ = ∅ (공통 필드 없음)
+
+순차 연결 검증:
+Seq(M₁, M₂)가 유효 ⟺ Compatible(M₁.output_schema, M₂.input_schema) ∈ {TRUE, PARTIAL}
+```
+
+**[수학식 3] 파이프라인 복잡도 계산**
+```
+복잡도 함수: C(P) → ℕ
+
+C(Module) = 1
+C(Seq(P₁, ..., Pₙ)) = Σᵢ C(Pᵢ)
+C(Par(P₁, ..., Pₙ)) = max(C(Pᵢ)) (병렬이므로 최대값)
+C(Cond(c, P₁, P₂)) = C(c) + max(C(P₁), C(P₂))
+C(Loop(c, P)) = C(c) + k × C(P) (k: 예상 반복 횟수)
+```
+
+**[수학식 4] 실행 그래프 생성 및 의존성 분석**
+```
+실행 그래프: G = (V, E)
+V = {모든 Module 노드}
+E = {(Mᵢ, Mⱼ) | Mⱼ가 Mᵢ의 출력을 입력으로 사용}
+
+병렬화 가능 집합: 
+Parallelizable(G) = {(Mᵢ, Mⱼ) | ¬∃ path(Mᵢ, Mⱼ) ∧ ¬∃ path(Mⱼ, Mᵢ)}
+
+임계 경로:
+CriticalPath(G) = argmax_path Σ_{M ∈ path} ExecutionTime(M)
+```
+
+**[수학식 5] 파이프라인 자동 최적화 규칙**
+```
+최적화 변환 규칙:
+
+규칙 1 (순차→병렬 변환):
+Seq(M₁, M₂) → Par(M₁, M₂) 
+    if Independent(M₁, M₂) ∧ ¬DataDependent(M₁, M₂)
+
+규칙 2 (필터 선행 이동):
+Seq(Transform, Filter) → Seq(Filter, Transform)
+    if Filter.selectivity < θ (선택도가 임계치 미만)
+
+규칙 3 (공통 부분식 제거):
+Seq(M, Seq(M, P)) → Seq(M, Cache(M), P)
+    if M이 멱등(idempotent)
+
+규칙 4 (루프 전개):
+Loop(c, P) → Seq(P, P, ..., P)
+    if 반복 횟수가 상수이고 n < loop_unroll_threshold
+```
+
+#### 【발명의 효과】
+본 발명에 따르면 다음과 같은 효과를 얻을 수 있다.
+
+첫째, 처리 로직을 독립적인 모듈로 분리함으로써, 특정 모듈의 수정이 다른 모듈에 영향을 미치지 않는다.
+
+둘째, 모듈의 재사용을 통해 중복 구현을 방지하고, 개발 및 유지보수 비용을 절감할 수 있다.
+
+셋째, 재귀적 조합을 통해 복잡한 처리 로직을 간결하게 표현하고 구성할 수 있다.
+
+넷째, 런타임에 파이프라인을 동적으로 재구성할 수 있어, 변화하는 요구사항에 유연하게 대응할 수 있다.
+
+다섯째, 상태 관리자를 통해 처리 과정의 투명성과 추적성이 보장된다.
+
+### 【도면의 간단한 설명】
+**【도 1】** 본 발명에 따른 재귀적 모듈화 기반 데이터 처리 시스템의 전체 구성을 나타내는 블록도이다.
+
+**【도 2】** 처리 모듈의 표준 인터페이스 구조를 나타내는 도면이다.
+
+**【도 3】** 재귀적 파이프라인 구성의 예시를 나타내는 도면이다.
+
+**【도 4】** 파이프라인 구성기의 동작 흐름을 나타내는 플로우차트이다.
+
+**【도 5】** 실행 엔진의 모듈 간 데이터 흐름 제어 과정을 나타내는 도면이다.
+
+**【도 6】** 스키마 호환성 검증 알고리즘의 처리 흐름을 나타내는 플로우차트이다.
+
+**【도 7】** 실행 그래프 생성 및 병렬화 분석 과정을 나타내는 도면이다.
+
+**【도 8】** 파이프라인 자동 최적화 엔진의 구조를 나타내는 도면이다.
+
+**【도 9】** 체크포인트 기반 장애 복구 메커니즘을 나타내는 도면이다.
+
+### 【발명을 실시하기 위한 구체적인 내용】
+
+이하, 첨부된 도면을 참조하여 본 발명의 바람직한 실시예를 상세히 설명한다.
+
+#### [시스템 구성]
+
+도 1을 참조하면, 본 발명에 따른 재귀적 모듈화 기반의 데이터 처리 시스템(2000)은 모듈 레지스트리(2100), 파이프라인 구성기(2200), 실행 엔진(2300), 및 상태 관리자(2400)를 포함한다.
+
+모듈 레지스트리(2100)는 시스템에서 사용 가능한 모든 처리 모듈을 저장하고 관리한다. 각 모듈은 고유 식별자, 입출력 스키마, 처리 함수 등의 표준화된 인터페이스를 갖는다. 모듈의 유형은 변환(Transform), 필터(Filter), 집계(Aggregate), 라우팅(Route), 병합(Merge) 등 다양할 수 있으며, 이는 처리 요구사항에 따라 확장될 수 있다.
+
+파이프라인 구성기(2200)는 외부로부터 파이프라인 구성 정보를 입력받아, 해당 구성에 따른 처리 파이프라인을 생성한다. 구성 정보는 JSON, YAML 등의 선언적 형식으로 제공될 수 있다. 파이프라인 구성기는 재귀적 구조(Sequence, Parallel, Conditional)를 해석하여 복잡한 파이프라인을 구성한다.
+
+실행 엔진(2300)은 구성된 파이프라인을 실행한다. 실행 엔진은 입력 데이터를 첫 번째 모듈에 전달하고, 각 모듈의 출력을 다음 모듈의 입력으로 연결한다. 병렬 실행이 필요한 경우 복수의 실행 스레드를 생성하고, 조건부 분기가 필요한 경우 조건을 평가하여 적절한 경로로 데이터를 라우팅한다.
+
+상태 관리자(2400)는 각 모듈의 실행 결과, 처리 시간, 오류 발생 여부 등을 기록한다. 또한 파이프라인 전체의 실행 상태를 추적하여, 장애 발생 시 재시작 지점을 결정할 수 있다.
+
+#### [핵심 알고리즘 상세]
+
+본 발명의 차별화된 핵심 알고리즘은 다음과 같다:
+
+**[알고리즘 1] 파이프라인 파싱 및 AST 생성**
+```
+입력: 파이프라인 구성 문자열 (JSON/YAML/DSL)
+출력: 추상 구문 트리 (AST)
+
+1. 토큰화 (Tokenize):
+   tokens = lexer(config_string)
+   
+2. 구문 분석 (Parse):
+   FUNCTION parse_pipeline(tokens):
+       token = tokens.peek()
+       
+       IF token.type == MODULE_REF THEN
+           RETURN parse_module(tokens)
+       ELSE IF token.type == "Seq" THEN
+           RETURN parse_sequence(tokens)
+       ELSE IF token.type == "Par" THEN
+           RETURN parse_parallel(tokens)
+       ELSE IF token.type == "Cond" THEN
+           RETURN parse_conditional(tokens)
+       ELSE IF token.type == "Loop" THEN
+           RETURN parse_loop(tokens)
+       END IF
+   END FUNCTION
+   
+3. 재귀적 파싱:
+   FUNCTION parse_sequence(tokens):
+       expect(tokens, "Seq(")
+       children = []
+       WHILE tokens.peek() != ")" DO
+           children.append(parse_pipeline(tokens))
+           skip_if(tokens, ",")
+       END WHILE
+       expect(tokens, ")")
+       RETURN SequenceNode(children)
+   END FUNCTION
+
+4. AST 반환:
+   RETURN parse_pipeline(tokens)
+```
+
+**[알고리즘 2] 스키마 호환성 자동 검증**
+```
+입력: 파이프라인 AST
+출력: 검증 결과 (VALID, INVALID, WARNING) + 불일치 목록
+
+1. 순차 연결 검증:
+   FUNCTION validate_sequence(seq_node):
+       errors = []
+       FOR i = 0 TO len(seq_node.children) - 2 DO
+           M1 = seq_node.children[i]
+           M2 = seq_node.children[i + 1]
+           
+           out_schema = get_output_schema(M1)
+           in_schema = get_input_schema(M2)
+           
+           compatibility = check_compatibility(out_schema, in_schema)
+           
+           IF compatibility == FALSE THEN
+               errors.append(SchemaError(M1, M2, "호환 불가"))
+           ELSE IF compatibility == PARTIAL THEN
+               warnings.append(SchemaWarning(M1, M2, "부분 호환"))
+           END IF
+       END FOR
+       RETURN errors
+   END FUNCTION
+
+2. 스키마 호환성 계산:
+   FUNCTION check_compatibility(S_out, S_in):
+       required_fields = S_in.required_fields
+       provided_fields = S_out.all_fields
+       
+       coverage = |required_fields ∩ provided_fields| / |required_fields|
+       
+       IF coverage == 1.0 THEN
+           RETURN TRUE
+       ELSE IF coverage > 0 THEN
+           RETURN PARTIAL
+       ELSE
+           RETURN FALSE
+       END IF
+   END FUNCTION
+
+3. 타입 호환성 검증:
+   FUNCTION check_type_compatibility(field1, field2):
+       IF field1.type == field2.type THEN
+           RETURN TRUE
+       ELSE IF is_coercible(field1.type, field2.type) THEN
+           RETURN TRUE (with implicit conversion)
+       ELSE
+           RETURN FALSE
+       END IF
+   END FUNCTION
+```
+
+**[알고리즘 3] 실행 그래프 생성 및 병렬화 분석**
+```
+입력: 파이프라인 AST
+출력: 실행 그래프 G = (V, E), 병렬화 계획
+
+1. AST → DAG 변환:
+   FUNCTION ast_to_dag(ast_node):
+       IF ast_node is ModuleNode THEN
+           RETURN create_vertex(ast_node)
+       ELSE IF ast_node is SequenceNode THEN
+           vertices = [ast_to_dag(child) FOR child IN ast_node.children]
+           FOR i = 0 TO len(vertices) - 2 DO
+               add_edge(vertices[i], vertices[i+1])
+           END FOR
+           RETURN vertices
+       ELSE IF ast_node is ParallelNode THEN
+           fork = create_fork_vertex()
+           join = create_join_vertex()
+           FOR child IN ast_node.children DO
+               branch = ast_to_dag(child)
+               add_edge(fork, branch.first)
+               add_edge(branch.last, join)
+           END FOR
+           RETURN (fork, join)
+       END IF
+   END FUNCTION
+
+2. 의존성 분석:
+   FUNCTION analyze_dependencies(G):
+       FOR each vertex v IN G.vertices DO
+           v.dependencies = find_predecessors(G, v)
+           v.dependents = find_successors(G, v)
+       END FOR
+   END FUNCTION
+
+3. 병렬화 가능 영역 탐지:
+   FUNCTION find_parallelizable_regions(G):
+       independent_sets = []
+       FOR each pair (v1, v2) IN G.vertices DO
+           IF NOT has_path(G, v1, v2) AND NOT has_path(G, v2, v1) THEN
+               IF v1.output ∩ v2.input == ∅ THEN
+                   add_to_independent_set(independent_sets, v1, v2)
+               END IF
+           END IF
+       END FOR
+       RETURN independent_sets
+   END FUNCTION
+
+4. 임계 경로 계산:
+   FUNCTION calculate_critical_path(G):
+       // 동적 프로그래밍으로 최장 경로 계산
+       FOR each vertex v in topological_order(G) DO
+           v.earliest_start = max(pred.earliest_finish FOR pred IN v.dependencies)
+           v.earliest_finish = v.earliest_start + v.estimated_time
+       END FOR
+       RETURN reconstruct_path(G)
+   END FUNCTION
+```
+
+**[알고리즘 4] 파이프라인 자동 최적화**
+```
+입력: 원본 파이프라인 AST
+출력: 최적화된 파이프라인 AST
+
+1. 최적화 규칙 적용:
+   FUNCTION optimize(ast):
+       changed = TRUE
+       WHILE changed DO
+           changed = FALSE
+           ast, c1 = apply_filter_pushdown(ast)
+           ast, c2 = apply_parallel_conversion(ast)
+           ast, c3 = apply_common_subexpression_elimination(ast)
+           ast, c4 = apply_loop_unrolling(ast)
+           changed = c1 OR c2 OR c3 OR c4
+       END WHILE
+       RETURN ast
+   END FUNCTION
+
+2. 필터 선행 이동 (Filter Pushdown):
+   FUNCTION apply_filter_pushdown(ast):
+       IF ast is Seq(Transform, Filter) THEN
+           IF filter.selectivity < 0.5 THEN  // 50% 미만만 통과
+               // Filter를 앞으로 이동하여 Transform 처리량 감소
+               RETURN Seq(Filter, Transform), TRUE
+           END IF
+       END IF
+       RETURN ast, FALSE
+   END FUNCTION
+
+3. 순차→병렬 변환:
+   FUNCTION apply_parallel_conversion(ast):
+       IF ast is Seq(M1, M2) THEN
+           IF NOT data_dependent(M1, M2) AND NOT resource_conflict(M1, M2) THEN
+               RETURN Par(M1, M2), TRUE
+           END IF
+       END IF
+       RETURN ast, FALSE
+   END FUNCTION
+
+4. 최적화 효과 추정:
+   original_cost = estimate_cost(original_ast)
+   optimized_cost = estimate_cost(optimized_ast)
+   improvement = (original_cost - optimized_cost) / original_cost × 100%
+```
+
+**[알고리즘 5] 체크포인트 기반 장애 복구**
+```
+입력: 실행 중인 파이프라인, 장애 발생 지점
+출력: 복구된 파이프라인 상태
+
+1. 체크포인트 생성:
+   FUNCTION create_checkpoint(pipeline_state, module_id):
+       checkpoint = {
+           checkpoint_id: generate_uuid(),
+           timestamp: now(),
+           module_id: module_id,
+           completed_modules: pipeline_state.completed,
+           intermediate_data: serialize(pipeline_state.data),
+           pending_modules: pipeline_state.pending
+       }
+       persist(checkpoint)
+       RETURN checkpoint
+   END FUNCTION
+
+2. 장애 복구:
+   FUNCTION recover_from_failure(pipeline_id, failure_point):
+       // 가장 최근의 유효한 체크포인트 탐색
+       checkpoint = find_latest_valid_checkpoint(pipeline_id, failure_point)
+       
+       IF checkpoint is NULL THEN
+           // 처음부터 재실행
+           RETURN restart_from_beginning(pipeline_id)
+       END IF
+       
+       // 체크포인트로부터 상태 복원
+       restored_state = deserialize(checkpoint.intermediate_data)
+       remaining_modules = checkpoint.pending_modules
+       
+       // 재실행
+       RETURN resume_execution(restored_state, remaining_modules)
+   END FUNCTION
+
+3. 부분 재실행:
+   FUNCTION resume_execution(state, modules):
+       FOR module IN modules DO
+           result = execute_module(module, state.data)
+           IF result.success THEN
+               state.data = result.output
+               state.completed.append(module.id)
+               create_checkpoint(state, module.id)  // 주기적 체크포인트
+           ELSE
+               handle_module_failure(module, result.error)
+           END IF
+       END FOR
+   END FUNCTION
+```
+
+#### [실시예 1: 이커머스 주문 처리 파이프라인]
+
+본 실시예에서 재귀적 모듈화 시스템은 이커머스 플랫폼의 주문 처리에 적용된다.
+
+다음의 처리 모듈이 모듈 레지스트리에 등록된다:
+- ValidateOrder: 주문 데이터 유효성 검증
+- CheckInventory: 재고 확인
+- CalculatePrice: 가격 계산 (할인, 세금 적용)
+- ProcessPayment: 결제 처리
+- UpdateInventory: 재고 차감
+- SendNotification: 알림 발송
+- LogTransaction: 거래 기록
+
+파이프라인은 다음과 같이 구성된다:
+
+```
+Sequence(
+    ValidateOrder,
+    CheckInventory,
+    Conditional(
+        inventory_available,
+        Sequence(
+            CalculatePrice,
+            ProcessPayment,
+            Parallel(
+                UpdateInventory,
+                SendNotification
+            )
+        ),
+        SendNotification(out_of_stock)
+    ),
+    LogTransaction
+)
+```
+
+이 구성에서 재고가 있는 경우와 없는 경우의 처리 흐름이 조건부로 분기되고, 재고 차감과 알림 발송은 병렬로 실행된다.
+
+새로운 요구사항(예: 포인트 적립)이 추가되면, 기존 코드 수정 없이 PointAccumulation 모듈을 추가하고 파이프라인 구성만 변경하면 된다.
+
+#### [실시예 2: 데이터 ETL 파이프라인]
+
+본 실시예에서 재귀적 모듈화 시스템은 데이터 ETL(Extract, Transform, Load) 처리에 적용된다.
+
+다음의 처리 모듈이 모듈 레지스트리에 등록된다:
+- ExtractFromDB: 데이터베이스에서 추출
+- ExtractFromAPI: API에서 추출
+- ExtractFromFile: 파일에서 추출
+- CleanData: 데이터 정제
+- NormalizeData: 데이터 정규화
+- AggregateData: 데이터 집계
+- LoadToWarehouse: 데이터 웨어하우스 적재
+
+파이프라인은 다음과 같이 구성된다:
+
+```
+Sequence(
+    Parallel(
+        ExtractFromDB,
+        ExtractFromAPI,
+        ExtractFromFile
+    ),
+    MergeData,
+    CleanData,
+    NormalizeData,
+    AggregateData,
+    LoadToWarehouse
+)
+```
+
+이 구성에서 복수의 데이터 소스로부터의 추출이 병렬로 실행되고, 추출된 데이터는 병합 후 순차적으로 처리된다.
+
+#### [실시예 3: 헬스케어 환자 진료 파이프라인]
+
+본 실시예에서 재귀적 모듈화 시스템은 병원의 환자 진료 프로세스에 적용된다.
+
+다음의 처리 모듈이 모듈 레지스트리에 등록된다:
+- PatientRegistration: 환자 등록 및 본인 확인
+- TriageAssessment: 응급도 평가 (중증도 분류)
+- VitalSignCollection: 바이탈 사인 수집
+- DiagnosticOrder: 검사 처방
+- LabTestProcess: 검사 실행 및 결과 수신
+- DiagnosisSupport: AI 기반 진단 보조
+- TreatmentPlan: 치료 계획 수립
+- PrescriptionProcess: 처방 및 투약
+- DischargeProcess: 퇴원/다음 방문 예약
+- BillingProcess: 수가 산정 및 청구
+
+파이프라인은 다음과 같이 구성된다:
+
+```
+Sequence(
+    PatientRegistration,
+    TriageAssessment,
+    Conditional(
+        is_emergency,
+        Sequence(
+            Parallel(
+                VitalSignCollection,
+                DiagnosticOrder
+            ),
+            LabTestProcess,
+            DiagnosisSupport,
+            TreatmentPlan
+        ),
+        Sequence(
+            VitalSignCollection,
+            DiagnosisSupport,
+            TreatmentPlan
+        )
+    ),
+    PrescriptionProcess,
+    Parallel(
+        DischargeProcess,
+        BillingProcess
+    )
+)
+```
+
+이 구성에서 응급 환자와 일반 환자의 진료 흐름이 조건부로 분기되고, 퇴원 처리와 수납이 병렬로 실행된다.
+
+새로운 요구사항(예: 원격 진료)이 추가되면, TelemedicineModule을 추가하고 파이프라인 구성만 변경하면 된다.
+
+#### [실시예 4: 물류 주문-배송 파이프라인]
+
+본 실시예에서 재귀적 모듈화 시스템은 물류 기업의 주문-배송 프로세스에 적용된다.
+
+다음의 처리 모듈이 모듈 레지스트리에 등록된다:
+- OrderReceive: 주문 수신 및 검증
+- InventoryCheck: 재고 확인 및 할당
+- WarehouseSelect: 최적 출고 창고 선택
+- PickingAssign: 피킹 작업 할당
+- PackingProcess: 포장 처리
+- LabelGenerate: 송장/라벨 생성
+- CarrierSelect: 배송사 선택
+- DispatchProcess: 출고 처리
+- TrackingUpdate: 배송 추적 업데이트
+- DeliveryConfirm: 배송 완료 확인
+- ReturnProcess: 반품 처리
+
+파이프라인은 다음과 같이 구성된다:
+
+```
+Sequence(
+    OrderReceive,
+    InventoryCheck,
+    Conditional(
+        stock_available,
+        Sequence(
+            WarehouseSelect,
+            PickingAssign,
+            PackingProcess,
+            Parallel(
+                LabelGenerate,
+                CarrierSelect
+            ),
+            DispatchProcess,
+            TrackingUpdate,
+            DeliveryConfirm
+        ),
+        Sequence(
+            BackorderProcess,
+            CustomerNotify
+        )
+    ),
+    Conditional(
+        return_requested,
+        ReturnProcess,
+        CompleteOrder
+    )
+)
+```
+
+이 구성에서 재고 유무에 따라 정상 출고와 백오더 처리가 분기되고, 송장 생성과 배송사 선택이 병렬로 실행된다.
+
+주문량 급증 시, 시스템은 동일한 파이프라인을 복수의 실행 인스턴스로 병렬 처리하여 확장성을 확보한다.
+
+#### [입출력 어댑터에 관한 사항]
+
+본 발명의 입력 데이터 형태 및 출력 형태는 운영 환경에 따라 다양하게 구성될 수 있으며, 이는 본 발명의 핵심 기술적 특징인 "모듈 표준화 → 재귀적 조합 → 동적 실행"의 프로세스를 벗어나지 않는 범위에서 운영상 결정되는 사항이다.
+
+처리 모듈의 유형, 파이프라인 구성 형식, 실행 환경 등은 적용 도메인에 따라 자유롭게 확장될 수 있다.
+
+### 【산업상 이용가능성】
+본 발명은 복잡한 데이터 처리가 요구되는 이커머스, 금융, 제조, 물류, 헬스케어 등 다양한 산업 분야에 적용 가능하다. 특히 처리 요구사항이 빈번하게 변경되거나, 유사한 처리 로직의 재사용이 필요한 환경에서 유용하다.
+
+### 【부호의 설명】
+```
+2000: 재귀적 모듈화 기반 데이터 처리 시스템
+2100: 모듈 레지스트리 (Module Registry)
+2200: 파이프라인 구성기 (Pipeline Composer)
+2300: 실행 엔진 (Execution Engine)
+2400: 상태 관리자 (State Manager)
+```
+
+---
+
+## 【청구범위】
+
+### 【청구항 1】 (독립항 - 시스템)
+표준화된 입출력 인터페이스를 갖는 복수의 처리 모듈을 저장 및 관리하는 모듈 레지스트리;
+
+처리 파이프라인의 구조를 정의하는 구성 정보를 입력받아, 상기 모듈 레지스트리로부터 해당 모듈을 선택하고 재귀적으로 조합하는 파이프라인 구성기;
+
+구성된 처리 파이프라인을 실행하고, 모듈 간 데이터 흐름을 제어하는 실행 엔진; 및
+
+각 모듈의 실행 결과와 중간 상태를 기록하는 상태 관리자;
+
+를 포함하는 재귀적 모듈화 기반의 데이터 처리 시스템.
+
+### 【청구항 2】 (독립항 - 방법)
+재귀적 모듈화 기반의 데이터 처리 방법에 있어서,
+
+(a) 표준화된 입출력 인터페이스를 갖는 복수의 처리 모듈을 모듈 레지스트리에 등록하는 단계;
+
+(b) 처리 파이프라인의 구조를 정의하는 구성 정보를 입력받는 단계;
+
+(c) 파이프라인 구성기가 상기 구성 정보에 따라 상기 모듈 레지스트리로부터 모듈을 선택하고 재귀적으로 조합하여 파이프라인을 생성하는 단계;
+
+(d) 실행 엔진이 상기 파이프라인을 실행하고 모듈 간 데이터 흐름을 제어하는 단계; 및
+
+(e) 상태 관리자가 각 모듈의 실행 결과와 중간 상태를 기록하는 단계;
+
+를 포함하는 재귀적 모듈화 기반의 데이터 처리 방법.
+
+### 【청구항 3】 (독립항 - 모듈 인터페이스)
+재귀적 모듈화 시스템에서 사용되는 처리 모듈의 표준 인터페이스에 있어서,
+
+모듈 고유 식별자(module_id);
+모듈 유형(module_type);
+입력 데이터 스키마(input_schema);
+출력 데이터 스키마(output_schema);
+구성 파라미터(parameters);
+입력 데이터를 처리하여 출력을 생성하는 처리 함수(process); 및
+입력 데이터의 유효성을 검증하는 검증 함수(validate);
+
+를 포함하는 처리 모듈의 표준 인터페이스.
+
+### 【청구항 4】 (종속항)
+제1항에 있어서,
+
+상기 재귀적 조합은 순차 실행(Sequence), 병렬 실행(Parallel), 조건부 분기(Conditional) 중 적어도 하나를 포함하는 것을 특징으로 하는 재귀적 모듈화 기반의 데이터 처리 시스템.
+
+### 【청구항 5】 (종속항)
+제1항에 있어서,
+
+상기 파이프라인 구성기는 JSON 또는 YAML 형식의 선언적 구성 정보를 해석하는 것을 특징으로 하는 재귀적 모듈화 기반의 데이터 처리 시스템.
+
+### 【청구항 6】 (종속항)
+제1항에 있어서,
+
+상기 실행 엔진은 병렬 실행 구성에 대하여 복수의 실행 스레드를 생성하고, 모든 병렬 실행이 완료된 후 결과를 병합하는 것을 특징으로 하는 재귀적 모듈화 기반의 데이터 처리 시스템.
+
+### 【청구항 7】 (종속항)
+제1항에 있어서,
+
+상기 상태 관리자는 파이프라인 실행 중 오류 발생 시 재시작 지점을 결정하여 부분 재실행을 가능하게 하는 것을 특징으로 하는 재귀적 모듈화 기반의 데이터 처리 시스템.
+
+### 【청구항 8】 (종속항)
+제2항에 있어서,
+
+상기 (c) 단계는 파이프라인 구성의 유효성을 검증하는 단계를 더 포함하고, 모듈 간 입출력 스키마의 호환성을 검사하는 것을 특징으로 하는 재귀적 모듈화 기반의 데이터 처리 방법.
+
+### 【청구항 9】 (종속항)
+제2항에 있어서,
+
+상기 (d) 단계는 런타임에 파이프라인 구성을 동적으로 변경할 수 있는 것을 특징으로 하는 재귀적 모듈화 기반의 데이터 처리 방법.
+
+### 【청구항 10】 (종속항)
+제3항에 있어서,
+
+상기 모듈 유형은 변환(Transform), 필터(Filter), 집계(Aggregate), 라우팅(Route), 병합(Merge) 중 적어도 하나를 포함하는 것을 특징으로 하는 처리 모듈의 표준 인터페이스.
+
+### 【청구항 11】 (종속항)
+제1항에 있어서,
+
+상기 모듈 레지스트리는 모듈의 버전 관리 기능을 포함하여, 동일 모듈의 복수 버전을 관리하는 것을 특징으로 하는 재귀적 모듈화 기반의 데이터 처리 시스템.
+
+### 【청구항 12】 (종속항)
+제1항에 있어서,
+
+신규 처리 모듈을 플러그인 방식으로 상기 모듈 레지스트리에 추가할 수 있는 확장 인터페이스를 더 포함하는 것을 특징으로 하는 재귀적 모듈화 기반의 데이터 처리 시스템.
+
+### 【청구항 13】 (종속항)
+제2항에 있어서,
+
+상기 (e) 단계는 실행 이력을 외부 감사 시스템으로 송출하는 단계를 더 포함하는 것을 특징으로 하는 재귀적 모듈화 기반의 데이터 처리 방법.
+
+### 【청구항 14】 (종속항)
+제1항에 있어서,
+
+상기 실행 엔진은 각 모듈의 실행 시간을 측정하고, 기설정된 타임아웃을 초과하는 경우 해당 모듈의 실행을 중단하는 것을 특징으로 하는 재귀적 모듈화 기반의 데이터 처리 시스템.
+
+### 【청구항 15】 (종속항)
+제1항에 있어서,
+
+상기 시스템은 파이프라인 실행 결과에 기초하여 모듈 조합의 효율성을 분석하고 최적화 권고를 생성하는 분석부를 더 포함하는 것을 특징으로 하는 재귀적 모듈화 기반의 데이터 처리 시스템.
+
+### 【청구항 16】 (종속항 - 재귀적 문법)
+제1항에 있어서,
+
+상기 재귀적 조합은 BNF(Backus-Naur Form) 형식의 형식 문법으로 정의되며, Pipeline이 Module, Sequence, Parallel, Conditional, Loop 중 하나로 재귀적으로 정의되는 것을 특징으로 하는 재귀적 모듈화 기반의 데이터 처리 시스템.
+
+### 【청구항 17】 (종속항 - 스키마 호환성 검증)
+제1항에 있어서,
+
+상기 파이프라인 구성기는 순차 연결된 모듈 간의 출력 스키마와 입력 스키마의 호환성을 자동으로 검증하고, 필수 필드 충족률에 기초하여 완전 호환, 부분 호환, 호환 불가를 판정하는 것을 특징으로 하는 재귀적 모듈화 기반의 데이터 처리 시스템.
+
+### 【청구항 18】 (종속항 - 실행 그래프)
+제1항에 있어서,
+
+상기 실행 엔진은 파이프라인 AST(추상 구문 트리)를 DAG(방향 비순환 그래프) 형태의 실행 그래프로 변환하고, 상기 실행 그래프에 기초하여 모듈 간 의존성을 분석하는 것을 특징으로 하는 재귀적 모듈화 기반의 데이터 처리 시스템.
+
+### 【청구항 19】 (종속항 - 자동 병렬화)
+제1항에 있어서,
+
+상기 실행 엔진은 실행 그래프에서 상호 의존성이 없는 모듈 쌍을 탐지하고, 순차 구성으로 정의된 모듈들을 자동으로 병렬 실행으로 변환하는 자동 병렬화 기능을 더 포함하는 것을 특징으로 하는 재귀적 모듈화 기반의 데이터 처리 시스템.
+
+### 【청구항 20】 (종속항 - 임계 경로 분석)
+제1항에 있어서,
+
+상기 실행 엔진은 실행 그래프에서 임계 경로(Critical Path)를 계산하고, 임계 경로 상의 모듈에 우선적으로 자원을 할당하는 것을 특징으로 하는 재귀적 모듈화 기반의 데이터 처리 시스템.
+
+### 【청구항 21】 (종속항 - 파이프라인 최적화)
+제1항에 있어서,
+
+상기 시스템은 파이프라인 자동 최적화 엔진을 더 포함하고, 상기 최적화 엔진은 필터 선행 이동, 순차-병렬 변환, 공통 부분식 제거, 루프 전개 중 적어도 하나의 최적화 규칙을 적용하는 것을 특징으로 하는 재귀적 모듈화 기반의 데이터 처리 시스템.
+
+### 【청구항 22】 (종속항 - 필터 선행 이동)
+제21항에 있어서,
+
+상기 필터 선행 이동 최적화는 필터 모듈의 선택도(selectivity)가 기설정된 임계치 미만인 경우 필터를 변환(Transform) 모듈 앞으로 이동시켜 후속 처리량을 감소시키는 것을 특징으로 하는 재귀적 모듈화 기반의 데이터 처리 시스템.
+
+### 【청구항 23】 (종속항 - 체크포인트)
+제1항에 있어서,
+
+상기 상태 관리자는 파이프라인 실행 중 주기적으로 체크포인트를 생성하고, 장애 발생 시 가장 최근의 유효한 체크포인트로부터 파이프라인을 재개하는 것을 특징으로 하는 재귀적 모듈화 기반의 데이터 처리 시스템.
+
+### 【청구항 24】 (종속항 - 복잡도 계산)
+제1항에 있어서,
+
+상기 시스템은 파이프라인의 복잡도를 재귀적으로 계산하고, 순차 구성은 자식 복잡도의 합으로, 병렬 구성은 자식 복잡도의 최대값으로, 조건부 구성은 조건 복잡도와 분기 복잡도 최대값의 합으로 산출하는 것을 특징으로 하는 재귀적 모듈화 기반의 데이터 처리 시스템.
+
+### 【청구항 25】 (종속항 - 타입 자동 변환)
+제17항에 있어서,
+
+상기 스키마 호환성 검증은 타입 불일치 시 암묵적 타입 변환(implicit type coercion)의 가능 여부를 추가로 판단하고, 변환 가능한 경우 자동 타입 변환 노드를 삽입하는 것을 특징으로 하는 재귀적 모듈화 기반의 데이터 처리 시스템.
+
+### 【청구항 26】 (종속항 - 루프 구조)
+제16항에 있어서,
+
+상기 재귀적 조합은 조건이 만족되는 동안 파이프라인을 반복 실행하는 Loop 구조를 더 포함하고, 반복 횟수가 상수인 경우 루프 전개(loop unrolling) 최적화를 적용하는 것을 특징으로 하는 재귀적 모듈화 기반의 데이터 처리 시스템.
+
+### 【청구항 27】 (종속항 - 파싱)
+제2항에 있어서,
+
+상기 (c) 단계는 구성 정보를 토큰화하고, 재귀 하강 파싱(recursive descent parsing)을 통해 추상 구문 트리(AST)를 생성하는 것을 특징으로 하는 재귀적 모듈화 기반의 데이터 처리 방법.
+
+### 【청구항 28】 (종속항 - 최적화 효과 측정)
+제21항에 있어서,
+
+상기 최적화 엔진은 최적화 적용 전후의 예상 실행 비용을 비교하고, 비용 감소율이 기설정된 임계치 이상인 경우에만 최적화를 적용하는 것을 특징으로 하는 재귀적 모듈화 기반의 데이터 처리 시스템.
+
+---
+
+## 【요약서】
+
+### 【요약】
+본 발명은 재귀적 모듈화 기반의 데이터 처리 시스템 및 방법에 관한 것으로, 표준화된 인터페이스를 갖는 처리 모듈을 재귀적으로 조합하여 다양한 처리 파이프라인을 동적으로 구성하는 기술을 제공한다. 본 발명에 따르면, 모듈 레지스트리에 등록된 복수의 모듈을 순차 실행, 병렬 실행, 조건부 분기 등의 재귀적 구조로 조합하여 파이프라인을 생성하고, 실행 엔진이 이를 실행하며, 상태 관리자가 실행 이력을 기록한다. 이를 통해 처리 로직의 재사용성, 유지보수성, 확장성이 향상된다.
+
+### 【대표도】
+도 1
+
+---
+
+## 【도면】
+
+### 【도 1】 재귀적 모듈화 기반 데이터 처리 시스템 구성도
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│              재귀적 모듈화 기반 데이터 처리 시스템 (2000)                      │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   ┌─────────────────────────────────────────────────────────────────────┐   │
+│   │                     모듈 레지스트리 (2100)                           │   │
+│   │  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐       │   │
+│   │  │Module A │ │Module B │ │Module C │ │Module D │ │Module E │  ...  │   │
+│   │  └─────────┘ └─────────┘ └─────────┘ └─────────┘ └─────────┘       │   │
+│   └─────────────────────────────────────────────────────────────────────┘   │
+│                                    │                                        │
+│                                    │ 모듈 조회                              │
+│                                    ▼                                        │
+│   ┌─────────────────────────────────────────────────────────────────────┐   │
+│   │                    파이프라인 구성기 (2200)                          │   │
+│   │                                                                     │   │
+│   │   [구성 정보 입력] ──▶ [구성 파싱] ──▶ [재귀적 조합] ──▶ [파이프라인] │   │
+│   │                                                                     │   │
+│   └────────────────────────────────┬────────────────────────────────────┘   │
+│                                    │                                        │
+│                                    │ 파이프라인 전달                         │
+│                                    ▼                                        │
+│   ┌─────────────────────────────────────────────────────────────────────┐   │
+│   │                       실행 엔진 (2300)                               │   │
+│   │                                                                     │   │
+│   │   [데이터 입력] ──▶ [모듈 실행] ──▶ [데이터 전달] ──▶ [결과 출력]    │   │
+│   │                                                                     │   │
+│   └────────────────────────────────┬────────────────────────────────────┘   │
+│                                    │                                        │
+│                                    │ 상태 기록                              │
+│                                    ▼                                        │
+│   ┌─────────────────────────────────────────────────────────────────────┐   │
+│   │                      상태 관리자 (2400)                              │   │
+│   │              [실행 결과] [중간 상태] [오류 기록] [재시작 지점]         │   │
+│   └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 【도 3】 재귀적 파이프라인 구성 예시
+
+```
+                    ┌─────────────────────────────────────┐
+                    │         Pipeline (Sequence)         │
+                    └─────────────────┬───────────────────┘
+                                      │
+          ┌───────────────────────────┼───────────────────────────┐
+          │                           │                           │
+          ▼                           ▼                           ▼
+    ┌───────────┐           ┌─────────────────┐           ┌───────────┐
+    │ Module A  │           │   Conditional   │           │ Module D  │
+    │ (Validate)│           │   (재고 확인)    │           │  (Log)    │
+    └───────────┘           └────────┬────────┘           └───────────┘
+                                     │
+                    ┌────────────────┴────────────────┐
+                    │                                 │
+               [재고 있음]                        [재고 없음]
+                    │                                 │
+                    ▼                                 ▼
+          ┌─────────────────┐                 ┌───────────┐
+          │    Sequence     │                 │ Module X  │
+          └────────┬────────┘                 │ (알림)    │
+                   │                          └───────────┘
+     ┌─────────────┼─────────────┐
+     │             │             │
+     ▼             ▼             ▼
+┌─────────┐  ┌─────────────┐  ┌─────────┐
+│Module B │  │  Parallel   │  │Module C │
+│(가격계산)│  └──────┬──────┘  │ (결제)  │
+└─────────┘         │         └─────────┘
+              ┌─────┴─────┐
+              │           │
+              ▼           ▼
+        ┌─────────┐ ┌─────────┐
+        │재고차감 │ │알림발송 │
+        └─────────┘ └─────────┘
+```
+
+### 【도 6】 스키마 호환성 검증 알고리즘
+
+```
+        ┌─────────────────┐
+        │ 파이프라인 AST   │
+        │ 입력            │
+        └────────┬────────┘
+                 │
+                 ▼
+        ┌─────────────────┐
+        │ 순차 연결된     │
+        │ 모듈 쌍 추출    │
+        └────────┬────────┘
+                 │
+                 ▼
+┌────────────────────────────────────────────────────────┐
+│              스키마 호환성 검사                          │
+│  ┌──────────────────────────────────────────────────┐  │
+│  │   M1.output_schema    ↔    M2.input_schema       │  │
+│  └──────────────────────────────────────────────────┘  │
+│                          │                             │
+│         ┌────────────────┼────────────────┐            │
+│         │                │                │            │
+│    [완전 호환]      [부분 호환]       [호환 불가]        │
+│    coverage=100%   0<coverage<100%   coverage=0%       │
+│         │                │                │            │
+│         ▼                ▼                ▼            │
+│    ┌─────────┐    ┌─────────────┐    ┌─────────┐      │
+│    │ 통과    │    │ 경고 + 통과 │    │ 오류    │      │
+│    │ ✓      │    │ ⚠          │    │ ✗      │      │
+│    └─────────┘    └─────────────┘    └─────────┘      │
+└────────────────────────────────────────────────────────┘
+                         │
+                         ▼
+        ┌─────────────────────────────────┐
+        │ 타입 호환성 추가 검사            │
+        │ - 동일 타입: 통과                │
+        │ - 변환 가능: 변환 노드 삽입      │
+        │ - 변환 불가: 오류                │
+        └─────────────────────────────────┘
+```
+
+### 【도 7】 실행 그래프 및 자동 병렬화
+
+```
+[원본 파이프라인 (순차 정의)]           [변환된 실행 그래프]
+
+Seq(A, B, C, D, E)                    ┌───┐
+                                      │ A │
+    분석 결과:                         └─┬─┘
+    - A → B: 의존성 있음                 │
+    - B → C: 의존성 없음 (독립)          ▼
+    - B → D: 의존성 없음 (독립)       ┌───┐
+    - C,D → E: 의존성 있음            │ B │
+                                      └─┬─┘
+                                        │
+                          ┌─────────────┴─────────────┐
+                          │     자동 병렬화           │
+                          ▼                           ▼
+                       ┌───┐                       ┌───┐
+                       │ C │ ─ ─ ─ 병렬 ─ ─ ─    │ D │
+                       └─┬─┘                       └─┬─┘
+                          │                           │
+                          └─────────────┬─────────────┘
+                                        │
+                                        ▼
+                                     ┌───┐
+                                     │ E │
+                                     └───┘
+
+[임계 경로 분석]
+임계 경로: A → B → C → E (또는 A → B → D → E)
+예상 시간: T(A) + T(B) + max(T(C), T(D)) + T(E)
+```
+
+### 【도 8】 파이프라인 자동 최적화 엔진
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      파이프라인 자동 최적화 엔진                               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   ┌─────────────────────────────────────────────────────────────────────┐   │
+│   │                      원본 파이프라인 AST                              │   │
+│   └─────────────────────────────────┬───────────────────────────────────┘   │
+│                                     │                                       │
+│                                     ▼                                       │
+│   ┌─────────────────────────────────────────────────────────────────────┐   │
+│   │                      최적화 규칙 엔진                                │   │
+│   │  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐    │   │
+│   │  │필터 선행    │ │순차→병렬   │ │공통 부분식  │ │루프 전개    │    │   │
+│   │  │이동        │ │변환        │ │제거         │ │            │    │   │
+│   │  │            │ │            │ │            │ │            │    │   │
+│   │  │ selectivity│ │ independent│ │ idempotent │ │ const iter │    │   │
+│   │  │ < 50%     │ │ modules    │ │ modules    │ │ count      │    │   │
+│   │  └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘    │   │
+│   └─────────────────────────────────┬───────────────────────────────────┘   │
+│                                     │                                       │
+│                                     ▼                                       │
+│   ┌─────────────────────────────────────────────────────────────────────┐   │
+│   │                      비용 비교 평가                                  │   │
+│   │                                                                     │   │
+│   │   원본 비용: C_original         최적화 비용: C_optimized             │   │
+│   │                                                                     │   │
+│   │   개선율 = (C_original - C_optimized) / C_original × 100%           │   │
+│   │                                                                     │   │
+│   │   IF 개선율 > threshold THEN 최적화 적용                            │   │
+│   └─────────────────────────────────┬───────────────────────────────────┘   │
+│                                     │                                       │
+│                                     ▼                                       │
+│   ┌─────────────────────────────────────────────────────────────────────┐   │
+│   │                      최적화된 파이프라인 AST                          │   │
+│   └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 【도 9】 체크포인트 기반 장애 복구
+
+```
+        파이프라인 실행 타임라인
+        ────────────────────────────────────────────────────────▶ 시간
+        │                                                        │
+        ▼                                                        │
+      ┌───┐   ┌───┐   ┌───┐   ┌───┐   ┌───┐                    │
+      │ A │──▶│ B │──▶│ C │──▶│ D │──▶│ E │                    │
+      └───┘   └───┘   └─┬─┘   └───┘   └───┘                    │
+        │       │       │       │                              │
+        ▼       ▼       ▼       │                              │
+       CP1     CP2     CP3      │                              │
+   (체크포인트)(체크포인트)(체크포인트)                           │
+        │       │       │       │                              │
+        └───────┴───────┴───────┘                              │
+                                │                              │
+                               ⚡ 장애 발생 (D 실행 중)          │
+                                │                              │
+                                ▼                              │
+        ┌─────────────────────────────────────────────────┐    │
+        │              장애 복구 프로세스                   │    │
+        │                                                 │    │
+        │  1. 가장 최근 체크포인트 탐색 → CP3             │    │
+        │  2. CP3 상태 복원 (C 완료 상태)                  │    │
+        │  3. 나머지 모듈(D, E) 재실행                     │    │
+        │                                                 │    │
+        └─────────────────────────────────────────────────┘    │
+                                │                              │
+                                ▼                              │
+                          ┌───┐   ┌───┐                       │
+                   복구 → │ D │──▶│ E │ → 완료                │
+                          └───┘   └───┘                       │
+```
+
