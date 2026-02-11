@@ -94,6 +94,77 @@ Pipeline = Module | Sequence(Pipeline, Pipeline, ...) | Parallel(Pipeline, Pipel
 - Parallel: 병렬로 실행되는 파이프라인의 분기
 - Conditional: 조건에 따라 분기되는 파이프라인
 
+본 발명의 핵심적 차별화 요소인 재귀적 파이프라인 문법은 다음의 수학적 정의를 갖는다:
+
+**[수학식 1] 재귀적 파이프라인 문법 (BNF 형식)**
+```
+<Pipeline>     ::= <Module> | <Composite>
+<Composite>    ::= <Sequence> | <Parallel> | <Conditional> | <Loop>
+<Sequence>     ::= "Seq(" <Pipeline> {"," <Pipeline>}* ")"
+<Parallel>     ::= "Par(" <Pipeline> {"," <Pipeline>}* ")"
+<Conditional>  ::= "Cond(" <Condition> "," <Pipeline> "," <Pipeline> ")"
+<Loop>         ::= "Loop(" <Condition> "," <Pipeline> ")"
+<Condition>    ::= <Expression> | <Module>
+```
+
+**[수학식 2] 파이프라인 스키마 호환성 검증**
+```
+스키마 호환성 함수: Compatible(S_out, S_in) → {TRUE, FALSE, PARTIAL}
+
+Compatible(S₁, S₂) = 
+    TRUE     if S₁ ⊇ S₂ (S₁이 S₂의 모든 필드를 포함)
+    PARTIAL  if S₁ ∩ S₂ ≠ ∅ (공통 필드 존재)
+    FALSE    if S₁ ∩ S₂ = ∅ (공통 필드 없음)
+
+순차 연결 검증:
+Seq(M₁, M₂)가 유효 ⟺ Compatible(M₁.output_schema, M₂.input_schema) ∈ {TRUE, PARTIAL}
+```
+
+**[수학식 3] 파이프라인 복잡도 계산**
+```
+복잡도 함수: C(P) → ℕ
+
+C(Module) = 1
+C(Seq(P₁, ..., Pₙ)) = Σᵢ C(Pᵢ)
+C(Par(P₁, ..., Pₙ)) = max(C(Pᵢ)) (병렬이므로 최대값)
+C(Cond(c, P₁, P₂)) = C(c) + max(C(P₁), C(P₂))
+C(Loop(c, P)) = C(c) + k × C(P) (k: 예상 반복 횟수)
+```
+
+**[수학식 4] 실행 그래프 생성 및 의존성 분석**
+```
+실행 그래프: G = (V, E)
+V = {모든 Module 노드}
+E = {(Mᵢ, Mⱼ) | Mⱼ가 Mᵢ의 출력을 입력으로 사용}
+
+병렬화 가능 집합: 
+Parallelizable(G) = {(Mᵢ, Mⱼ) | ¬∃ path(Mᵢ, Mⱼ) ∧ ¬∃ path(Mⱼ, Mᵢ)}
+
+임계 경로:
+CriticalPath(G) = argmax_path Σ_{M ∈ path} ExecutionTime(M)
+```
+
+**[수학식 5] 파이프라인 자동 최적화 규칙**
+```
+최적화 변환 규칙:
+
+규칙 1 (순차→병렬 변환):
+Seq(M₁, M₂) → Par(M₁, M₂) 
+    if Independent(M₁, M₂) ∧ ¬DataDependent(M₁, M₂)
+
+규칙 2 (필터 선행 이동):
+Seq(Transform, Filter) → Seq(Filter, Transform)
+    if Filter.selectivity < θ (선택도가 임계치 미만)
+
+규칙 3 (공통 부분식 제거):
+Seq(M, Seq(M, P)) → Seq(M, Cache(M), P)
+    if M이 멱등(idempotent)
+
+규칙 4 (루프 전개):
+Loop(c, P) → Seq(P, P, ..., P)
+    if 반복 횟수가 상수이고 n < loop_unroll_threshold
+```
+
 #### 【발명의 효과】
 본 발명에 따르면 다음과 같은 효과를 얻을 수 있다.
 
