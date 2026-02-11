@@ -262,6 +262,164 @@ V_synergy = α × Σᵢⱼ (1 - sim(sᵢ, sⱼ)) × min(V(sᵢ), V(sⱼ))
 
 가치 산출 엔진(1300)은 신호 객체에 대하여 기설정된 가치 산출 알고리즘을 적용한다. 가치 산출 알고리즘은 신호의 품질, 관련성, 시의성, 희소성 등 복수의 요소를 고려하여 정량화된 가치를 산출한다. 산출된 가치는 자산 객체(Asset Object)에 기록된다.
 
+#### [가치 산출 엔진 상세 알고리즘]
+
+가치 산출 엔진(1300)은 다음의 순차적 알고리즘을 실행한다:
+
+**[알고리즘 1] 신호 품질 평가**
+```
+입력: 신호 객체 s
+출력: 품질 점수 Q(s)
+
+1. 완전성 평가:
+   C(s) = count(non_null_required_fields) / count(required_fields)
+   
+2. 정확성 평가:
+   A(s) = count(valid_values) / count(all_values)
+   유효성 검사: 타입 일치, 범위 준수, 형식 적합
+   
+3. 신선도 평가:
+   Δt = current_time - s.timestamp
+   F(s) = exp(-λ × Δt)
+   λ = domain_specific_decay_rate (도메인별 설정)
+   
+4. 품질 점수 산출:
+   Q(s) = 0.3 × C(s) + 0.4 × A(s) + 0.3 × F(s)
+   
+5. 품질 임계치 검사:
+   IF Q(s) < Q_threshold THEN
+      flag_for_review(s)
+   RETURN Q(s)
+```
+
+**[알고리즘 2] 관련성 및 희소성 평가**
+```
+입력: 신호 객체 s, 대상 도메인 d, 신호 풀 S
+출력: 관련성 점수 R(s), 희소성 점수 Sc(s)
+
+1. 특징 벡터 추출:
+   V_s = extract_features(s)  // TF-IDF, 임베딩 등
+   V_d = get_domain_vector(d)
+   
+2. 관련성 산출 (코사인 유사도):
+   R(s) = dot(V_s, V_d) / (norm(V_s) × norm(V_d))
+   R(s) = (R(s) + 1) / 2  // 0~1 범위로 정규화
+   
+3. 유사 신호 탐색:
+   similar_count = 0
+   FOR each signal s' IN S DO
+      sim = cosine_similarity(V_s, V_s')
+      IF sim > similarity_threshold THEN
+         similar_count += 1
+   END FOR
+   
+4. 희소성 산출:
+   Sc(s) = 1 - (similar_count / |S|)
+   
+RETURN R(s), Sc(s)
+```
+
+**[알고리즘 3] 시의성 평가**
+```
+입력: 신호 객체 s, 관련 이벤트 목록 events
+출력: 시의성 점수 T(s)
+
+1. 관련 이벤트 탐색:
+   relevant_events = find_related_events(s, events)
+   
+2. IF relevant_events is empty THEN
+      t_event = current_time
+   ELSE
+      t_event = nearest_event_time(relevant_events)
+   END IF
+   
+3. 시간 거리 계산:
+   time_distance = |s.timestamp - t_event|
+   
+4. 시의성 산출 (시그모이드 기반):
+   T(s) = 1 / (1 + exp(α × (time_distance - t_peak)))
+   α = 0.1 (민감도 파라미터)
+   t_peak = domain_optimal_window (도메인별 최적 윈도우)
+   
+RETURN T(s)
+```
+
+**[알고리즘 4] 종합 가치 산출 및 자산 생성**
+```
+입력: 신호 객체 s (또는 복수 신호 {s₁, ..., sₙ})
+출력: 자산 객체 AO
+
+1. 개별 요소 점수 수집:
+   Q = quality_score(s)
+   R = relevance_score(s)
+   Sc = scarcity_score(s)
+   T = timeliness_score(s)
+   
+2. 종합 가치 산출:
+   V_total = (w₁×Q + w₂×R + w₃×Sc + w₄×T)^γ
+   w = [0.25, 0.30, 0.20, 0.25]  // 기본 가중치
+   γ = 1.0  // 비선형 조정 계수
+   
+3. 영역별 가치 분배:
+   FOR each domain d IN target_domains DO
+      V_domain[d] = V_total × base_ratio[d] × R(s, d)
+   END FOR
+   normalize(V_domain)  // 합이 V_total이 되도록
+   
+4. 복수 신호 시너지 (해당 시):
+   IF |signals| > 1 THEN
+      V_synergy = calculate_synergy(signals)
+      V_total += V_synergy
+   END IF
+   
+5. 신뢰도 산출:
+   Conf = min(Q, data_consistency, model_agreement)
+   
+6. 유효 기간 산출:
+   T_valid = T_base × (1 + 0.5 × Sc) × F(s)
+   
+7. 자산 객체 생성:
+   AO = {
+      asset_id: generate_uuid(),
+      source_signals: [s.signal_id, ...],
+      value_vector: V_domain,
+      total_value: V_total,
+      confidence: Conf,
+      creation_timestamp: now(),
+      validity_period: T_valid
+   }
+   
+RETURN AO
+```
+
+**[알고리즘 5] 가치 재평가 (시간 경과 후)**
+```
+입력: 기존 자산 객체 AO, 현재 시점 t_now
+출력: 갱신된 가치 V_updated
+
+1. 경과 시간 계산:
+   Δt = t_now - AO.creation_timestamp
+   
+2. 시간 감쇠 적용:
+   decay_factor = exp(-λ_asset × Δt)
+   
+3. 가치 갱신:
+   V_updated = AO.total_value × decay_factor
+   
+4. 유효 기간 검사:
+   IF t_now > AO.creation_timestamp + AO.validity_period THEN
+      mark_as_expired(AO)
+      V_updated = 0
+   END IF
+   
+5. 컨텍스트 변화 반영 (선택적):
+   IF context_changed() THEN
+      V_updated = recalculate_with_new_context(AO)
+   END IF
+   
+RETURN V_updated
+```
+
 출력 어댑터 계층(1400)은 자산 객체를 요청된 출력 형태로 변환한다. 출력 형태는 대시보드, API 응답, 리포트, 알림, 제어 명령 등 다양할 수 있으며, 이는 사용자 요구에 따라 결정되는 사항이다.
 
 무결성 관리부(1500)는 전체 처리 과정의 무결성을 검증하고, 처리 이력을 불변 기록(Immutable Log)으로 저장한다.
