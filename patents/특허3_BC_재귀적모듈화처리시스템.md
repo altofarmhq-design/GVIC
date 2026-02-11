@@ -205,6 +205,111 @@ Sequence(
 
 이 구성에서 복수의 데이터 소스로부터의 추출이 병렬로 실행되고, 추출된 데이터는 병합 후 순차적으로 처리된다.
 
+#### [실시예 3: 헬스케어 환자 진료 파이프라인]
+
+본 실시예에서 재귀적 모듈화 시스템은 병원의 환자 진료 프로세스에 적용된다.
+
+다음의 처리 모듈이 모듈 레지스트리에 등록된다:
+- PatientRegistration: 환자 등록 및 본인 확인
+- TriageAssessment: 응급도 평가 (중증도 분류)
+- VitalSignCollection: 바이탈 사인 수집
+- DiagnosticOrder: 검사 처방
+- LabTestProcess: 검사 실행 및 결과 수신
+- DiagnosisSupport: AI 기반 진단 보조
+- TreatmentPlan: 치료 계획 수립
+- PrescriptionProcess: 처방 및 투약
+- DischargeProcess: 퇴원/다음 방문 예약
+- BillingProcess: 수가 산정 및 청구
+
+파이프라인은 다음과 같이 구성된다:
+
+```
+Sequence(
+    PatientRegistration,
+    TriageAssessment,
+    Conditional(
+        is_emergency,
+        Sequence(
+            Parallel(
+                VitalSignCollection,
+                DiagnosticOrder
+            ),
+            LabTestProcess,
+            DiagnosisSupport,
+            TreatmentPlan
+        ),
+        Sequence(
+            VitalSignCollection,
+            DiagnosisSupport,
+            TreatmentPlan
+        )
+    ),
+    PrescriptionProcess,
+    Parallel(
+        DischargeProcess,
+        BillingProcess
+    )
+)
+```
+
+이 구성에서 응급 환자와 일반 환자의 진료 흐름이 조건부로 분기되고, 퇴원 처리와 수납이 병렬로 실행된다.
+
+새로운 요구사항(예: 원격 진료)이 추가되면, TelemedicineModule을 추가하고 파이프라인 구성만 변경하면 된다.
+
+#### [실시예 4: 물류 주문-배송 파이프라인]
+
+본 실시예에서 재귀적 모듈화 시스템은 물류 기업의 주문-배송 프로세스에 적용된다.
+
+다음의 처리 모듈이 모듈 레지스트리에 등록된다:
+- OrderReceive: 주문 수신 및 검증
+- InventoryCheck: 재고 확인 및 할당
+- WarehouseSelect: 최적 출고 창고 선택
+- PickingAssign: 피킹 작업 할당
+- PackingProcess: 포장 처리
+- LabelGenerate: 송장/라벨 생성
+- CarrierSelect: 배송사 선택
+- DispatchProcess: 출고 처리
+- TrackingUpdate: 배송 추적 업데이트
+- DeliveryConfirm: 배송 완료 확인
+- ReturnProcess: 반품 처리
+
+파이프라인은 다음과 같이 구성된다:
+
+```
+Sequence(
+    OrderReceive,
+    InventoryCheck,
+    Conditional(
+        stock_available,
+        Sequence(
+            WarehouseSelect,
+            PickingAssign,
+            PackingProcess,
+            Parallel(
+                LabelGenerate,
+                CarrierSelect
+            ),
+            DispatchProcess,
+            TrackingUpdate,
+            DeliveryConfirm
+        ),
+        Sequence(
+            BackorderProcess,
+            CustomerNotify
+        )
+    ),
+    Conditional(
+        return_requested,
+        ReturnProcess,
+        CompleteOrder
+    )
+)
+```
+
+이 구성에서 재고 유무에 따라 정상 출고와 백오더 처리가 분기되고, 송장 생성과 배송사 선택이 병렬로 실행된다.
+
+주문량 급증 시, 시스템은 동일한 파이프라인을 복수의 실행 인스턴스로 병렬 처리하여 확장성을 확보한다.
+
 #### [입출력 어댑터에 관한 사항]
 
 본 발명의 입력 데이터 형태 및 출력 형태는 운영 환경에 따라 다양하게 구성될 수 있으며, 이는 본 발명의 핵심 기술적 특징인 "모듈 표준화 → 재귀적 조합 → 동적 실행"의 프로세스를 벗어나지 않는 범위에서 운영상 결정되는 사항이다.
