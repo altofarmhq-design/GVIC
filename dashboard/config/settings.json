@@ -1,0 +1,32 @@
+{
+  "project": {
+    "name": "GVIC 통합 시스템",
+    "version": "1.0.0",
+    "description": "결이론 기반 6개 특허 통합 플랫폼"
+  },
+  "sigma": {
+    "values": [0.5, 0.3, 0.2],
+    "labels": ["공공(V_pub)", "생산(V_pro)", "개인(V_ind)"]
+  },
+  "omega": {
+    "V_pub_min": 0.2,
+    "V_pub_max": 0.8,
+    "V_ind_max": 0.5,
+    "sum_constraint": 1.0
+  },
+  "patents": {
+    "1": {"id": "H", "name": "전역 수렴 제어 시스템", "status": "pending"},
+    "2": {"id": "AEG", "name": "신호 자산화 플랫폼", "status": "pending"},
+    "3": {"id": "BC", "name": "재귀적 모듈화 시스템", "status": "pending"},
+    "4": {"id": "DI", "name": "비적합 데이터 자산화", "status": "pending"},
+    "5": {"id": "F", "name": "가중 분배 모델", "status": "pending"},
+    "6": {"id": "J", "name": "다중 도메인 통합 인터페이스", "status": "pending"}
+  },
+  "phases": {
+    "1": {"name": "환경 구축", "status": "in_progress", "progress": 50},
+    "2": {"name": "대시보드 생성", "status": "in_progress", "progress": 0},
+    "3": {"name": "코어 엔진 구현", "status": "pending", "progress": 0},
+    "4": {"name": "입출력 UI", "status": "pending", "progress": 0},
+    "5": {"name": "통합 테스트", "status": "pending", "progress": 0}
+  }
+}
