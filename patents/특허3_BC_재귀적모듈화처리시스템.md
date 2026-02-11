@@ -213,6 +213,262 @@ Loop(c, P) → Seq(P, P, ..., P)
 
 상태 관리자(2400)는 각 모듈의 실행 결과, 처리 시간, 오류 발생 여부 등을 기록한다. 또한 파이프라인 전체의 실행 상태를 추적하여, 장애 발생 시 재시작 지점을 결정할 수 있다.
 
+#### [핵심 알고리즘 상세]
+
+본 발명의 차별화된 핵심 알고리즘은 다음과 같다:
+
+**[알고리즘 1] 파이프라인 파싱 및 AST 생성**
+```
+입력: 파이프라인 구성 문자열 (JSON/YAML/DSL)
+출력: 추상 구문 트리 (AST)
+
+1. 토큰화 (Tokenize):
+   tokens = lexer(config_string)
+   
+2. 구문 분석 (Parse):
+   FUNCTION parse_pipeline(tokens):
+       token = tokens.peek()
+       
+       IF token.type == MODULE_REF THEN
+           RETURN parse_module(tokens)
+       ELSE IF token.type == "Seq" THEN
+           RETURN parse_sequence(tokens)
+       ELSE IF token.type == "Par" THEN
+           RETURN parse_parallel(tokens)
+       ELSE IF token.type == "Cond" THEN
+           RETURN parse_conditional(tokens)
+       ELSE IF token.type == "Loop" THEN
+           RETURN parse_loop(tokens)
+       END IF
+   END FUNCTION
+   
+3. 재귀적 파싱:
+   FUNCTION parse_sequence(tokens):
+       expect(tokens, "Seq(")
+       children = []
+       WHILE tokens.peek() != ")" DO
+           children.append(parse_pipeline(tokens))
+           skip_if(tokens, ",")
+       END WHILE
+       expect(tokens, ")")
+       RETURN SequenceNode(children)
+   END FUNCTION
+
+4. AST 반환:
+   RETURN parse_pipeline(tokens)
+```
+
+**[알고리즘 2] 스키마 호환성 자동 검증**
+```
+입력: 파이프라인 AST
+출력: 검증 결과 (VALID, INVALID, WARNING) + 불일치 목록
+
+1. 순차 연결 검증:
+   FUNCTION validate_sequence(seq_node):
+       errors = []
+       FOR i = 0 TO len(seq_node.children) - 2 DO
+           M1 = seq_node.children[i]
+           M2 = seq_node.children[i + 1]
+           
+           out_schema = get_output_schema(M1)
+           in_schema = get_input_schema(M2)
+           
+           compatibility = check_compatibility(out_schema, in_schema)
+           
+           IF compatibility == FALSE THEN
+               errors.append(SchemaError(M1, M2, "호환 불가"))
+           ELSE IF compatibility == PARTIAL THEN
+               warnings.append(SchemaWarning(M1, M2, "부분 호환"))
+           END IF
+       END FOR
+       RETURN errors
+   END FUNCTION
+
+2. 스키마 호환성 계산:
+   FUNCTION check_compatibility(S_out, S_in):
+       required_fields = S_in.required_fields
+       provided_fields = S_out.all_fields
+       
+       coverage = |required_fields ∩ provided_fields| / |required_fields|
+       
+       IF coverage == 1.0 THEN
+           RETURN TRUE
+       ELSE IF coverage > 0 THEN
+           RETURN PARTIAL
+       ELSE
+           RETURN FALSE
+       END IF
+   END FUNCTION
+
+3. 타입 호환성 검증:
+   FUNCTION check_type_compatibility(field1, field2):
+       IF field1.type == field2.type THEN
+           RETURN TRUE
+       ELSE IF is_coercible(field1.type, field2.type) THEN
+           RETURN TRUE (with implicit conversion)
+       ELSE
+           RETURN FALSE
+       END IF
+   END FUNCTION
+```
+
+**[알고리즘 3] 실행 그래프 생성 및 병렬화 분석**
+```
+입력: 파이프라인 AST
+출력: 실행 그래프 G = (V, E), 병렬화 계획
+
+1. AST → DAG 변환:
+   FUNCTION ast_to_dag(ast_node):
+       IF ast_node is ModuleNode THEN
+           RETURN create_vertex(ast_node)
+       ELSE IF ast_node is SequenceNode THEN
+           vertices = [ast_to_dag(child) FOR child IN ast_node.children]
+           FOR i = 0 TO len(vertices) - 2 DO
+               add_edge(vertices[i], vertices[i+1])
+           END FOR
+           RETURN vertices
+       ELSE IF ast_node is ParallelNode THEN
+           fork = create_fork_vertex()
+           join = create_join_vertex()
+           FOR child IN ast_node.children DO
+               branch = ast_to_dag(child)
+               add_edge(fork, branch.first)
+               add_edge(branch.last, join)
+           END FOR
+           RETURN (fork, join)
+       END IF
+   END FUNCTION
+
+2. 의존성 분석:
+   FUNCTION analyze_dependencies(G):
+       FOR each vertex v IN G.vertices DO
+           v.dependencies = find_predecessors(G, v)
+           v.dependents = find_successors(G, v)
+       END FOR
+   END FUNCTION
+
+3. 병렬화 가능 영역 탐지:
+   FUNCTION find_parallelizable_regions(G):
+       independent_sets = []
+       FOR each pair (v1, v2) IN G.vertices DO
+           IF NOT has_path(G, v1, v2) AND NOT has_path(G, v2, v1) THEN
+               IF v1.output ∩ v2.input == ∅ THEN
+                   add_to_independent_set(independent_sets, v1, v2)
+               END IF
+           END IF
+       END FOR
+       RETURN independent_sets
+   END FUNCTION
+
+4. 임계 경로 계산:
+   FUNCTION calculate_critical_path(G):
+       // 동적 프로그래밍으로 최장 경로 계산
+       FOR each vertex v in topological_order(G) DO
+           v.earliest_start = max(pred.earliest_finish FOR pred IN v.dependencies)
+           v.earliest_finish = v.earliest_start + v.estimated_time
+       END FOR
+       RETURN reconstruct_path(G)
+   END FUNCTION
+```
+
+**[알고리즘 4] 파이프라인 자동 최적화**
+```
+입력: 원본 파이프라인 AST
+출력: 최적화된 파이프라인 AST
+
+1. 최적화 규칙 적용:
+   FUNCTION optimize(ast):
+       changed = TRUE
+       WHILE changed DO
+           changed = FALSE
+           ast, c1 = apply_filter_pushdown(ast)
+           ast, c2 = apply_parallel_conversion(ast)
+           ast, c3 = apply_common_subexpression_elimination(ast)
+           ast, c4 = apply_loop_unrolling(ast)
+           changed = c1 OR c2 OR c3 OR c4
+       END WHILE
+       RETURN ast
+   END FUNCTION
+
+2. 필터 선행 이동 (Filter Pushdown):
+   FUNCTION apply_filter_pushdown(ast):
+       IF ast is Seq(Transform, Filter) THEN
+           IF filter.selectivity < 0.5 THEN  // 50% 미만만 통과
+               // Filter를 앞으로 이동하여 Transform 처리량 감소
+               RETURN Seq(Filter, Transform), TRUE
+           END IF
+       END IF
+       RETURN ast, FALSE
+   END FUNCTION
+
+3. 순차→병렬 변환:
+   FUNCTION apply_parallel_conversion(ast):
+       IF ast is Seq(M1, M2) THEN
+           IF NOT data_dependent(M1, M2) AND NOT resource_conflict(M1, M2) THEN
+               RETURN Par(M1, M2), TRUE
+           END IF
+       END IF
+       RETURN ast, FALSE
+   END FUNCTION
+
+4. 최적화 효과 추정:
+   original_cost = estimate_cost(original_ast)
+   optimized_cost = estimate_cost(optimized_ast)
+   improvement = (original_cost - optimized_cost) / original_cost × 100%
+```
+
+**[알고리즘 5] 체크포인트 기반 장애 복구**
+```
+입력: 실행 중인 파이프라인, 장애 발생 지점
+출력: 복구된 파이프라인 상태
+
+1. 체크포인트 생성:
+   FUNCTION create_checkpoint(pipeline_state, module_id):
+       checkpoint = {
+           checkpoint_id: generate_uuid(),
+           timestamp: now(),
+           module_id: module_id,
+           completed_modules: pipeline_state.completed,
+           intermediate_data: serialize(pipeline_state.data),
+           pending_modules: pipeline_state.pending
+       }
+       persist(checkpoint)
+       RETURN checkpoint
+   END FUNCTION
+
+2. 장애 복구:
+   FUNCTION recover_from_failure(pipeline_id, failure_point):
+       // 가장 최근의 유효한 체크포인트 탐색
+       checkpoint = find_latest_valid_checkpoint(pipeline_id, failure_point)
+       
+       IF checkpoint is NULL THEN
+           // 처음부터 재실행
+           RETURN restart_from_beginning(pipeline_id)
+       END IF
+       
+       // 체크포인트로부터 상태 복원
+       restored_state = deserialize(checkpoint.intermediate_data)
+       remaining_modules = checkpoint.pending_modules
+       
+       // 재실행
+       RETURN resume_execution(restored_state, remaining_modules)
+   END FUNCTION
+
+3. 부분 재실행:
+   FUNCTION resume_execution(state, modules):
+       FOR module IN modules DO
+           result = execute_module(module, state.data)
+           IF result.success THEN
+               state.data = result.output
+               state.completed.append(module.id)
+               create_checkpoint(state, module.id)  // 주기적 체크포인트
+           ELSE
+               handle_module_failure(module, result.error)
+           END IF
+       END FOR
+   END FUNCTION
+```
+
 #### [실시예 1: 이커머스 주문 처리 파이프라인]
 
 본 실시예에서 재귀적 모듈화 시스템은 이커머스 플랫폼의 주문 처리에 적용된다.
