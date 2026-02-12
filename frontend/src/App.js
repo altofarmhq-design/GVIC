@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { 
   LayoutDashboard, Play, Database, Bell, Settings, 
-  Zap, RefreshCw, Network, Radio
+  Zap, RefreshCw, Network, Radio, Layers
 } from 'lucide-react';
 import { api } from "@/lib/api";
 import { 
@@ -14,7 +14,8 @@ import {
   DataTab, 
   AlertsTab, 
   SettingsTab,
-  MonitoringTab
+  MonitoringTab,
+  ModelsTab
 } from "@/components/tabs";
 
 function App() {
@@ -73,12 +74,15 @@ function App() {
       {/* Main Content */}
       <main className="container mx-auto px-6 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="bg-slate-800 border border-slate-700 mb-6" data-testid="main-tabs">
+          <TabsList className="bg-slate-800 border border-slate-700 mb-6 flex-wrap" data-testid="main-tabs">
             <TabsTrigger value="dashboard" className="data-[state=active]:bg-slate-700">
               <LayoutDashboard className="w-4 h-4 mr-2" /> 대시보드
             </TabsTrigger>
             <TabsTrigger value="processing" className="data-[state=active]:bg-slate-700">
               <Play className="w-4 h-4 mr-2" /> 처리
+            </TabsTrigger>
+            <TabsTrigger value="models" className="data-[state=active]:bg-slate-700">
+              <Layers className="w-4 h-4 mr-2" /> 모델
             </TabsTrigger>
             <TabsTrigger value="monitoring" className="data-[state=active]:bg-slate-700">
               <Radio className="w-4 h-4 mr-2" /> 모니터링
@@ -103,6 +107,10 @@ function App() {
 
           <TabsContent value="processing">
             <ProcessingTab onProcess={fetchData} />
+          </TabsContent>
+
+          <TabsContent value="models">
+            <ModelsTab onModelChange={fetchData} />
           </TabsContent>
 
           <TabsContent value="monitoring">
