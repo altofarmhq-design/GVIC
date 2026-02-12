@@ -1042,6 +1042,9 @@ function App() {
             <TabsTrigger value="processing" className="data-[state=active]:bg-slate-700">
               <Play className="w-4 h-4 mr-2" /> 처리
             </TabsTrigger>
+            <TabsTrigger value="integration" className="data-[state=active]:bg-slate-700">
+              <Network className="w-4 h-4 mr-2" /> 통합
+            </TabsTrigger>
             <TabsTrigger value="data" className="data-[state=active]:bg-slate-700">
               <Database className="w-4 h-4 mr-2" /> 데이터
             </TabsTrigger>
@@ -1059,6 +1062,10 @@ function App() {
 
           <TabsContent value="processing">
             <ProcessingTab onProcess={fetchData} />
+          </TabsContent>
+
+          <TabsContent value="integration">
+            <IntegrationTab onRefresh={fetchData} />
           </TabsContent>
 
           <TabsContent value="data">
