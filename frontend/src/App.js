@@ -85,6 +85,9 @@ function App() {
             <TabsTrigger value="models" className="data-[state=active]:bg-slate-700">
               <Layers className="w-4 h-4 mr-2" /> 모델
             </TabsTrigger>
+            <TabsTrigger value="prediction" className="data-[state=active]:bg-slate-700">
+              <Brain className="w-4 h-4 mr-2" /> 예측
+            </TabsTrigger>
             <TabsTrigger value="monitoring" className="data-[state=active]:bg-slate-700">
               <Radio className="w-4 h-4 mr-2" /> 모니터링
             </TabsTrigger>
