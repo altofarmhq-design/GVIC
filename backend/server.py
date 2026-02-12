@@ -1017,6 +1017,255 @@ async def delete_model(model_id: str):
     
     return {"success": True, "deleted_model_id": model_id}
 
+# ==================== Time Series Prediction APIs (시계열 예측 기반 사전 조정) ====================
+
+import numpy as np
+from collections import deque
+
+# 예측 데이터 저장소
+prediction_data = {
+    "history": deque(maxlen=100),  # 최근 100개 데이터 포인트
+    "predictions": [],
+    "last_prediction": None
+}
+
+class PredictionConfig(BaseModel):
+    window_size: int = 10  # 예측에 사용할 데이터 윈도우 크기
+    forecast_steps: int = 5  # 예측할 미래 스텝 수
+    confidence_threshold: float = 0.7  # 자동 조정 신뢰도 임계값
+    auto_adjust: bool = False  # 예측 기반 자동 조정 활성화
+
+prediction_config = {
+    "window_size": 10,
+    "forecast_steps": 5,
+    "confidence_threshold": 0.7,
+    "auto_adjust": False
+}
+
+def simple_moving_average_forecast(data: List[float], window: int, steps: int) -> List[float]:
+    """단순 이동 평균 기반 예측"""
+    if len(data) < window:
+        return [data[-1] if data else 0.0] * steps
+    
+    forecasts = []
+    recent = list(data[-window:])
+    
+    for _ in range(steps):
+        pred = sum(recent) / len(recent)
+        forecasts.append(pred)
+        recent.pop(0)
+        recent.append(pred)
+    
+    return forecasts
+
+def exponential_smoothing_forecast(data: List[float], alpha: float, steps: int) -> List[float]:
+    """지수 평활법 기반 예측"""
+    if not data:
+        return [0.0] * steps
+    
+    # 초기값
+    smoothed = data[0]
+    
+    # 지수 평활
+    for val in data[1:]:
+        smoothed = alpha * val + (1 - alpha) * smoothed
+    
+    # 예측 (지수 평활법의 예측은 마지막 평활값)
+    return [smoothed] * steps
+
+def calculate_confidence(actual: List[float], predicted: List[float]) -> float:
+    """예측 신뢰도 계산 (MAPE 기반)"""
+    if not actual or not predicted:
+        return 0.0
+    
+    n = min(len(actual), len(predicted))
+    errors = []
+    for i in range(n):
+        if actual[i] != 0:
+            error = abs(actual[i] - predicted[i]) / abs(actual[i])
+            errors.append(error)
+    
+    if not errors:
+        return 1.0
+    
+    mape = sum(errors) / len(errors)
+    confidence = max(0, 1 - mape)
+    return confidence
+
+@api_router.get("/prediction/config")
+async def get_prediction_config():
+    """예측 설정 조회"""
+    return prediction_config
+
+@api_router.put("/prediction/config")
+async def update_prediction_config(config: PredictionConfig):
+    """예측 설정 업데이트"""
+    prediction_config["window_size"] = config.window_size
+    prediction_config["forecast_steps"] = config.forecast_steps
+    prediction_config["confidence_threshold"] = config.confidence_threshold
+    prediction_config["auto_adjust"] = config.auto_adjust
+    
+    tracker.log("예측", "설정 변경", {"auto_adjust": config.auto_adjust})
+    return {"success": True, "config": prediction_config}
+
+@api_router.post("/prediction/analyze")
+async def analyze_and_predict():
+    """시계열 분석 및 예측 수행"""
+    # MongoDB에서 최근 처리 이력 조회
+    history = await db.processing_history.find(
+        {"success": True}, {"_id": 0}
+    ).sort("timestamp", -1).limit(50).to_list(50)
+    
+    if len(history) < 3:
+        return {
+            "success": False,
+            "message": "예측을 위한 충분한 데이터가 없습니다 (최소 3건 필요)",
+            "data_count": len(history)
+        }
+    
+    # 데이터 추출 (역순으로 정렬 - 오래된 것부터)
+    history = list(reversed(history))
+    
+    # 분배 비율 데이터 추출
+    public_ratios = []
+    productive_ratios = []
+    individual_ratios = []
+    balance_scores = []
+    
+    for h in history:
+        dist = h.get("data", {}).get("distribution", {})
+        if dist:
+            total = dist.get("public", 0) + dist.get("productive", 0) + dist.get("individual", 0)
+            if total > 0:
+                public_ratios.append(dist.get("public", 0) / total)
+                productive_ratios.append(dist.get("productive", 0) / total)
+                individual_ratios.append(dist.get("individual", 0) / total)
+        balance = h.get("data", {}).get("balance_score", 0)
+        if balance:
+            balance_scores.append(balance)
+    
+    window = prediction_config["window_size"]
+    steps = prediction_config["forecast_steps"]
+    
+    # 예측 수행 (이동 평균 + 지수 평활 앙상블)
+    predictions = {
+        "public": {
+            "sma": simple_moving_average_forecast(public_ratios, window, steps),
+            "exp": exponential_smoothing_forecast(public_ratios, 0.3, steps)
+        },
+        "productive": {
+            "sma": simple_moving_average_forecast(productive_ratios, window, steps),
+            "exp": exponential_smoothing_forecast(productive_ratios, 0.3, steps)
+        },
+        "individual": {
+            "sma": simple_moving_average_forecast(individual_ratios, window, steps),
+            "exp": exponential_smoothing_forecast(individual_ratios, 0.3, steps)
+        },
+        "balance": {
+            "sma": simple_moving_average_forecast(balance_scores, window, steps),
+            "exp": exponential_smoothing_forecast(balance_scores, 0.3, steps)
+        }
+    }
+    
+    # 앙상블 예측 (평균)
+    ensemble = {
+        "public": [(predictions["public"]["sma"][i] + predictions["public"]["exp"][i]) / 2 for i in range(steps)],
+        "productive": [(predictions["productive"]["sma"][i] + predictions["productive"]["exp"][i]) / 2 for i in range(steps)],
+        "individual": [(predictions["individual"]["sma"][i] + predictions["individual"]["exp"][i]) / 2 for i in range(steps)],
+        "balance": [(predictions["balance"]["sma"][i] + predictions["balance"]["exp"][i]) / 2 for i in range(steps)]
+    }
+    
+    # 신뢰도 계산
+    confidence = calculate_confidence(
+        public_ratios[-min(5, len(public_ratios)):] if public_ratios else [],
+        ensemble["public"][:min(5, steps)]
+    )
+    
+    # 현재 시그마와 비교하여 조정 필요 여부 판단
+    current_sigma = config_mgr.get_sigma()
+    predicted_sigma = [
+        ensemble["public"][0],
+        ensemble["productive"][0],
+        ensemble["individual"][0]
+    ]
+    
+    # 정규화
+    total = sum(predicted_sigma)
+    if total > 0:
+        predicted_sigma = [s/total for s in predicted_sigma]
+    
+    # 편차 계산
+    deviations = [abs(current_sigma[i] - predicted_sigma[i]) for i in range(3)]
+    max_deviation = max(deviations)
+    
+    # 조정 제안
+    adjustment_needed = max_deviation > prediction_config["confidence_threshold"] * 0.1
+    suggested_sigma = predicted_sigma if adjustment_needed else current_sigma
+    
+    result = {
+        "success": True,
+        "data_points": len(history),
+        "current_sigma": current_sigma,
+        "predicted_sigma": predicted_sigma,
+        "ensemble_predictions": ensemble,
+        "confidence": confidence,
+        "max_deviation": max_deviation,
+        "adjustment_needed": adjustment_needed,
+        "suggested_sigma": suggested_sigma,
+        "forecast_steps": steps,
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
+    
+    prediction_data["predictions"].append(result)
+    if len(prediction_data["predictions"]) > 50:
+        prediction_data["predictions"] = prediction_data["predictions"][-50:]
+    prediction_data["last_prediction"] = result
+    
+    tracker.log("예측", "분석 완료", {
+        "confidence": confidence,
+        "adjustment_needed": adjustment_needed
+    })
+    
+    return result
+
+@api_router.post("/prediction/apply")
+async def apply_prediction():
+    """예측 결과 적용 (시그마 조정)"""
+    if not prediction_data["last_prediction"]:
+        raise HTTPException(status_code=400, detail="No prediction available")
+    
+    pred = prediction_data["last_prediction"]
+    suggested = pred.get("suggested_sigma")
+    
+    if not suggested:
+        raise HTTPException(status_code=400, detail="No suggested sigma in prediction")
+    
+    # 시그마 업데이트
+    old_sigma = config_mgr.get_sigma()
+    config_mgr.update_sigma(suggested)
+    
+    tracker.log("예측", "예측 적용", {
+        "old_sigma": old_sigma,
+        "new_sigma": suggested
+    })
+    
+    return {
+        "success": True,
+        "old_sigma": old_sigma,
+        "new_sigma": suggested,
+        "confidence": pred.get("confidence", 0)
+    }
+
+@api_router.get("/prediction/history")
+async def get_prediction_history(limit: int = 10):
+    """예측 이력 조회"""
+    history = prediction_data["predictions"][-limit:]
+    return {
+        "history": history,
+        "total": len(prediction_data["predictions"]),
+        "last_prediction": prediction_data["last_prediction"]
+    }
+
 # Include the router in the main app
 app.include_router(api_router)
 
