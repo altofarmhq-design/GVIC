@@ -561,5 +561,13 @@
     "data": {
       "records_count": 10
     }
+  },
+  {
+    "timestamp": "2026-02-12T13:40:31.479824",
+    "phase": "비교",
+    "action": "분석 완료",
+    "data": {
+      "records_count": 10
+    }
   }
 ]
