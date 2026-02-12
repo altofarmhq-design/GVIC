@@ -2055,6 +2055,9 @@ async def load_data_sources():
     except Exception as e:
         logging.error(f"Error loading data sources: {e}")
 
+# Include auth router in api_router
+api_router.include_router(auth_router)
+
 # Include the router in the main app
 app.include_router(api_router)
 
