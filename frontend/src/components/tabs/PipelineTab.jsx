@@ -6,10 +6,13 @@ import { Badge } from '../ui/badge';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { Textarea } from '../ui/textarea';
+import { Checkbox } from '../ui/checkbox';
 import { 
   Play, FileText, Download, CheckCircle, 
   TrendingUp, TrendingDown, BarChart3, 
-  FileSpreadsheet, Loader2, RefreshCw, Link, Globe
+  FileSpreadsheet, Loader2, RefreshCw, Link, Globe,
+  Settings, FileDown
 } from 'lucide-react';
 import {
   PieChart, Pie, Cell, ResponsiveContainer
