@@ -1309,5 +1309,24 @@
       "records": 1000,
       "pdf": "/app/backend/data/reports/GVIC_Report_20260212_154741.pdf"
     }
+  },
+  {
+    "timestamp": "2026-02-12T15:48:42.989778",
+    "phase": "URL분석",
+    "action": "시작",
+    "data": {
+      "url": "https://www.coupang.com/test-product",
+      "max_reviews": 300
+    }
+  },
+  {
+    "timestamp": "2026-02-12T15:48:43.462119",
+    "phase": "URL분석",
+    "action": "완료",
+    "data": {
+      "url": "https://www.coupang.com/test-product",
+      "records": 300,
+      "pdf": "/app/backend/data/reports/GVIC_URL_Report_20260212_154843.pdf"
+    }
   }
 ]
