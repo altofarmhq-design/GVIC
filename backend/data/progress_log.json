@@ -336,5 +336,13 @@
       "value": 7.5,
       "success": true
     }
+  },
+  {
+    "timestamp": "2026-02-12T13:02:37.990035",
+    "phase": "데이터",
+    "action": "IO 처리",
+    "data": {
+      "format": "json"
+    }
   }
 ]
