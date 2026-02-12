@@ -1,32 +1,52 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   ResponsiveContainer, 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, 
-  Tooltip as RechartsTooltip, Cell, AreaChart, Area
+  Tooltip as RechartsTooltip, Cell, AreaChart, Area, LineChart, Line
 } from 'recharts';
-import { Play, RefreshCw, AlertCircle, Layers } from 'lucide-react';
+import { Play, RefreshCw, AlertCircle, Layers, History, CheckCircle, XCircle } from 'lucide-react';
 import { api } from "@/lib/api";
 
 export const ProcessingTab = ({ onProcess }) => {
   const [inputValue, setInputValue] = useState(5.0);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [history, setHistory] = useState([]);
+  const [sessionHistory, setSessionHistory] = useState([]);
+  const [dbHistory, setDbHistory] = useState([]);
+  const [showHistory, setShowHistory] = useState(false);
+
+  // MongoDB에서 이력 불러오기
+  const fetchHistory = async () => {
+    try {
+      const response = await api.getProcessHistory(50);
+      setDbHistory(response.data.history || []);
+    } catch (error) {
+      console.error("Fetch history error:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchHistory();
+  }, []);
 
   const handleProcess = async () => {
     setLoading(true);
     try {
       const response = await api.process(inputValue);
       setResult(response.data);
-      setHistory(prev => [...prev.slice(-9), {
+      setSessionHistory(prev => [...prev.slice(-9), {
         time: new Date().toLocaleTimeString(),
         input: inputValue,
         value: response.data?.data?.asset?.value || 0,
         balance: response.data?.data?.balance_score || 0
       }]);
+      // 처리 후 이력 새로고침
+      fetchHistory();
       if (onProcess) onProcess();
     } catch (error) {
       console.error("Process error:", error);
@@ -44,6 +64,14 @@ export const ProcessingTab = ({ onProcess }) => {
     { name: '입력', pub: result.data.convergence.input_ratio[0]*100, pro: result.data.convergence.input_ratio[1]*100, ind: result.data.convergence.input_ratio[2]*100 },
     { name: '출력', pub: result.data.convergence.output_ratio[0]*100, pro: result.data.convergence.output_ratio[1]*100, ind: result.data.convergence.output_ratio[2]*100 }
   ] : [];
+
+  // 차트용 이력 데이터 변환
+  const chartHistory = dbHistory.slice(0, 20).reverse().map((item, idx) => ({
+    idx: idx + 1,
+    value: item.data?.asset?.value || 0,
+    balance: (item.data?.balance_score || 0) * 100,
+    input: item.input_value
+  }));
 
   return (
     <div className="space-y-6">
@@ -207,30 +235,102 @@ export const ProcessingTab = ({ onProcess }) => {
         </CardContent>
       </Card>
 
-      {/* History Chart */}
-      {history.length > 0 && (
-        <Card className="bg-slate-800/50 border-slate-700">
-          <CardHeader>
-            <CardTitle className="text-slate-100 text-sm">처리 이력</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-48">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={history}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                  <XAxis dataKey="time" stroke="#94a3b8" fontSize={10} />
-                  <YAxis stroke="#94a3b8" fontSize={10} />
-                  <RechartsTooltip 
-                    contentStyle={{ background: '#1e293b', border: '1px solid #475569', borderRadius: '8px' }}
-                  />
-                  <Area type="monotone" dataKey="value" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.3} name="자산 가치" />
-                  <Area type="monotone" dataKey="balance" stroke="#10b981" fill="#10b981" fillOpacity={0.2} name="균형 점수" />
-                </AreaChart>
-              </ResponsiveContainer>
+      {/* History Section */}
+      <Card className="bg-slate-800/50 border-slate-700">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle className="text-slate-100 flex items-center gap-2">
+              <History className="w-5 h-5" /> 처리 이력 (MongoDB)
+            </CardTitle>
+            <CardDescription className="text-slate-400">
+              총 {dbHistory.length}건의 처리 기록
+            </CardDescription>
+          </div>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={fetchHistory}
+              data-testid="refresh-history-button"
+            >
+              <RefreshCw className="w-4 h-4 mr-1" /> 새로고침
+            </Button>
+            <Button 
+              variant={showHistory ? "default" : "outline"}
+              size="sm" 
+              onClick={() => setShowHistory(!showHistory)}
+              data-testid="toggle-history-button"
+            >
+              {showHistory ? "차트 보기" : "목록 보기"}
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {showHistory ? (
+            // 이력 목록 테이블
+            <ScrollArea className="h-64" data-testid="history-list">
+              <div className="space-y-2">
+                {dbHistory.map((item, idx) => (
+                  <div key={item.id || idx} className="bg-slate-900/50 rounded-lg p-3 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      {item.success ? (
+                        <CheckCircle className="w-5 h-5 text-emerald-400" />
+                      ) : (
+                        <XCircle className="w-5 h-5 text-red-400" />
+                      )}
+                      <div>
+                        <p className="text-slate-100 font-medium">입력값: {item.input_value}</p>
+                        <p className="text-slate-500 text-xs">{item.timestamp?.slice(0, 19).replace('T', ' ')}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      {item.success && item.data && (
+                        <>
+                          <p className="text-violet-400 font-medium">
+                            자산: {item.data?.asset?.value?.toFixed(3) || '-'}
+                          </p>
+                          <p className="text-emerald-400 text-sm">
+                            균형: {((item.data?.balance_score || 0) * 100).toFixed(1)}%
+                          </p>
+                        </>
+                      )}
+                      {!item.success && (
+                        <Badge variant="destructive">실패</Badge>
+                      )}
+                    </div>
+                  </div>
+                ))}
+                {dbHistory.length === 0 && (
+                  <p className="text-slate-500 text-center py-8">처리 이력이 없습니다</p>
+                )}
+              </div>
+            </ScrollArea>
+          ) : (
+            // 이력 차트
+            <div className="h-64">
+              {chartHistory.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={chartHistory}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                    <XAxis dataKey="idx" stroke="#94a3b8" fontSize={10} label={{ value: '처리 순서', position: 'bottom', fill: '#94a3b8', fontSize: 10 }} />
+                    <YAxis stroke="#94a3b8" fontSize={10} />
+                    <RechartsTooltip 
+                      contentStyle={{ background: '#1e293b', border: '1px solid #475569', borderRadius: '8px' }}
+                      formatter={(value, name) => [typeof value === 'number' ? value.toFixed(3) : value, name]}
+                    />
+                    <Line type="monotone" dataKey="value" stroke="#8b5cf6" strokeWidth={2} dot={{ fill: '#8b5cf6' }} name="자산 가치" />
+                    <Line type="monotone" dataKey="balance" stroke="#10b981" strokeWidth={2} dot={{ fill: '#10b981' }} name="균형 점수 (%)" />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex items-center justify-center h-full text-slate-500">
+                  <p>처리 이력이 없습니다. 값을 처리하면 이력이 표시됩니다.</p>
+                </div>
+              )}
             </div>
-          </CardContent>
-        </Card>
-      )}
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };
