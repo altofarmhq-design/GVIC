@@ -121,48 +121,79 @@ class PDFReportAdapter(OutputAdapter):
     def __init__(self):
         self.output_type = OutputType.PDF_REPORT
         
-    def format(self, result: ModularAnalysisResult) -> Dict[str, Any]:
+    def format(self, result: ModularAnalysisResult, output_options: Dict[str, Any] = None) -> Dict[str, Any]:
         """PDF용 데이터 구조화"""
+        options = output_options or {}
+        
+        # 사용자 지정 제목 또는 기본 제목
+        title = options.get('reportTitle') or f"GVIC 분석 리포트 - {result.analysis_type}"
+        
+        sections = [
+            {
+                "id": "summary",
+                "title": "1. 분석 요약",
+                "content": result.input_summary
+            }
+        ]
+        
+        # 감성 분포 포함 여부
+        if options.get('includeSentiment', True):
+            sections.append({
+                "id": "sentiment",
+                "title": f"{len(sections)+1}. 감성 분포",
+                "content": result.sentiment_distribution
+            })
+        
+        # 요인 분석 포함 여부
+        if options.get('includeFactors', True):
+            sections.append({
+                "id": "positive_factors",
+                "title": f"{len(sections)+1}. 긍정 평가 요인",
+                "content": [f.to_dict() for f in result.positive_factors]
+            })
+            sections.append({
+                "id": "negative_factors",
+                "title": f"{len(sections)+1}. 부정 평가 요인",
+                "content": [f.to_dict() for f in result.negative_factors]
+            })
+        
+        # GVIC 분석 포함 여부
+        if options.get('includeGvicAnalysis', True):
+            sections.append({
+                "id": "gvic_analysis",
+                "title": f"{len(sections)+1}. GVIC 엔진 분석 결과",
+                "content": result.gvic_results
+            })
+        
+        # 인사이트 포함 여부
+        if options.get('includeInsights', True):
+            sections.append({
+                "id": "insights",
+                "title": f"{len(sections)+1}. 종합 인사이트",
+                "content": result.insights
+            })
+        
+        # 권장 조치 포함 여부
+        if options.get('includeRecommendations', True):
+            sections.append({
+                "id": "recommendations",
+                "title": f"{len(sections)+1}. 권장 조치 사항",
+                "content": result.recommendations
+            })
+        
+        # 사용자 추가 메모 포함
+        custom_notes = options.get('customNotes', '')
+        if custom_notes:
+            sections.append({
+                "id": "custom_notes",
+                "title": f"{len(sections)+1}. 추가 메모",
+                "content": custom_notes
+            })
+        
         return {
-            "title": f"GVIC 분석 리포트 - {result.analysis_type}",
+            "title": title,
             "generated_at": datetime.now().isoformat(),
-            "sections": [
-                {
-                    "id": "summary",
-                    "title": "1. 분석 요약",
-                    "content": result.input_summary
-                },
-                {
-                    "id": "sentiment",
-                    "title": "2. 감성 분포",
-                    "content": result.sentiment_distribution
-                },
-                {
-                    "id": "positive_factors",
-                    "title": "3. 긍정 평가 요인",
-                    "content": [f.to_dict() for f in result.positive_factors]
-                },
-                {
-                    "id": "negative_factors",
-                    "title": "4. 부정 평가 요인",
-                    "content": [f.to_dict() for f in result.negative_factors]
-                },
-                {
-                    "id": "gvic_analysis",
-                    "title": "5. GVIC 엔진 분석 결과",
-                    "content": result.gvic_results
-                },
-                {
-                    "id": "insights",
-                    "title": "6. 종합 인사이트",
-                    "content": result.insights
-                },
-                {
-                    "id": "recommendations",
-                    "title": "7. 권장 조치 사항",
-                    "content": result.recommendations
-                }
-            ]
+            "sections": sections
         }
     
     def export(self, formatted_data: Dict[str, Any], destination: str) -> str:
