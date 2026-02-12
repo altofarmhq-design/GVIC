@@ -1353,5 +1353,24 @@
     "data": {
       "records": 20
     }
+  },
+  {
+    "timestamp": "2026-02-12T15:50:41.982063",
+    "phase": "URL분석",
+    "action": "시작",
+    "data": {
+      "url": "https://www.oliveyoung.co.kr/store/goods/test123",
+      "max_reviews": 500
+    }
+  },
+  {
+    "timestamp": "2026-02-12T15:50:42.513432",
+    "phase": "URL분석",
+    "action": "완료",
+    "data": {
+      "url": "https://www.oliveyoung.co.kr/store/goods/test123",
+      "records": 500,
+      "pdf": "/app/backend/data/reports/GVIC_URL_Report_20260212_155042.pdf"
+    }
   }
 ]
