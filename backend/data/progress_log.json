@@ -130,5 +130,14 @@
       "source": "erp",
       "success": true
     }
+  },
+  {
+    "timestamp": "2026-02-12T06:28:38.644050",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 0.75,
+      "success": true
+    }
   }
 ]
