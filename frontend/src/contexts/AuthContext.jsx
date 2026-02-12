@@ -107,6 +107,8 @@ export function AuthProvider({ children }) {
       logout,
       hasRole,
       hasPermission,
+      isInternalUser,
+      isAdmin,
       checkAuth
     }}>
       {children}
