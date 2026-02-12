@@ -108,34 +108,10 @@ const PipelineTab = () => {
     }
   };
 
-  // PDF 직접 다운로드 함수 - fetch + blob 방식
-  const handleDownloadPdf = async (filename) => {
+  // PDF 직접 다운로드 함수 - 새 탭에서 열기
+  const handleDownloadPdf = (filename) => {
     if (!filename) return;
-    
-    try {
-      // 같은 origin에서 파일 가져오기
-      const response = await fetch(`/${filename}`);
-      if (!response.ok) throw new Error('파일을 찾을 수 없습니다');
-      
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = filename;
-      link.style.display = 'none';
-      document.body.appendChild(link);
-      link.click();
-      
-      // 정리
-      setTimeout(() => {
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-      }, 100);
-    } catch (err) {
-      console.error('다운로드 오류:', err);
-      alert('파일 다운로드에 실패했습니다.');
-    }
+    window.open(`/${filename}`, '_blank');
   };
 
   const handleRunPipeline = async () => {
