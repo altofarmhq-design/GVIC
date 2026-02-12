@@ -63,20 +63,37 @@ export function AuthProvider({ children }) {
 
   const hasRole = (requiredRoles) => {
     if (!user) return false;
-    if (user.role === 'admin') return true;
+    // super_admin과 admin은 모든 내부 권한 접근 가능
+    if (user.role === 'super_admin' || user.role === 'admin') return true;
     return requiredRoles.includes(user.role);
   };
 
   const hasPermission = (permission) => {
     if (!user) return false;
-    if (user.role === 'admin') return true;
+    // super_admin과 admin은 모든 권한
+    if (user.role === 'super_admin' || user.role === 'admin') return true;
     
     const rolePermissions = {
+      // 내부 역할
       operator: ['read', 'write', 'process', 'report'],
-      viewer: ['read']
+      visitor: ['read'],
+      // 외부 역할 (모두 visitor와 동일)
+      ext_admin: ['read'],
+      ext_operator: ['read'],
+      ext_visitor: ['read']
     };
     
     return rolePermissions[user.role]?.includes(permission) || false;
+  };
+
+  const isInternalUser = () => {
+    if (!user) return false;
+    return ['super_admin', 'admin', 'operator', 'visitor'].includes(user.role);
+  };
+
+  const isAdmin = () => {
+    if (!user) return false;
+    return ['super_admin', 'admin'].includes(user.role);
   };
 
   return (
