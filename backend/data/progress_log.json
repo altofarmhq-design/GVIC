@@ -1337,5 +1337,13 @@
       "value": 5.0,
       "success": true
     }
+  },
+  {
+    "timestamp": "2026-02-12T15:49:22.086228",
+    "phase": "비교",
+    "action": "분석 완료",
+    "data": {
+      "records_count": 10
+    }
   }
 ]
