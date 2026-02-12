@@ -615,15 +615,14 @@ const PipelineTab = () => {
                             {new Date(report.created).toLocaleString('ko-KR')} · {(report.size / 1024).toFixed(1)} KB
                           </div>
                         </div>
-                        <Button 
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDownloadPdf(report.name)}
-                          className="text-blue-400 hover:text-blue-300 hover:bg-blue-500/20"
+                        <a 
+                          href={`${process.env.REACT_APP_BACKEND_URL}/api/pipeline/report/${report.name}`}
+                          download={report.name}
+                          className="text-blue-400 hover:text-blue-300 hover:bg-blue-500/20 p-2 rounded"
                           data-testid={`download-report-${idx}`}
                         >
                           <FileDown className="h-5 w-5" />
-                        </Button>
+                        </a>
                       </div>
                     ))}
                   </div>
