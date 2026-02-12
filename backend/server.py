@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, Request
 from fastapi.responses import FileResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
@@ -21,6 +21,14 @@ load_dotenv(ROOT_DIR / '.env')
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
+
+# Import auth module
+from auth import create_auth_router
+
+# Create auth router and get dependencies
+auth_router = create_auth_router(db)
+get_current_user = auth_router.get_current_user
+require_role = auth_router.require_role
 
 # Import GVIC modules
 from core import GVICEngine, InternalControlSystem, IOInterface, GVICVisualizer, WorkflowManager
