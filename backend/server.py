@@ -1991,23 +1991,6 @@ async def process_collected_data(source_id: str):
     except Exception as e:
         return {"success": False, "error": str(e)}
 
-@api_router.get("/datasources/collected")
-async def get_collected_data(source_id: Optional[str] = None, limit: int = 50):
-    """수집된 데이터 조회"""
-    query = {}
-    if source_id:
-        query["source_id"] = source_id
-    
-    records = await db.collected_data.find(
-        query, {"_id": 0}
-    ).sort("timestamp", -1).limit(limit).to_list(limit)
-    
-    return {
-        "records": records,
-        "total": len(records),
-        "last_collection": collected_data["last_collection"]
-    }
-
 @api_router.post("/datasources/{source_id}/start")
 async def start_polling(source_id: str):
     """폴링 시작"""
