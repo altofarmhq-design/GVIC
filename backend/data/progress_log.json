@@ -524,5 +524,15 @@
       "pareto_front_size": 20,
       "best_weighted_score": 0.8423529411764704
     }
+  },
+  {
+    "timestamp": "2026-02-12T13:37:31.410205",
+    "phase": "파레토",
+    "action": "최적화 실행",
+    "data": {
+      "solutions_count": 56,
+      "pareto_front_size": 12,
+      "best_weighted_score": 0.8423529411764704
+    }
   }
 ]

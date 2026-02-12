@@ -1519,6 +1519,152 @@ async def apply_pareto_solution(index: int = 0):
         "applied_solution": pareto_front[index]
     }
 
+# ==================== Comparison Analysis APIs (처리 결과 비교 분석) ====================
+
+class ComparisonRequest(BaseModel):
+    record_ids: List[str] = []
+    limit: int = 10
+
+@api_router.post("/comparison/analyze")
+async def analyze_comparison(request: ComparisonRequest):
+    """처리 결과 비교 분석"""
+    # 레코드 조회
+    if request.record_ids:
+        records = []
+        for rid in request.record_ids:
+            record = await db.processing_history.find_one({"id": rid}, {"_id": 0})
+            if record:
+                records.append(record)
+    else:
+        # 최근 N개 레코드 조회
+        records = await db.processing_history.find(
+            {"success": True}, {"_id": 0}
+        ).sort("timestamp", -1).limit(request.limit).to_list(request.limit)
+    
+    if len(records) < 2:
+        return {
+            "success": False,
+            "message": "비교를 위해 최소 2개의 레코드가 필요합니다",
+            "records_count": len(records)
+        }
+    
+    # 통계 계산
+    asset_values = []
+    balance_scores = []
+    distributions = {"public": [], "productive": [], "individual": []}
+    
+    for record in records:
+        data = record.get("data", {})
+        asset = data.get("asset", {})
+        dist = data.get("distribution", {})
+        
+        if asset.get("value"):
+            asset_values.append(asset["value"])
+        if data.get("balance_score"):
+            balance_scores.append(data["balance_score"])
+        if dist:
+            total = dist.get("public", 0) + dist.get("productive", 0) + dist.get("individual", 0)
+            if total > 0:
+                distributions["public"].append(dist.get("public", 0) / total)
+                distributions["productive"].append(dist.get("productive", 0) / total)
+                distributions["individual"].append(dist.get("individual", 0) / total)
+    
+    # 통계 계산
+    def calc_stats(values):
+        if not values:
+            return {"min": 0, "max": 0, "avg": 0, "std": 0}
+        return {
+            "min": min(values),
+            "max": max(values),
+            "avg": sum(values) / len(values),
+            "std": (sum((v - sum(values)/len(values))**2 for v in values) / len(values)) ** 0.5
+        }
+    
+    stats = {
+        "asset_value": calc_stats(asset_values),
+        "balance_score": calc_stats(balance_scores),
+        "distribution": {
+            "public": calc_stats(distributions["public"]),
+            "productive": calc_stats(distributions["productive"]),
+            "individual": calc_stats(distributions["individual"])
+        }
+    }
+    
+    # 트렌드 분석
+    trend = {
+        "asset_value": "stable",
+        "balance_score": "stable"
+    }
+    
+    if len(asset_values) >= 3:
+        recent = asset_values[:3]
+        older = asset_values[-3:]
+        if sum(recent)/3 > sum(older)/3 * 1.05:
+            trend["asset_value"] = "increasing"
+        elif sum(recent)/3 < sum(older)/3 * 0.95:
+            trend["asset_value"] = "decreasing"
+    
+    if len(balance_scores) >= 3:
+        recent = balance_scores[:3]
+        older = balance_scores[-3:]
+        if sum(recent)/3 > sum(older)/3 * 1.02:
+            trend["balance_score"] = "increasing"
+        elif sum(recent)/3 < sum(older)/3 * 0.98:
+            trend["balance_score"] = "decreasing"
+    
+    # 이상치 탐지
+    outliers = []
+    if asset_values:
+        avg = stats["asset_value"]["avg"]
+        std = stats["asset_value"]["std"]
+        for i, v in enumerate(asset_values):
+            if std > 0 and abs(v - avg) > 2 * std:
+                outliers.append({
+                    "index": i,
+                    "value": v,
+                    "type": "asset_value",
+                    "deviation": (v - avg) / std
+                })
+    
+    # 레코드별 상세 데이터
+    comparison_data = []
+    for i, record in enumerate(records):
+        data = record.get("data", {})
+        comparison_data.append({
+            "index": i,
+            "id": record.get("id"),
+            "timestamp": record.get("timestamp"),
+            "input_value": record.get("input_value"),
+            "asset_value": data.get("asset", {}).get("value", 0),
+            "balance_score": data.get("balance_score", 0),
+            "quality_score": data.get("asset", {}).get("quality_score", 0),
+            "distribution": data.get("distribution", {})
+        })
+    
+    tracker.log("비교", "분석 완료", {"records_count": len(records)})
+    
+    return {
+        "success": True,
+        "records_count": len(records),
+        "statistics": stats,
+        "trend": trend,
+        "outliers": outliers,
+        "comparison_data": comparison_data,
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
+
+@api_router.get("/comparison/records")
+async def get_comparison_records(limit: int = 20):
+    """비교 가능한 레코드 목록 조회"""
+    records = await db.processing_history.find(
+        {"success": True}, {"_id": 0, "id": 1, "timestamp": 1, "input_value": 1, "data.asset.value": 1, "data.balance_score": 1}
+    ).sort("timestamp", -1).limit(limit).to_list(limit)
+    
+    return {
+        "records": records,
+        "total": await db.processing_history.count_documents({"success": True})
+    }
+
 # Include the router in the main app
 app.include_router(api_router)
 
