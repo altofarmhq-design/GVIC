@@ -808,5 +808,61 @@
       "source_id": "ds_66dc4ab6",
       "name": "TEST_Playwright Source"
     }
+  },
+  {
+    "timestamp": "2026-02-12T13:56:33.987743",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:56:37.718863",
+    "phase": "데이터소스",
+    "action": "폴링 시작",
+    "data": {
+      "source_id": "ds_0a6c69cb"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:56:39.553374",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:56:42.456091",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_66dc4ab6",
+      "success": true,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:56:44.449810",
+    "phase": "데이터소스",
+    "action": "폴링 시작",
+    "data": {
+      "source_id": "ds_66dc4ab6"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:56:44.499141",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_66dc4ab6",
+      "success": true,
+      "value": null
+    }
   }
 ]
