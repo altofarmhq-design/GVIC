@@ -164,15 +164,18 @@ curl "/api/dashboard"
 - [x] 특허 6 (가중 분배) 분석 결과 시각화
 - [x] 처리 결과 차트 (분배 결과, 수렴 변환)
 
-## 다음 작업 (P1)
+## 구현 완료 (P1) - 2026-02-12
 
-### 전체 기능 통합 테스트
-- [ ] testing_agent_v3_fork를 사용한 E2E 테스트
-- [ ] 엣지 케이스 검증
+### 전체 기능 통합 테스트 (완료)
+- [x] testing_agent_v3_fork를 사용한 E2E 테스트 (백엔드 29/29, 프론트엔드 6/6 탭 통과)
+- [x] 엣지 케이스 검증 완료
 
-### 코드 품질 개선
-- [ ] 린터 경고 수정 (ruff)
-- [ ] App.js 컴포넌트 분리 (1000줄+ → 기능별 분리)
+### 코드 품질 개선 (완료)
+- [x] 린터 경고 수정 (ruff) - backend/core, backend/utils 모두 통과
+- [x] App.js 컴포넌트 분리 완료 (1328줄 → 135줄, 90% 감소)
+  - 6개 탭 컴포넌트 분리 (DashboardTab, ProcessingTab, IntegrationTab, DataTab, AlertsTab, SettingsTab)
+  - API 함수 모듈화 (/lib/api.js)
+  - 공통 컴포넌트 분리 (MetricCard)
 
 ## 향후 작업 (P2)
 
