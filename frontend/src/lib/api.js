@@ -56,7 +56,18 @@ export const api = {
   applyParetoSolution: (index) => axios.post(`${API}/pareto/apply/${index}`),
   // Comparison APIs
   analyzeComparison: (options = {}) => axios.post(`${API}/comparison/analyze`, options),
-  getComparisonRecords: (limit = 20) => axios.get(`${API}/comparison/records?limit=${limit}`)
+  getComparisonRecords: (limit = 20) => axios.get(`${API}/comparison/records?limit=${limit}`),
+  // Data Sources APIs
+  getDataSources: () => axios.get(`${API}/datasources`),
+  createDataSource: (config) => axios.post(`${API}/datasources`, config),
+  getDataSource: (sourceId) => axios.get(`${API}/datasources/${sourceId}`),
+  updateDataSource: (sourceId, config) => axios.put(`${API}/datasources/${sourceId}`, config),
+  deleteDataSource: (sourceId) => axios.delete(`${API}/datasources/${sourceId}`),
+  fetchDataSource: (sourceId) => axios.post(`${API}/datasources/${sourceId}/fetch`),
+  processDataSource: (sourceId) => axios.post(`${API}/datasources/${sourceId}/process`),
+  getCollectedData: (limit = 50) => axios.get(`${API}/datasources/collected?limit=${limit}`),
+  startDataSource: (sourceId) => axios.post(`${API}/datasources/${sourceId}/start`),
+  stopDataSource: (sourceId) => axios.post(`${API}/datasources/${sourceId}/stop`)
 };
 
 export default api;
