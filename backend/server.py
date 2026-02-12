@@ -2720,6 +2720,29 @@ async def download_report(filename: str):
     )
 
 
+@api_router.get("/pipeline/report-base64/{filename}")
+async def download_report_base64(filename: str):
+    """PDF 리포트를 base64로 반환"""
+    import base64
+    
+    file_path = f"/app/backend/data/reports/{filename}"
+    
+    if not os.path.exists(file_path):
+        file_path = f"/app/frontend/public/{filename}"
+    
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="Report not found")
+    
+    with open(file_path, "rb") as f:
+        content = f.read()
+    
+    return {
+        "filename": filename,
+        "content": base64.b64encode(content).decode("utf-8"),
+        "size": len(content)
+    }
+
+
 # ==================== URL 기반 분석 API ====================
 
 from crawlers.url_crawler import crawl_url, CrawlResult
