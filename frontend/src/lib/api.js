@@ -42,7 +42,13 @@ export const api = {
   getModel: (modelId) => axios.get(`${API}/models/${modelId}`),
   createModel: (model) => axios.post(`${API}/models`, model),
   activateModel: (modelId) => axios.post(`${API}/models/${modelId}/activate`),
-  deleteModel: (modelId) => axios.delete(`${API}/models/${modelId}`)
+  deleteModel: (modelId) => axios.delete(`${API}/models/${modelId}`),
+  // Prediction APIs
+  getPredictionConfig: () => axios.get(`${API}/prediction/config`),
+  updatePredictionConfig: (config) => axios.put(`${API}/prediction/config`, config),
+  analyzePrediction: () => axios.post(`${API}/prediction/analyze`),
+  applyPrediction: () => axios.post(`${API}/prediction/apply`),
+  getPredictionHistory: (limit = 10) => axios.get(`${API}/prediction/history?limit=${limit}`)
 };
 
 export default api;
