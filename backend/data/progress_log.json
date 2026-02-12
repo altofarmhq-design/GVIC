@@ -441,5 +441,14 @@
     "data": {
       "records": 5
     }
+  },
+  {
+    "timestamp": "2026-02-12T13:20:36.983919",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 5.0,
+      "success": true
+    }
   }
 ]

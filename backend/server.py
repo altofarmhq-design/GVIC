@@ -588,6 +588,119 @@ async def get_report_summary():
         "balance_score": engine.convergence.calculate_balance_index()
     }
 
+# ==================== Real-time Monitoring APIs ====================
+
+import random
+import time
+
+# 모니터링 데이터 저장소 (메모리)
+monitoring_data = {
+    "consumption": [],
+    "distribution_history": [],
+    "alerts": [],
+    "last_update": None
+}
+
+def generate_monitoring_data():
+    """실시간 모니터링 데이터 생성 (특허6 ConsumptionMonitor 시뮬레이션)"""
+    now = datetime.now(timezone.utc)
+    sigma = config_mgr.get_sigma()
+    
+    # 소비량 시뮬레이션 (약간의 변동 추가)
+    base_consumption = [100, 120, 80]  # 공공, 생산, 개인 기본 소비량
+    consumption = {
+        "timestamp": now.isoformat(),
+        "public": base_consumption[0] * (1 + random.uniform(-0.1, 0.1)),
+        "productive": base_consumption[1] * (1 + random.uniform(-0.1, 0.1)),
+        "individual": base_consumption[2] * (1 + random.uniform(-0.1, 0.1)),
+        "total": sum(base_consumption) * (1 + random.uniform(-0.05, 0.05))
+    }
+    
+    # 분배 비율 변동 추적
+    actual_ratio = [
+        consumption["public"] / consumption["total"],
+        consumption["productive"] / consumption["total"],
+        consumption["individual"] / consumption["total"]
+    ]
+    
+    # 편차 계산
+    deviation = [abs(actual_ratio[i] - sigma[i]) for i in range(3)]
+    avg_deviation = sum(deviation) / 3
+    
+    return {
+        "consumption": consumption,
+        "target_ratio": sigma,
+        "actual_ratio": actual_ratio,
+        "deviation": deviation,
+        "avg_deviation": avg_deviation,
+        "efficiency": 1 - avg_deviation,
+        "status": "optimal" if avg_deviation < 0.05 else "adjusting" if avg_deviation < 0.1 else "alert"
+    }
+
+@api_router.get("/monitor/realtime")
+async def get_realtime_monitoring():
+    """실시간 모니터링 데이터 조회"""
+    # 새 데이터 생성
+    data = generate_monitoring_data()
+    
+    # 히스토리에 추가 (최대 60개 유지 - 1분 데이터)
+    monitoring_data["consumption"].append({
+        "time": datetime.now().strftime("%H:%M:%S"),
+        "public": data["consumption"]["public"],
+        "productive": data["consumption"]["productive"],
+        "individual": data["consumption"]["individual"]
+    })
+    if len(monitoring_data["consumption"]) > 60:
+        monitoring_data["consumption"] = monitoring_data["consumption"][-60:]
+    
+    monitoring_data["last_update"] = datetime.now(timezone.utc).isoformat()
+    
+    return {
+        "current": data,
+        "history": monitoring_data["consumption"][-20:],  # 최근 20개
+        "last_update": monitoring_data["last_update"]
+    }
+
+@api_router.get("/monitor/distribution")
+async def get_distribution_monitor():
+    """분배 상태 모니터링"""
+    sigma = config_mgr.get_sigma()
+    omega = config_mgr.get_omega()
+    
+    # 실제 분배 상태 시뮬레이션
+    actual = [
+        sigma[0] + random.uniform(-0.02, 0.02),
+        sigma[1] + random.uniform(-0.02, 0.02),
+        sigma[2] + random.uniform(-0.02, 0.02)
+    ]
+    # 정규화
+    total = sum(actual)
+    actual = [a/total for a in actual]
+    
+    # 경계 조건 검증
+    violations = []
+    if actual[0] < omega.get("V_pub_min", 0.2):
+        violations.append({"type": "V_pub_min", "current": actual[0], "limit": omega["V_pub_min"]})
+    if actual[0] > omega.get("V_pub_max", 0.5):
+        violations.append({"type": "V_pub_max", "current": actual[0], "limit": omega["V_pub_max"]})
+    if actual[1] < omega.get("V_pro_min", 0.2):
+        violations.append({"type": "V_pro_min", "current": actual[1], "limit": omega["V_pro_min"]})
+    if actual[1] > omega.get("V_pro_max", 0.5):
+        violations.append({"type": "V_pro_max", "current": actual[1], "limit": omega["V_pro_max"]})
+    if actual[2] < omega.get("V_ind_min", 0.1):
+        violations.append({"type": "V_ind_min", "current": actual[2], "limit": omega["V_ind_min"]})
+    if actual[2] > omega.get("V_ind_max", 0.5):
+        violations.append({"type": "V_ind_max", "current": actual[2], "limit": omega["V_ind_max"]})
+    
+    return {
+        "target": sigma,
+        "actual": actual,
+        "omega": omega,
+        "violations": violations,
+        "is_valid": len(violations) == 0,
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
+
 # Include the router in the main app
 app.include_router(api_router)
 
