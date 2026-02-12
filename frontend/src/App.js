@@ -103,6 +103,9 @@ function App() {
             <TabsTrigger value="integration" className="data-[state=active]:bg-slate-700">
               <Network className="w-4 h-4 mr-2" /> 통합
             </TabsTrigger>
+            <TabsTrigger value="datasources" className="data-[state=active]:bg-slate-700">
+              <Cloud className="w-4 h-4 mr-2" /> 외부소스
+            </TabsTrigger>
             <TabsTrigger value="data" className="data-[state=active]:bg-slate-700">
               <Database className="w-4 h-4 mr-2" /> 데이터
             </TabsTrigger>
@@ -144,6 +147,10 @@ function App() {
 
           <TabsContent value="integration">
             <IntegrationTab onRefresh={fetchData} />
+          </TabsContent>
+
+          <TabsContent value="datasources">
+            <DataSourcesTab onRefresh={fetchData} />
           </TabsContent>
 
           <TabsContent value="data">
