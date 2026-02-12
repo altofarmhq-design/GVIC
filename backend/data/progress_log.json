@@ -425,5 +425,13 @@
       "value": 5.0,
       "success": true
     }
+  },
+  {
+    "timestamp": "2026-02-12T13:19:52.525632",
+    "phase": "리포트",
+    "action": "PDF 생성",
+    "data": {
+      "records": 5
+    }
   }
 ]
