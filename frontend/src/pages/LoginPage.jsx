@@ -91,6 +91,13 @@ export default function LoginPage() {
             </Alert>
           )}
           
+          {success && (
+            <Alert className="mb-4 bg-green-500/10 border-green-500/50">
+              <CheckCircle className="h-4 w-4 text-green-400" />
+              <AlertDescription className="text-green-400">{success}</AlertDescription>
+            </Alert>
+          )}
+          
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-2 bg-slate-700/50 mb-4">
               <TabsTrigger value="login" className="data-[state=active]:bg-slate-600">로그인</TabsTrigger>
