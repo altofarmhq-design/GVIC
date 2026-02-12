@@ -1492,5 +1492,13 @@
     "phase": "알림",
     "action": "헬스체크 실행",
     "data": {}
+  },
+  {
+    "timestamp": "2026-02-12T16:35:51.159699",
+    "phase": "리포트",
+    "action": "PDF 생성",
+    "data": {
+      "records": 20
+    }
   }
 ]
