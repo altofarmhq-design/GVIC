@@ -839,6 +839,184 @@ async def get_adjustment_history(limit: int = 20):
         "last_adjustment": auto_adjustment_config["last_adjustment"]
     }
 
+# ==================== Multi-Model Management APIs (특허6: 4100 모델 저장부) ====================
+
+# 사전 정의된 분배 모델들
+distribution_models = {
+    "default": {
+        "id": "default",
+        "name": "기본 균형 모델",
+        "description": "공공/생산/개인 균형 분배 (33/34/33)",
+        "sigma": [0.33, 0.34, 0.33],
+        "omega": {
+            "V_pub_min": 0.2, "V_pub_max": 0.5,
+            "V_pro_min": 0.2, "V_pro_max": 0.5,
+            "V_ind_min": 0.1, "V_ind_max": 0.5
+        },
+        "type": "balanced",
+        "is_active": True,
+        "created_at": "2026-01-01T00:00:00Z"
+    },
+    "public_priority": {
+        "id": "public_priority",
+        "name": "공공 우선 모델",
+        "description": "공공 영역 우선 분배 (45/30/25)",
+        "sigma": [0.45, 0.30, 0.25],
+        "omega": {
+            "V_pub_min": 0.35, "V_pub_max": 0.55,
+            "V_pro_min": 0.2, "V_pro_max": 0.4,
+            "V_ind_min": 0.15, "V_ind_max": 0.35
+        },
+        "type": "public_priority",
+        "is_active": False,
+        "created_at": "2026-01-01T00:00:00Z"
+    },
+    "productive_priority": {
+        "id": "productive_priority",
+        "name": "생산 우선 모델",
+        "description": "생산 영역 우선 분배 (25/50/25)",
+        "sigma": [0.25, 0.50, 0.25],
+        "omega": {
+            "V_pub_min": 0.15, "V_pub_max": 0.35,
+            "V_pro_min": 0.4, "V_pro_max": 0.6,
+            "V_ind_min": 0.15, "V_ind_max": 0.35
+        },
+        "type": "productive_priority",
+        "is_active": False,
+        "created_at": "2026-01-01T00:00:00Z"
+    },
+    "individual_priority": {
+        "id": "individual_priority",
+        "name": "개인 우선 모델",
+        "description": "개인 영역 우선 분배 (25/30/45)",
+        "sigma": [0.25, 0.30, 0.45],
+        "omega": {
+            "V_pub_min": 0.15, "V_pub_max": 0.35,
+            "V_pro_min": 0.2, "V_pro_max": 0.4,
+            "V_ind_min": 0.35, "V_ind_max": 0.55
+        },
+        "type": "individual_priority",
+        "is_active": False,
+        "created_at": "2026-01-01T00:00:00Z"
+    },
+    "growth": {
+        "id": "growth",
+        "name": "성장 집중 모델",
+        "description": "생산과 개인 집중 분배 (20/40/40)",
+        "sigma": [0.20, 0.40, 0.40],
+        "omega": {
+            "V_pub_min": 0.1, "V_pub_max": 0.3,
+            "V_pro_min": 0.3, "V_pro_max": 0.5,
+            "V_ind_min": 0.3, "V_ind_max": 0.5
+        },
+        "type": "growth",
+        "is_active": False,
+        "created_at": "2026-01-01T00:00:00Z"
+    }
+}
+
+current_model_id = "default"
+
+class ModelCreateRequest(BaseModel):
+    name: str
+    description: str = ""
+    sigma: List[float]
+    omega: Dict[str, float]
+    type: str = "custom"
+
+@api_router.get("/models")
+async def get_all_models():
+    """모든 분배 모델 조회"""
+    models_list = list(distribution_models.values())
+    return {
+        "models": models_list,
+        "current_model_id": current_model_id,
+        "total": len(models_list)
+    }
+
+@api_router.get("/models/{model_id}")
+async def get_model(model_id: str):
+    """특정 모델 조회"""
+    if model_id not in distribution_models:
+        raise HTTPException(status_code=404, detail="Model not found")
+    return distribution_models[model_id]
+
+@api_router.post("/models")
+async def create_model(request: ModelCreateRequest):
+    """새 분배 모델 생성"""
+    # 시그마 합계 검증
+    if abs(sum(request.sigma) - 1.0) > 0.01:
+        raise HTTPException(status_code=400, detail="Sigma must sum to 1.0")
+    
+    model_id = f"custom_{uuid.uuid4().hex[:8]}"
+    new_model = {
+        "id": model_id,
+        "name": request.name,
+        "description": request.description,
+        "sigma": request.sigma,
+        "omega": request.omega,
+        "type": request.type,
+        "is_active": False,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    distribution_models[model_id] = new_model
+    
+    tracker.log("모델", "새 모델 생성", {"model_id": model_id, "name": request.name})
+    
+    return {"success": True, "model": new_model}
+
+@api_router.post("/models/{model_id}/activate")
+async def activate_model(model_id: str):
+    """모델 활성화 (전환)"""
+    global current_model_id
+    
+    if model_id not in distribution_models:
+        raise HTTPException(status_code=404, detail="Model not found")
+    
+    # 기존 활성 모델 비활성화
+    for mid in distribution_models:
+        distribution_models[mid]["is_active"] = False
+    
+    # 선택된 모델 활성화
+    model = distribution_models[model_id]
+    model["is_active"] = True
+    current_model_id = model_id
+    
+    # 시그마와 오메가 업데이트
+    config_mgr.update_sigma(model["sigma"])
+    config_mgr.update_omega(model["omega"])
+    
+    tracker.log("모델", "모델 전환", {"model_id": model_id, "name": model["name"]})
+    
+    return {
+        "success": True,
+        "activated_model": model,
+        "sigma": model["sigma"],
+        "omega": model["omega"]
+    }
+
+@api_router.delete("/models/{model_id}")
+async def delete_model(model_id: str):
+    """커스텀 모델 삭제"""
+    if model_id not in distribution_models:
+        raise HTTPException(status_code=404, detail="Model not found")
+    
+    model = distribution_models[model_id]
+    
+    # 기본 모델은 삭제 불가
+    if not model_id.startswith("custom_"):
+        raise HTTPException(status_code=400, detail="Cannot delete built-in models")
+    
+    # 활성 모델은 삭제 불가
+    if model["is_active"]:
+        raise HTTPException(status_code=400, detail="Cannot delete active model")
+    
+    del distribution_models[model_id]
+    
+    tracker.log("모델", "모델 삭제", {"model_id": model_id})
+    
+    return {"success": True, "deleted_model_id": model_id}
+
 # Include the router in the main app
 app.include_router(api_router)
 
