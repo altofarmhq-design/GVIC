@@ -359,5 +359,53 @@
       "source": "erp",
       "success": true
     }
+  },
+  {
+    "timestamp": "2026-02-12T13:08:04.691724",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 5.0,
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:08:24.747899",
+    "phase": "통합",
+    "action": "데이터 교환",
+    "data": {
+      "source": "erp",
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:09:02.601072",
+    "phase": "데이터",
+    "action": "IO 처리",
+    "data": {
+      "format": "json"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:09:04.062247",
+    "phase": "데이터",
+    "action": "IO 처리",
+    "data": {
+      "format": "json"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:09:05.566075",
+    "phase": "데이터",
+    "action": "IO 처리",
+    "data": {
+      "format": "json"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:09:11.788450",
+    "phase": "알림",
+    "action": "헬스체크 실행",
+    "data": {}
   }
 ]
