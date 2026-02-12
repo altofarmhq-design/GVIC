@@ -159,6 +159,60 @@ export default function UsersTab() {
         </Button>
       </div>
 
+      {/* Pending Users Section */}
+      {pendingUsers.length > 0 && (
+        <Card className="bg-orange-500/10 border-orange-500/50">
+          <CardHeader>
+            <CardTitle className="text-orange-400 flex items-center gap-2">
+              <Clock className="w-5 h-5" /> 승인 대기 ({pendingUsers.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {pendingUsers.map((user) => (
+                <div 
+                  key={user.user_id}
+                  className="flex items-center justify-between p-4 bg-slate-700/50 rounded-lg"
+                  data-testid={`pending-user-${user.user_id}`}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center">
+                      <span className="text-lg font-semibold text-orange-400">
+                        {user.name?.charAt(0)?.toUpperCase()}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="font-medium text-slate-100">{user.name}</span>
+                      <p className="text-sm text-slate-400">{user.email}</p>
+                      <p className="text-xs text-slate-500">
+                        신청일: {new Date(user.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button 
+                      size="sm" 
+                      className="bg-green-600 hover:bg-green-700"
+                      onClick={() => handleApprove(user.user_id)}
+                    >
+                      <UserCheck className="w-4 h-4 mr-1" /> 승인
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      className="text-red-400 border-red-500/50 hover:bg-red-500/20"
+                      onClick={() => handleReject(user.user_id)}
+                    >
+                      <UserX className="w-4 h-4 mr-1" /> 거부
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <Card className="bg-slate-800/50 border-slate-700">
         <CardHeader>
           <CardTitle className="text-slate-100 flex items-center gap-2">
