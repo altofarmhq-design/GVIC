@@ -227,13 +227,13 @@ function Dashboard() {
               <Bell className="w-4 h-4 mr-2" /> 알림
             </TabsTrigger>
             
-            {hasRole(['admin', 'operator']) && (
+            {hasRole(['super_admin', 'admin', 'operator']) && (
               <TabsTrigger value="settings" className="data-[state=active]:bg-slate-700">
                 <Settings className="w-4 h-4 mr-2" /> 설정
               </TabsTrigger>
             )}
             
-            {hasRole(['admin']) && (
+            {isAdmin() && (
               <TabsTrigger value="users" className="data-[state=active]:bg-slate-700">
                 <Users className="w-4 h-4 mr-2" /> 사용자
               </TabsTrigger>
