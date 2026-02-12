@@ -11,7 +11,7 @@ from datetime import datetime
 from typing import Dict, Any, List
 
 class GVICAPITester:
-    def __init__(self, base_url="https://gvic-auth.preview.emergentagent.com"):
+    def __init__(self, base_url="https://patent-engine-1.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.tests_run = 0
