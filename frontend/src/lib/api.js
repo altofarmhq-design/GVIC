@@ -100,12 +100,14 @@ export const api = {
   // Pipeline APIs
   runPipeline: (config) => axios.post(`${API}/pipeline/run`, config),
   getAnalysisFiles: () => axios.get(`${API}/analysis/files`),
-  getPipelineReports: () => axios.get(`${API}/pipeline/reports`)
+  getPipelineReports: () => axios.get(`${API}/pipeline/reports`),
+  analyzeUrl: (config) => axios.post(`${API}/pipeline/analyze-url`, config)
 };
 
 // Export individual functions for easier imports
 export const runPipeline = (config) => api.runPipeline(config).then(res => res.data);
 export const getAnalysisFiles = () => api.getAnalysisFiles().then(res => res.data);
 export const getPipelineReports = () => api.getPipelineReports().then(res => res.data);
+export const analyzeUrl = (config) => api.analyzeUrl(config).then(res => res.data);
 
 export default api;
