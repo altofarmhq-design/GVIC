@@ -89,5 +89,28 @@
     "data": {
       "test": true
     }
+  },
+  {
+    "timestamp": "2026-02-12T05:35:13.651014",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 0.85,
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T05:35:15.567805",
+    "phase": "데이터",
+    "action": "IO 처리",
+    "data": {
+      "format": "csv"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T05:35:18.734492",
+    "phase": "알림",
+    "action": "헬스체크 실행",
+    "data": {}
   }
 ]
