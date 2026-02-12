@@ -31,7 +31,12 @@ export const api = {
   generateReport: (options = {}) => axios.post(`${API}/report/generate`, options, { responseType: 'blob' }),
   // Monitoring APIs
   getRealtimeMonitoring: () => axios.get(`${API}/monitor/realtime`),
-  getDistributionMonitor: () => axios.get(`${API}/monitor/distribution`)
+  getDistributionMonitor: () => axios.get(`${API}/monitor/distribution`),
+  // Dynamic Adjustment APIs
+  getAdjustmentConfig: () => axios.get(`${API}/adjustment/config`),
+  updateAdjustmentConfig: (config) => axios.put(`${API}/adjustment/config`, config),
+  executeAdjustment: () => axios.post(`${API}/adjustment/execute`),
+  getAdjustmentHistory: (limit = 20) => axios.get(`${API}/adjustment/history?limit=${limit}`)
 };
 
 export default api;
