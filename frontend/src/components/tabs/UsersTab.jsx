@@ -68,24 +68,43 @@ export default function UsersTab() {
 
   const getRoleBadge = (role) => {
     const styles = {
+      super_admin: 'bg-purple-500/20 text-purple-400 border-purple-500/50',
       admin: 'bg-red-500/20 text-red-400 border-red-500/50',
       operator: 'bg-blue-500/20 text-blue-400 border-blue-500/50',
-      viewer: 'bg-gray-500/20 text-gray-400 border-gray-500/50'
+      visitor: 'bg-gray-500/20 text-gray-400 border-gray-500/50',
+      ext_admin: 'bg-orange-500/20 text-orange-400 border-orange-500/50',
+      ext_operator: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50',
+      ext_visitor: 'bg-slate-500/20 text-slate-400 border-slate-500/50'
+    };
+    const labels = {
+      super_admin: '최고관리자',
+      admin: '관리자',
+      operator: '오퍼레이터',
+      visitor: '방문객',
+      ext_admin: '외부관리자',
+      ext_operator: '외부오퍼레이터',
+      ext_visitor: '외부방문객'
     };
     const icons = {
-      admin: <Crown className="w-3 h-3 mr-1" />,
+      super_admin: <Crown className="w-3 h-3 mr-1" />,
+      admin: <Shield className="w-3 h-3 mr-1" />,
       operator: <Settings2 className="w-3 h-3 mr-1" />,
-      viewer: <Eye className="w-3 h-3 mr-1" />
+      visitor: <Eye className="w-3 h-3 mr-1" />,
+      ext_admin: <Shield className="w-3 h-3 mr-1" />,
+      ext_operator: <Settings2 className="w-3 h-3 mr-1" />,
+      ext_visitor: <Eye className="w-3 h-3 mr-1" />
     };
     return (
-      <Badge variant="outline" className={`${styles[role] || styles.viewer} flex items-center`}>
-        {icons[role]}
-        {role}
+      <Badge variant="outline" className={`${styles[role] || styles.visitor} flex items-center`}>
+        {icons[role] || icons.visitor}
+        {labels[role] || role}
       </Badge>
     );
   };
 
-  if (!hasRole(['admin'])) {
+  const isExternalRole = (role) => role?.startsWith('ext_');
+
+  if (!hasRole(['super_admin', 'admin'])) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
