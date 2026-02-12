@@ -79,6 +79,7 @@ INTERNAL_ADMIN_ROLES = ["super_admin", "admin"]
 class UserRegister(BaseModel):
     email: EmailStr
     password: str = Field(..., min_length=6)
+    password_confirm: str = Field(..., min_length=6)
     name: str = Field(..., min_length=2)
 
 class UserLogin(BaseModel):
