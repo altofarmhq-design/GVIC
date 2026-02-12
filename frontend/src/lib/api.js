@@ -48,7 +48,12 @@ export const api = {
   updatePredictionConfig: (config) => axios.put(`${API}/prediction/config`, config),
   analyzePrediction: () => axios.post(`${API}/prediction/analyze`),
   applyPrediction: () => axios.post(`${API}/prediction/apply`),
-  getPredictionHistory: (limit = 10) => axios.get(`${API}/prediction/history?limit=${limit}`)
+  getPredictionHistory: (limit = 10) => axios.get(`${API}/prediction/history?limit=${limit}`),
+  // Pareto APIs
+  getParetoConfig: () => axios.get(`${API}/pareto/config`),
+  updateParetoConfig: (config) => axios.put(`${API}/pareto/config`, config),
+  runParetoOptimization: () => axios.post(`${API}/pareto/optimize`),
+  applyParetoSolution: (index) => axios.post(`${API}/pareto/apply/${index}`)
 };
 
 export default api;
