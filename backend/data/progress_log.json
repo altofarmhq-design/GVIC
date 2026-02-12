@@ -327,5 +327,14 @@
     "data": {
       "domain_id": "test_domain"
     }
+  },
+  {
+    "timestamp": "2026-02-12T13:02:14.377417",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 7.5,
+      "success": true
+    }
   }
 ]
