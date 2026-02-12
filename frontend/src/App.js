@@ -220,6 +220,12 @@ function Dashboard() {
               </TabsTrigger>
             )}
             
+            {hasPermission('process') && (
+              <TabsTrigger value="pipeline" className="data-[state=active]:bg-slate-700">
+                <FileText className="w-4 h-4 mr-2" /> 분석
+              </TabsTrigger>
+            )}
+            
             <TabsTrigger value="data" className="data-[state=active]:bg-slate-700">
               <Database className="w-4 h-4 mr-2" /> 데이터
             </TabsTrigger>
