@@ -1234,5 +1234,24 @@
     "phase": "알림",
     "action": "헬스체크 실행",
     "data": {}
+  },
+  {
+    "timestamp": "2026-02-12T15:41:42.136115",
+    "phase": "URL분석",
+    "action": "시작",
+    "data": {
+      "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000186204",
+      "max_reviews": 500
+    }
+  },
+  {
+    "timestamp": "2026-02-12T15:41:42.741018",
+    "phase": "URL분석",
+    "action": "완료",
+    "data": {
+      "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000186204",
+      "records": 500,
+      "pdf": "/app/backend/data/reports/GVIC_URL_Report_20260212_154142.pdf"
+    }
   }
 ]
