@@ -701,6 +701,144 @@ async def get_distribution_monitor():
         "timestamp": datetime.now(timezone.utc).isoformat()
     }
 
+# ==================== Dynamic Adjustment APIs (특허6: DynamicAdjuster) ====================
+
+# 자동 조정 설정 저장소
+auto_adjustment_config = {
+    "enabled": False,
+    "threshold": 0.05,  # 5% 편차 임계값
+    "adjustment_rate": 0.01,  # 1% 조정률
+    "max_adjustments": 10,  # 최대 조정 횟수
+    "interval_seconds": 60,  # 조정 간격 (초)
+    "last_adjustment": None,
+    "adjustment_history": []
+}
+
+class AutoAdjustmentConfig(BaseModel):
+    enabled: bool = False
+    threshold: float = 0.05
+    adjustment_rate: float = 0.01
+    max_adjustments: int = 10
+    interval_seconds: int = 60
+
+@api_router.get("/adjustment/config")
+async def get_adjustment_config():
+    """자동 조정 설정 조회"""
+    return auto_adjustment_config
+
+@api_router.put("/adjustment/config")
+async def update_adjustment_config(config: AutoAdjustmentConfig):
+    """자동 조정 설정 업데이트"""
+    auto_adjustment_config["enabled"] = config.enabled
+    auto_adjustment_config["threshold"] = config.threshold
+    auto_adjustment_config["adjustment_rate"] = config.adjustment_rate
+    auto_adjustment_config["max_adjustments"] = config.max_adjustments
+    auto_adjustment_config["interval_seconds"] = config.interval_seconds
+    
+    tracker.log("자동조정", "설정 변경", {
+        "enabled": config.enabled,
+        "threshold": config.threshold
+    })
+    
+    return {"success": True, "config": auto_adjustment_config}
+
+@api_router.post("/adjustment/execute")
+async def execute_adjustment():
+    """수동 조정 실행 (특허6: DynamicAdjuster 로직)"""
+    sigma = config_mgr.get_sigma()
+    omega = config_mgr.get_omega()
+    
+    # 현재 분배 상태 시뮬레이션
+    actual = [
+        sigma[0] + random.uniform(-0.05, 0.05),
+        sigma[1] + random.uniform(-0.05, 0.05),
+        sigma[2] + random.uniform(-0.05, 0.05)
+    ]
+    total = sum(actual)
+    actual = [a/total for a in actual]
+    
+    # 편차 계산
+    deviations = [abs(actual[i] - sigma[i]) for i in range(3)]
+    max_deviation = max(deviations)
+    
+    adjustments = []
+    new_sigma = list(sigma)
+    
+    # 임계값 초과 시 조정
+    threshold = auto_adjustment_config["threshold"]
+    rate = auto_adjustment_config["adjustment_rate"]
+    
+    for i in range(3):
+        if deviations[i] > threshold:
+            # 목표 방향으로 조정
+            direction = 1 if actual[i] < sigma[i] else -1
+            adjustment = direction * rate
+            
+            # 경계 조건 확인
+            new_value = new_sigma[i] + adjustment
+            category = ["V_pub", "V_pro", "V_ind"][i]
+            min_key = f"{category}_min"
+            max_key = f"{category}_max"
+            
+            # 경계 내로 제한
+            new_value = max(omega.get(min_key, 0.1), min(omega.get(max_key, 0.5), new_value))
+            
+            adjustments.append({
+                "category": ["public", "productive", "individual"][i],
+                "from": sigma[i],
+                "to": new_value,
+                "deviation": deviations[i],
+                "direction": "increase" if direction > 0 else "decrease"
+            })
+            new_sigma[i] = new_value
+    
+    # 정규화 (합이 1이 되도록)
+    total_new = sum(new_sigma)
+    new_sigma = [s/total_new for s in new_sigma]
+    
+    # 시그마 업데이트 (조정이 있을 경우만)
+    if adjustments:
+        config_mgr.update_sigma(new_sigma)
+        
+        # 이력 저장
+        adjustment_record = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "old_sigma": sigma,
+            "new_sigma": new_sigma,
+            "adjustments": adjustments,
+            "max_deviation": max_deviation
+        }
+        auto_adjustment_config["adjustment_history"].append(adjustment_record)
+        if len(auto_adjustment_config["adjustment_history"]) > 100:
+            auto_adjustment_config["adjustment_history"] = auto_adjustment_config["adjustment_history"][-100:]
+        
+        auto_adjustment_config["last_adjustment"] = datetime.now(timezone.utc).isoformat()
+        
+        tracker.log("자동조정", "조정 실행", {
+            "adjustments_count": len(adjustments),
+            "max_deviation": max_deviation
+        })
+    
+    return {
+        "success": True,
+        "adjusted": len(adjustments) > 0,
+        "old_sigma": sigma,
+        "new_sigma": new_sigma,
+        "adjustments": adjustments,
+        "max_deviation": max_deviation,
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
+
+@api_router.get("/adjustment/history")
+async def get_adjustment_history(limit: int = 20):
+    """조정 이력 조회"""
+    history = auto_adjustment_config["adjustment_history"][-limit:]
+    return {
+        "history": history,
+        "total": len(auto_adjustment_config["adjustment_history"]),
+        "last_adjustment": auto_adjustment_config["last_adjustment"]
+    }
+
 # Include the router in the main app
 app.include_router(api_router)
 

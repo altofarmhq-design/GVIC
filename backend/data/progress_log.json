@@ -468,5 +468,14 @@
       "value": 5.0,
       "success": true
     }
+  },
+  {
+    "timestamp": "2026-02-12T13:22:55.497817",
+    "phase": "통합",
+    "action": "데이터 교환",
+    "data": {
+      "source": "erp",
+      "success": true
+    }
   }
 ]
