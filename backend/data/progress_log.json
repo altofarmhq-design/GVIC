@@ -407,5 +407,14 @@
     "phase": "알림",
     "action": "헬스체크 실행",
     "data": {}
+  },
+  {
+    "timestamp": "2026-02-12T13:11:54.761826",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 5.0,
+      "success": true
+    }
   }
 ]
