@@ -8,3 +8,4 @@ export { MonitoringTab } from './MonitoringTab';
 export { ModelsTab } from './ModelsTab';
 export { PredictionTab } from './PredictionTab';
 export { ParetoTab } from './ParetoTab';
+export { ComparisonTab } from './ComparisonTab';
