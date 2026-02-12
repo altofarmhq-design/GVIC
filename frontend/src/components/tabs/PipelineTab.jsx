@@ -109,34 +109,15 @@ const PipelineTab = () => {
   };
 
   // PDF 직접 다운로드 함수
-  const handleDownloadPdf = async (pdfUrlOrName) => {
+  const handleDownloadPdf = (pdfUrlOrName) => {
     if (!pdfUrlOrName) return;
     
     // URL에서 파일명 추출 또는 파일명 직접 사용
     const filename = pdfUrlOrName.includes('/') ? pdfUrlOrName.split('/').pop() : pdfUrlOrName;
     const downloadUrl = `${process.env.REACT_APP_BACKEND_URL}/api/pipeline/report/${filename}`;
     
-    try {
-      // fetch로 파일 다운로드
-      const response = await fetch(downloadUrl);
-      if (!response.ok) throw new Error('다운로드 실패');
-      
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error('PDF 다운로드 오류:', err);
-      // 대체 방법: 새 탭에서 열기
-      window.open(downloadUrl, '_blank');
-    }
+    // 직접 링크로 다운로드 (Content-Disposition: attachment가 설정되어 있어 자동 다운로드됨)
+    window.location.href = downloadUrl;
   };
 
   const handleRunPipeline = async () => {
