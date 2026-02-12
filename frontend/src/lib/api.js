@@ -36,7 +36,13 @@ export const api = {
   getAdjustmentConfig: () => axios.get(`${API}/adjustment/config`),
   updateAdjustmentConfig: (config) => axios.put(`${API}/adjustment/config`, config),
   executeAdjustment: () => axios.post(`${API}/adjustment/execute`),
-  getAdjustmentHistory: (limit = 20) => axios.get(`${API}/adjustment/history?limit=${limit}`)
+  getAdjustmentHistory: (limit = 20) => axios.get(`${API}/adjustment/history?limit=${limit}`),
+  // Multi-Model APIs
+  getAllModels: () => axios.get(`${API}/models`),
+  getModel: (modelId) => axios.get(`${API}/models/${modelId}`),
+  createModel: (model) => axios.post(`${API}/models`, model),
+  activateModel: (modelId) => axios.post(`${API}/models/${modelId}/activate`),
+  deleteModel: (modelId) => axios.delete(`${API}/models/${modelId}`)
 };
 
 export default api;
