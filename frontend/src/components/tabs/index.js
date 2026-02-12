@@ -9,3 +9,4 @@ export { ModelsTab } from './ModelsTab';
 export { PredictionTab } from './PredictionTab';
 export { ParetoTab } from './ParetoTab';
 export { ComparisonTab } from './ComparisonTab';
+export { default as DataSourcesTab } from './DataSourcesTab';
