@@ -597,5 +597,24 @@
       "success": true,
       "value": 1.0
     }
+  },
+  {
+    "timestamp": "2026-02-12T13:53:28.416651",
+    "phase": "데이터소스",
+    "action": "소스 등록",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "name": ""
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:53:41.359359",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
   }
 ]
