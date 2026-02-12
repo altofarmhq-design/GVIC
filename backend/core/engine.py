@@ -259,7 +259,7 @@ class GVICEngine:
             new_omega.get('V_ind_max', 0.5)
         ])
         
-        logger.info(f"Omega updated")
+        logger.info("Omega updated")
     
     def get_system_status(self) -> Dict:
         """시스템 상태 조회"""
