@@ -137,10 +137,6 @@ const PipelineTab = () => {
       alert('파일 다운로드에 실패했습니다.');
     }
   };
-    setTimeout(() => {
-      document.body.removeChild(iframe);
-    }, 5000);
-  };
 
   const handleRunPipeline = async () => {
     setIsRunning(true);
