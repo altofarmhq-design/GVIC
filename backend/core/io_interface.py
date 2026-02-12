@@ -30,14 +30,14 @@ class InputProcessor:
             if isinstance(data, str):
                 try:
                     processed_data = json.loads(data)
-                except:
+                except (json.JSONDecodeError, ValueError):
                     processed_data = {'raw': data}
             else:
                 processed_data = data
         elif format == 'numeric':
             try:
                 processed_data = float(data)
-            except:
+            except (ValueError, TypeError):
                 processed_data = 0.0
         elif format == 'key_value':
             if isinstance(data, str):
@@ -71,7 +71,7 @@ class InputProcessor:
             try:
                 json.loads(data)
                 return 'json'
-            except:
+            except (json.JSONDecodeError, ValueError):
                 pass
             
             # key=value 형식 확인
@@ -92,7 +92,7 @@ class InputProcessor:
                 key, value = line.split('=', 1)
                 try:
                     result[key.strip()] = float(value.strip())
-                except:
+                except (ValueError, TypeError):
                     result[key.strip()] = value.strip()
         return result
     
@@ -112,7 +112,7 @@ class InputProcessor:
                 if i < len(values):
                     try:
                         row[header] = float(values[i])
-                    except:
+                    except (ValueError, TypeError):
                         row[header] = values[i]
             result.append(row)
         

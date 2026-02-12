@@ -53,7 +53,7 @@ class AlertManager:
         for subscriber in self.subscribers:
             try:
                 subscriber(alert)
-            except:
+            except Exception:
                 pass
         
         return alert

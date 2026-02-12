@@ -33,7 +33,7 @@ class ConfigManager:
             try:
                 with open(self.config_path, 'r', encoding='utf-8') as f:
                     return {**default_config, **json.load(f)}
-            except:
+            except (json.JSONDecodeError, IOError):
                 pass
         
         return default_config

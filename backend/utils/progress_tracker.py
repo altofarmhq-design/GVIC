@@ -17,7 +17,7 @@ class ProgressTracker:
             try:
                 with open(self.log_path, 'r', encoding='utf-8') as f:
                     return json.load(f)
-            except:
+            except (json.JSONDecodeError, IOError):
                 pass
         return []
     
