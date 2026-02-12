@@ -190,8 +190,27 @@ export default function LoginPage() {
                     />
                   </div>
                 </div>
-                <Button type="submit" className="w-full" disabled={loading} data-testid="register-submit">
-                  {loading ? '가입 중...' : '회원가입'}
+                <div className="space-y-2">
+                  <Label className="text-slate-200">비밀번호 확인</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                    <Input
+                      type="password"
+                      placeholder="비밀번호를 다시 입력"
+                      value={passwordConfirm}
+                      onChange={(e) => setPasswordConfirm(e.target.value)}
+                      className="pl-10 bg-slate-700 border-slate-600"
+                      required
+                      minLength={6}
+                      data-testid="register-password-confirm"
+                    />
+                  </div>
+                  {password && passwordConfirm && password !== passwordConfirm && (
+                    <p className="text-xs text-red-400">비밀번호가 일치하지 않습니다</p>
+                  )}
+                </div>
+                <Button type="submit" className="w-full" disabled={loading || (password !== passwordConfirm)} data-testid="register-submit">
+                  {loading ? '가입 신청 중...' : '회원가입 신청'}
                 </Button>
               </form>
             </TabsContent>
