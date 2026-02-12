@@ -1,15 +1,21 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { 
   PieChart, Pie, Cell, ResponsiveContainer, 
   RadialBarChart, RadialBar, Tooltip as RechartsTooltip
 } from 'recharts';
 import { 
   Activity, CheckCircle, AlertTriangle, Zap, 
-  Shield, BarChart3, TrendingUp, PieChart as PieChartIcon
+  Shield, BarChart3, TrendingUp, PieChart as PieChartIcon,
+  FileDown, RefreshCw
 } from 'lucide-react';
 import { MetricCard } from "@/components/MetricCard";
+import { api } from "@/lib/api";
 
 export const DashboardTab = ({ dashboard, systemStatus }) => {
+  const [generating, setGenerating] = useState(false);
+
   const pieData = dashboard?.charts?.distribution?.data || [
     { name: '공공', value: 33, color: '#3b82f6' },
     { name: '생산', value: 34, color: '#10b981' },
@@ -23,8 +29,46 @@ export const DashboardTab = ({ dashboard, systemStatus }) => {
   // 모듈 상태
   const moduleStats = systemStatus?.modules || {};
 
+  // PDF 리포트 다운로드
+  const handleDownloadReport = async () => {
+    setGenerating(true);
+    try {
+      const response = await api.generateReport({ include_history: true, limit: 20 });
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `gvic_report_${new Date().toISOString().slice(0,10)}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Report generation error:", error);
+      alert("리포트 생성 중 오류가 발생했습니다.");
+    }
+    setGenerating(false);
+  };
+
   return (
     <div className="space-y-6">
+      {/* Header with Report Button */}
+      <div className="flex justify-end">
+        <Button 
+          onClick={handleDownloadReport} 
+          disabled={generating}
+          className="bg-violet-600 hover:bg-violet-500"
+          data-testid="download-report-button"
+        >
+          {generating ? (
+            <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+          ) : (
+            <FileDown className="w-4 h-4 mr-2" />
+          )}
+          PDF 리포트 다운로드
+        </Button>
+      </div>
+
       {/* Metrics Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" data-testid="metrics-row">
         <MetricCard 
