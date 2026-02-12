@@ -2917,10 +2917,12 @@ async def analyze_url(request: URLAnalysisRequest):
     formatted_data = output_adapter.format(analysis_result, output_opts)
     pdf_path = output_adapter.export(formatted_data, output_file)
     
-    # public 폴더에 복사
-    public_pdf = f"/app/frontend/public/GVIC_Report_Latest.pdf"
+    # public 폴더에 복사 (원본 파일명으로도 복사)
     import shutil
-    shutil.copy(pdf_path, public_pdf)
+    public_pdf_latest = f"/app/frontend/public/GVIC_Report_Latest.pdf"
+    public_pdf_named = f"/app/frontend/public/{os.path.basename(pdf_path)}"
+    shutil.copy(pdf_path, public_pdf_latest)
+    shutil.copy(pdf_path, public_pdf_named)
     
     # ===== 데이터 허브: 세션 완료 =====
     await data_hub.complete_session(pdf_path, "/GVIC_Report_Latest.pdf")
