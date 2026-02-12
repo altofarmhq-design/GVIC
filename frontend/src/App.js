@@ -125,6 +125,10 @@ function App() {
             <PredictionTab onUpdate={fetchData} />
           </TabsContent>
 
+          <TabsContent value="pareto">
+            <ParetoTab onUpdate={fetchData} />
+          </TabsContent>
+
           <TabsContent value="monitoring">
             <MonitoringTab />
           </TabsContent>
