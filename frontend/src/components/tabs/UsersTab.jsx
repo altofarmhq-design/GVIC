@@ -71,6 +71,25 @@ export default function UsersTab() {
     setRoleDialog({ open: false, user: null, newRole: '' });
   };
 
+  const handleApprove = async (userId) => {
+    try {
+      await api.approveUser(userId);
+      fetchUsers();
+    } catch (error) {
+      console.error('Failed to approve user:', error);
+    }
+  };
+
+  const handleReject = async (userId) => {
+    if (!window.confirm('이 사용자의 가입을 거부하시겠습니까?')) return;
+    try {
+      await api.rejectUser(userId);
+      fetchUsers();
+    } catch (error) {
+      console.error('Failed to reject user:', error);
+    }
+  };
+
   const getRoleBadge = (role) => {
     const styles = {
       super_admin: 'bg-purple-500/20 text-purple-400 border-purple-500/50',
