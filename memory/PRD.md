@@ -312,10 +312,16 @@ curl "/api/dashboard"
 - [x] **Google OAuth 연동 (Emergent Auth)**
   - Google 세션 교환 API (POST /api/auth/google/session)
   - OAuth 콜백 처리 (/auth/callback)
-- [x] **역할 기반 접근 제어 (RBAC)**
-  - 3단계 역할: Admin (전체 권한), Operator (처리/리포트), Viewer (읽기 전용)
-  - 역할별 메뉴/탭 접근 제한
-  - API 엔드포인트 권한 검사
+- [x] **역할 기반 접근 제어 (RBAC) - 7단계 역할**
+  - 내부 시스템:
+    - 최고관리자 (super_admin): 전체 권한 + 시스템 설정
+    - 관리자 (admin): 전체 권한
+    - 오퍼레이터 (operator): 처리/리포트/모니터링
+    - 방문객 (visitor): 읽기 전용
+  - 외부 시스템 (모두 방문객 권한):
+    - 외부관리자 (ext_admin)
+    - 외부오퍼레이터 (ext_operator)
+    - 외부방문객 (ext_visitor)
 - [x] **사용자 관리 (Admin 전용)**
   - 사용자 목록 조회 API (GET /api/auth/users)
   - 역할 변경 API (PUT /api/auth/users/{id})
