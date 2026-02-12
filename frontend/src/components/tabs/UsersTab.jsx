@@ -26,14 +26,19 @@ import {
 export default function UsersTab() {
   const { user: currentUser, hasRole } = useAuth();
   const [users, setUsers] = useState([]);
+  const [pendingUsers, setPendingUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deleteDialog, setDeleteDialog] = useState({ open: false, user: null });
   const [roleDialog, setRoleDialog] = useState({ open: false, user: null, newRole: '' });
 
   const fetchUsers = async () => {
     try {
-      const response = await api.getUsers();
-      setUsers(response.data.users);
+      const [usersRes, pendingRes] = await Promise.all([
+        api.getUsers(),
+        api.getPendingUsers()
+      ]);
+      setUsers(usersRes.data.users.filter(u => u.status !== 'pending'));
+      setPendingUsers(pendingRes.data.users);
     } catch (error) {
       console.error('Failed to fetch users:', error);
     }
