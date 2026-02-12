@@ -297,7 +297,46 @@ curl "/api/dashboard"
 ## 향후 작업 (P5)
 
 ### 추가 기능
-- [ ] 사용자 인증 및 역할 기반 접근 제어 (RBAC)
+- [x] 사용자 인증 및 역할 기반 접근 제어 (RBAC) - 완료 (2026-02-12)
+- [ ] 대시보드 UI/UX 전면 개편
+- [ ] 다국어 지원
+- [ ] 모바일 반응형 UI 개선
+
+## 구현 완료 (P5) - 2026-02-12
+
+### 사용자 인증 및 역할 기반 접근 제어 (RBAC) (완료)
+- [x] **JWT 기반 커스텀 인증**
+  - 회원가입 API (POST /api/auth/register)
+  - 로그인 API (POST /api/auth/login)
+  - 비밀번호 변경 API (PUT /api/auth/password)
+- [x] **Google OAuth 연동 (Emergent Auth)**
+  - Google 세션 교환 API (POST /api/auth/google/session)
+  - OAuth 콜백 처리 (/auth/callback)
+- [x] **역할 기반 접근 제어 (RBAC)**
+  - 3단계 역할: Admin (전체 권한), Operator (처리/리포트), Viewer (읽기 전용)
+  - 역할별 메뉴/탭 접근 제한
+  - API 엔드포인트 권한 검사
+- [x] **사용자 관리 (Admin 전용)**
+  - 사용자 목록 조회 API (GET /api/auth/users)
+  - 역할 변경 API (PUT /api/auth/users/{id})
+  - 사용자 삭제 API (DELETE /api/auth/users/{id})
+  - UsersTab 컴포넌트
+- [x] **프론트엔드 인증 UI**
+  - LoginPage 컴포넌트 (로그인/회원가입 탭)
+  - AuthCallback 컴포넌트 (OAuth 콜백 처리)
+  - AuthContext (인증 상태 관리)
+  - ProtectedRoute (인증 필요 라우트 보호)
+  - 사용자 메뉴 드롭다운
+
+### 테스트 결과 (P5)
+- 백엔드 인증 API: 모든 엔드포인트 정상 작동
+- JWT 토큰 발급/검증: 정상
+- Google OAuth: Emergent Auth 연동 완료
+- 역할별 접근 제어: 정상 작동
+
+## 향후 작업 (P6)
+
+### 추가 기능
 - [ ] 대시보드 UI/UX 전면 개편
 - [ ] 다국어 지원
 - [ ] 모바일 반응형 UI 개선
