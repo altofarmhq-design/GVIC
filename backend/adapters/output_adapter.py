@@ -205,6 +205,20 @@ class PDFReportAdapter(OutputAdapter):
         from reportlab.lib.units import cm
         from reportlab.pdfbase import pdfmetrics
         from reportlab.pdfbase.ttfonts import TTFont
+        from reportlab.pdfbase.cidfonts import UnicodeCIDFont
+        
+        # 한글 폰트 등록 (Noto Sans CJK KR)
+        try:
+            # TTC 파일에서 특정 폰트 추출
+            from reportlab.pdfbase.ttfonts import TTFont
+            pdfmetrics.registerFont(TTFont('NotoSansKR', '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc', subfontIndex=1))
+            pdfmetrics.registerFont(TTFont('NotoSansKR-Bold', '/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc', subfontIndex=1))
+            korean_font = 'NotoSansKR'
+            korean_font_bold = 'NotoSansKR-Bold'
+        except Exception as e:
+            logger.warning(f"한글 폰트 등록 실패: {e}, 기본 폰트 사용")
+            korean_font = 'Helvetica'
+            korean_font_bold = 'Helvetica-Bold'
         
         # PDF 생성
         doc = SimpleDocTemplate(
@@ -216,11 +230,12 @@ class PDFReportAdapter(OutputAdapter):
             bottomMargin=2*cm
         )
         
-        # 스타일 정의
+        # 스타일 정의 (한글 폰트 적용)
         styles = getSampleStyleSheet()
         title_style = ParagraphStyle(
             'CustomTitle', 
             parent=styles['Heading1'], 
+            fontName=korean_font_bold,
             fontSize=24, 
             spaceAfter=30, 
             textColor=colors.HexColor('#1e293b')
@@ -228,6 +243,7 @@ class PDFReportAdapter(OutputAdapter):
         heading_style = ParagraphStyle(
             'CustomHeading', 
             parent=styles['Heading2'], 
+            fontName=korean_font_bold,
             fontSize=16, 
             spaceAfter=12, 
             spaceBefore=20,
@@ -236,6 +252,7 @@ class PDFReportAdapter(OutputAdapter):
         subheading_style = ParagraphStyle(
             'CustomSubheading', 
             parent=styles['Heading3'], 
+            fontName=korean_font_bold,
             fontSize=13, 
             spaceAfter=8, 
             textColor=colors.HexColor('#475569')
@@ -243,12 +260,14 @@ class PDFReportAdapter(OutputAdapter):
         normal_style = ParagraphStyle(
             'CustomNormal', 
             parent=styles['Normal'], 
+            fontName=korean_font,
             fontSize=11, 
             spaceAfter=8
         )
         positive_style = ParagraphStyle(
             'PositiveStyle', 
             parent=styles['Normal'], 
+            fontName=korean_font,
             fontSize=11, 
             textColor=colors.HexColor('#16a34a'),
             spaceAfter=6
@@ -256,6 +275,7 @@ class PDFReportAdapter(OutputAdapter):
         negative_style = ParagraphStyle(
             'NegativeStyle', 
             parent=styles['Normal'], 
+            fontName=korean_font,
             fontSize=11, 
             textColor=colors.HexColor('#dc2626'),
             spaceAfter=6
