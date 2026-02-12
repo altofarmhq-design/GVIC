@@ -1575,5 +1575,53 @@
       "pareto_front_size": 17,
       "best_weighted_score": 0.8423529411764704
     }
+  },
+  {
+    "timestamp": "2026-02-12T17:58:07.016699",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T17:58:08.856271",
+    "phase": "데이터소스",
+    "action": "폴링 시작",
+    "data": {
+      "source_id": "ds_0a6c69cb"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T17:58:10.587669",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T17:59:12.694107",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T18:00:14.854367",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
   }
 ]
