@@ -108,21 +108,35 @@ const PipelineTab = () => {
     }
   };
 
-  // PDF 직접 다운로드 함수
-  const handleDownloadPdf = (pdfUrlOrName) => {
-    if (!pdfUrlOrName) return;
+  // PDF 직접 다운로드 함수 - fetch + blob 방식
+  const handleDownloadPdf = async (filename) => {
+    if (!filename) return;
     
-    // URL에서 파일명 추출 또는 파일명 직접 사용
-    const filename = pdfUrlOrName.includes('/') ? pdfUrlOrName.split('/').pop() : pdfUrlOrName;
-    const downloadUrl = `${process.env.REACT_APP_BACKEND_URL}/api/pipeline/report/${filename}`;
-    
-    // iframe을 사용하여 다운로드 (페이지 이동 없이)
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = downloadUrl;
-    document.body.appendChild(iframe);
-    
-    // 5초 후 iframe 제거
+    try {
+      // 같은 origin에서 파일 가져오기
+      const response = await fetch(`/${filename}`);
+      if (!response.ok) throw new Error('파일을 찾을 수 없습니다');
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      
+      // 정리
+      setTimeout(() => {
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      }, 100);
+    } catch (err) {
+      console.error('다운로드 오류:', err);
+      alert('파일 다운로드에 실패했습니다.');
+    }
+  };
     setTimeout(() => {
       document.body.removeChild(iframe);
     }, 5000);
