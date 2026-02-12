@@ -262,7 +262,69 @@ export const DashboardTab = ({ dashboard, systemStatus }) => {
             </div>
           </CardContent>
         </Card>
+
+        {/* 통합 분석 통계 */}
+        <Card className="bg-slate-800/50 border-slate-700">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-slate-100 text-sm flex items-center gap-2">
+              <BarChart3 className="w-4 h-4 text-green-400" /> 통합 분석 통계
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-slate-400">분석 세션</span>
+              <span className="text-slate-200">{dashboard?.metrics?.total_sessions || 0}회</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-slate-400">평균 긍정률</span>
+              <span className="text-green-400">{((dashboard?.metrics?.avg_positive_ratio || 0) * 100).toFixed(1)}%</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-slate-400">평균 공정성</span>
+              <span className="text-blue-400">{(dashboard?.metrics?.avg_fairness_index || 0).toFixed(3)}</span>
+            </div>
+          </CardContent>
+        </Card>
       </div>
+
+      {/* 최근 분석 세션 */}
+      {dashboard?.recent_sessions?.length > 0 && (
+        <Card className="bg-slate-800/50 border-slate-700">
+          <CardHeader>
+            <CardTitle className="text-slate-100 flex items-center gap-2">
+              <Activity className="w-5 h-5 text-cyan-400" /> 최근 분석 세션
+            </CardTitle>
+            <CardDescription className="text-slate-400">
+              URL/파일 분석을 통해 처리된 최근 데이터
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {dashboard.recent_sessions.slice(0, 5).map((session, idx) => (
+                <div key={idx} className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-2 h-2 rounded-full ${session.status === 'completed' ? 'bg-green-500' : 'bg-yellow-500'}`} />
+                    <div>
+                      <div className="text-sm text-slate-200 truncate max-w-xs">
+                        {session.product_name || session.source_url?.substring(0, 40) || '분석'}
+                      </div>
+                      <div className="text-xs text-slate-500">
+                        {session.completed_at ? new Date(session.completed_at).toLocaleString('ko-KR') : '-'}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm text-slate-300">{session.total_records?.toLocaleString() || 0}건</div>
+                    <div className="text-xs text-green-400">
+                      긍정 {((session.sentiment_positive_ratio || 0) * 100).toFixed(0)}%
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };
