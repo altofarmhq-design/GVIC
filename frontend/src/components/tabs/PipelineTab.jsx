@@ -635,7 +635,7 @@ const PipelineTab = () => {
                           title="PDF 다운로드"
                         >
                           <FileDown className="h-5 w-5" />
-                        </a>
+                        </Button>
                       </div>
                     ))}
                   </div>
