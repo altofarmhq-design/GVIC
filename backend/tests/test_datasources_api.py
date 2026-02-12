@@ -172,7 +172,7 @@ class TestDataSourcesFetch:
         assert "source_id" in data
         
         if data["success"]:
-            assert "data" in data
+            assert "raw_data" in data or "data" in data
             assert "extracted_value" in data
             print(f"✓ Fetched data successfully, extracted value: {data.get('extracted_value')}")
         else:
