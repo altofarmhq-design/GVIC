@@ -116,8 +116,16 @@ const PipelineTab = () => {
     const filename = pdfUrlOrName.includes('/') ? pdfUrlOrName.split('/').pop() : pdfUrlOrName;
     const downloadUrl = `${process.env.REACT_APP_BACKEND_URL}/api/pipeline/report/${filename}`;
     
-    // 직접 링크로 다운로드 (Content-Disposition: attachment가 설정되어 있어 자동 다운로드됨)
-    window.location.href = downloadUrl;
+    // iframe을 사용하여 다운로드 (페이지 이동 없이)
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = downloadUrl;
+    document.body.appendChild(iframe);
+    
+    // 5초 후 iframe 제거
+    setTimeout(() => {
+      document.body.removeChild(iframe);
+    }, 5000);
   };
 
   const handleRunPipeline = async () => {
