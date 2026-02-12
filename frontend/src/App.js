@@ -14,7 +14,7 @@ import {
 import { 
   LayoutDashboard, Play, Database, Bell, Settings, 
   Zap, RefreshCw, Network, Radio, Layers, Brain, Target, GitCompare, Cloud,
-  Users, LogOut, User, Shield
+  Users, LogOut, User, Shield, FileText
 } from 'lucide-react';
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
@@ -30,7 +30,8 @@ import {
   PredictionTab,
   ParetoTab,
   ComparisonTab,
-  DataSourcesTab
+  DataSourcesTab,
+  PipelineTab
 } from "@/components/tabs";
 import UsersTab from "@/components/tabs/UsersTab";
 import LoginPage from "@/pages/LoginPage";
