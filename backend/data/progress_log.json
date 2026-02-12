@@ -799,5 +799,14 @@
       "success": false,
       "value": null
     }
+  },
+  {
+    "timestamp": "2026-02-12T13:56:14.193333",
+    "phase": "데이터소스",
+    "action": "소스 등록",
+    "data": {
+      "source_id": "ds_66dc4ab6",
+      "name": "TEST_Playwright Source"
+    }
   }
 ]
