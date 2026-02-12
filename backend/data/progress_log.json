@@ -1528,5 +1528,14 @@
       "records": 1000,
       "pdf": "/app/backend/data/reports/GVIC_URL_Report_20260212_170928.pdf"
     }
+  },
+  {
+    "timestamp": "2026-02-12T17:27:11.026536",
+    "phase": "파이프라인",
+    "action": "전체 분석 완료",
+    "data": {
+      "records": 1000,
+      "pdf": "/app/backend/data/reports/GVIC_Report_20260212_172710.pdf"
+    }
   }
 ]
