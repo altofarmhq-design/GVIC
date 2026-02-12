@@ -1058,5 +1058,45 @@
       "success": false,
       "value": null
     }
+  },
+  {
+    "timestamp": "2026-02-12T14:11:27.369149",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T14:12:29.719102",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T14:13:31.883359",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T14:14:34.054745",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
   }
 ]
