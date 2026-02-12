@@ -403,6 +403,11 @@ class PDFReportAdapter(OutputAdapter):
                 else:
                     elements.append(Paragraph("권장 사항이 없습니다.", normal_style))
             
+            elif section["id"] == "custom_notes":
+                # 사용자 추가 메모
+                if content:
+                    elements.append(Paragraph(str(content), normal_style))
+            
             elements.append(Spacer(1, 15))
         
         # PDF 빌드
