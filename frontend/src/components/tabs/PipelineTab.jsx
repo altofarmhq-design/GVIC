@@ -101,7 +101,21 @@ const PipelineTab = () => {
       setCurrentStep(5);
       loadData(); // 리포트 목록 갱신
     } catch (err) {
-      setError(err.response?.data?.detail || err.message || 'URL 분석 실패');
+      // detail이 객체인 경우 문자열로 변환
+      let errorMsg = 'URL 분석 실패';
+      if (err.response?.data?.detail) {
+        const detail = err.response.data.detail;
+        if (typeof detail === 'string') {
+          errorMsg = detail;
+        } else if (Array.isArray(detail)) {
+          errorMsg = detail.map(d => d.msg || JSON.stringify(d)).join(', ');
+        } else {
+          errorMsg = JSON.stringify(detail);
+        }
+      } else if (err.message) {
+        errorMsg = err.message;
+      }
+      setError(errorMsg);
       console.error('URL analysis error:', err);
     } finally {
       setIsRunning(false);
