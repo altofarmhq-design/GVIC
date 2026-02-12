@@ -2681,13 +2681,12 @@ async def run_full_pipeline_api(request: PipelineRequest):
 
 @api_router.get("/pipeline/reports")
 async def list_pipeline_reports():
-    """생성된 PDF 리포트 목록 (public 폴더 기준)"""
-    # public 폴더의 PDF 목록 반환 (프론트엔드에서 직접 다운로드 가능)
-    report_dir = "/app/frontend/public"
+    """생성된 PDF 리포트 목록"""
+    report_dir = "/app/backend/data/reports"
     reports = []
     if os.path.exists(report_dir):
         for f in os.listdir(report_dir):
-            if f.endswith('.pdf') and f != 'GVIC_Report_Latest.pdf':
+            if f.endswith('.pdf'):
                 file_path = os.path.join(report_dir, f)
                 reports.append({
                     "name": f,
