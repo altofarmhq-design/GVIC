@@ -578,5 +578,14 @@
       "value": 5.0,
       "success": true
     }
+  },
+  {
+    "timestamp": "2026-02-12T13:51:12.155672",
+    "phase": "데이터소스",
+    "action": "소스 등록",
+    "data": {
+      "source_id": "ds_a3ae82f3",
+      "name": "테스트 API 소스"
+    }
   }
 ]
