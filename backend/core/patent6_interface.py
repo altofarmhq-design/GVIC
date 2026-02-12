@@ -45,7 +45,7 @@ class DomainInterface:
                 return {'values': data, 'type': 'array'}
             else:
                 return {'value': str(data), 'type': 'unknown'}
-        except Exception as e:
+        except Exception:
             self.error_count += 1
             return None
     

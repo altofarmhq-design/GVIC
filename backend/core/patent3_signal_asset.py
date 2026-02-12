@@ -10,7 +10,7 @@ Signal Assetization Integrated Platform
 """
 import numpy as np
 from dataclasses import dataclass, field
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, List, Any, Tuple
 from datetime import datetime, timezone
 from enum import Enum
 import uuid

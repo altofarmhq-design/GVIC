@@ -3,10 +3,9 @@
 Multiple Domain Integration Interface System
 """
 from dataclasses import dataclass, field
-from typing import Dict, List, Any, Optional, Callable
+from typing import Dict, List, Any, Optional
 from datetime import datetime
 from enum import Enum
-import json
 import uuid
 import numpy as np
 

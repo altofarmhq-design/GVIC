@@ -1,6 +1,6 @@
 """입출력 인터페이스 모듈"""
 from dataclasses import dataclass, field
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any
 from datetime import datetime
 import json
 

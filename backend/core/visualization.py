@@ -1,6 +1,5 @@
 """시각화 모듈"""
-from typing import Dict, List, Any
-import numpy as np
+from typing import Dict, List
 
 class GVICVisualizer:
     """GVIC 시각화 클래스"""

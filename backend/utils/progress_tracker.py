@@ -1,7 +1,7 @@
 """진행 추적 모듈"""
 import json
 from pathlib import Path
-from typing import Dict, List, Any
+from typing import Dict, List
 from datetime import datetime
 
 class ProgressTracker:

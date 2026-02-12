@@ -7,9 +7,8 @@ Recursive Modularization-Based Data Processing System
 - 2300: 실행 엔진 (모듈 간 데이터 흐름 제어/실행)
 - 2400: 상태 관리자 (실행 결과/이력 기록, 장애 복구)
 """
-import numpy as np
 from dataclasses import dataclass, field
-from typing import Dict, List, Any, Optional, Callable, Tuple, Union
+from typing import Dict, List, Any, Optional, Callable, Tuple
 from datetime import datetime, timezone
 from enum import Enum
 import uuid

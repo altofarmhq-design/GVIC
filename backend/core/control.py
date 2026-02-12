@@ -1,8 +1,8 @@
 """내부 통제 시스템
 알림 관리 및 헬스체크
 """
-from dataclasses import dataclass, field
-from typing import Dict, List, Any, Callable, Optional
+from dataclasses import dataclass
+from typing import Dict, List, Callable, Optional
 from datetime import datetime
 from enum import Enum
 

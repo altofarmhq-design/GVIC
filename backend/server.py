@@ -21,7 +21,7 @@ db = client[os.environ['DB_NAME']]
 
 # Import GVIC modules
 from core import GVICEngine, InternalControlSystem, IOInterface, GVICVisualizer, WorkflowManager
-from core import MultiDomainIntegrationSystem, DomainType, ProtocolType
+from core import MultiDomainIntegrationSystem
 from utils import ConfigManager, ProgressTracker
 
 # Initialize components

@@ -10,13 +10,13 @@
 특허 6-J: 다중 도메인 통합 인터페이스
 """
 from dataclasses import dataclass, field
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any
 from datetime import datetime, timezone
 import numpy as np
 import logging
 
 from .patent1_convergence import ConvergenceController
-from .patent2_signal import SignalPreprocessor, SignalType
+from .patent2_signal import SignalPreprocessor
 from .patent3_signal_asset import SignalAssetizationPlatform
 from .patent3_pipeline import PipelineProcessor
 from .patent4_nonconform import NonconformHandler
