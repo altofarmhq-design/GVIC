@@ -1345,5 +1345,13 @@
     "data": {
       "records_count": 10
     }
+  },
+  {
+    "timestamp": "2026-02-12T15:49:30.135692",
+    "phase": "리포트",
+    "action": "PDF 생성",
+    "data": {
+      "records": 20
+    }
   }
 ]
