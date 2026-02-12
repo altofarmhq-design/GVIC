@@ -2721,9 +2721,19 @@ async def download_report(filename: str):
 
 from crawlers.url_crawler import crawl_url, CrawlResult
 
+class OutputOptionsModel(BaseModel):
+    reportTitle: str = ""
+    includeInsights: bool = True
+    includeRecommendations: bool = True
+    includeSentiment: bool = True
+    includeFactors: bool = True
+    includeGvicAnalysis: bool = True
+    customNotes: str = ""
+
 class URLAnalysisRequest(BaseModel):
     url: str
     max_reviews: int = 1000
+    output_options: Optional[OutputOptionsModel] = None
 
 @api_router.post("/pipeline/analyze-url")
 async def analyze_url(request: URLAnalysisRequest):
