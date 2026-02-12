@@ -42,11 +42,25 @@ export default function LoginPage() {
   const handleRegister = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
     setLoading(true);
     
+    // Validate password confirmation
+    if (password !== passwordConfirm) {
+      setError('비밀번호가 일치하지 않습니다');
+      setLoading(false);
+      return;
+    }
+    
     try {
-      await register(email, password, name);
-      navigate(from, { replace: true });
+      const result = await register(email, password, passwordConfirm, name);
+      // Show success message for pending approval
+      setSuccess(result.message || '회원가입 신청이 완료되었습니다. 관리자 승인 후 로그인할 수 있습니다.');
+      setActiveTab('login');
+      // Clear form
+      setName('');
+      setPassword('');
+      setPasswordConfirm('');
     } catch (err) {
       setError(err.response?.data?.detail || '회원가입에 실패했습니다');
     }
