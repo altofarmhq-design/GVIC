@@ -477,5 +477,11 @@
       "source": "erp",
       "success": true
     }
+  },
+  {
+    "timestamp": "2026-02-12T13:25:59.052965",
+    "phase": "알림",
+    "action": "헬스체크 실행",
+    "data": {}
   }
 ]

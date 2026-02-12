@@ -173,17 +173,49 @@ curl "/api/dashboard"
 ### 코드 품질 개선 (완료)
 - [x] 린터 경고 수정 (ruff) - backend/core, backend/utils 모두 통과
 - [x] App.js 컴포넌트 분리 완료 (1328줄 → 135줄, 90% 감소)
-  - 6개 탭 컴포넌트 분리 (DashboardTab, ProcessingTab, IntegrationTab, DataTab, AlertsTab, SettingsTab)
+  - 7개 탭 컴포넌트 분리 (DashboardTab, ProcessingTab, MonitoringTab, IntegrationTab, DataTab, AlertsTab, SettingsTab)
   - API 함수 모듈화 (/lib/api.js)
   - 공통 컴포넌트 분리 (MetricCard)
 
-## 향후 작업 (P2)
+## 구현 완료 (P2) - 2026-02-12
 
-### 기능 확장
-- [ ] 실시간 소비 모니터링 연동
-- [ ] 동적 조정 자동화
+### 처리 이력 MongoDB 영구 저장 (완료)
+- [x] 처리 결과 MongoDB 저장 (기존 구현 확인)
+- [x] 이력 조회 API (GET /api/process/history)
+- [x] ProcessingTab에 이력 목록/차트 뷰 추가
+
+### 분석 리포트 생성 기능 (완료)
+- [x] ReportLab 라이브러리 설치
+- [x] PDF 리포트 생성 API (POST /api/report/generate)
+- [x] 리포트 요약 API (GET /api/report/summary)
+- [x] DashboardTab에 "PDF 리포트 다운로드" 버튼 추가
+
+### 실시간 소비 모니터링 연동 (완료)
+- [x] 실시간 모니터링 API (GET /api/monitor/realtime)
+- [x] 분배 상태 모니터링 API (GET /api/monitor/distribution)
+- [x] MonitoringTab 컴포넌트 신규 생성
+  - 실시간 소비량 스택 차트
+  - 분배 비율 비교 (목표 vs 실제)
+  - 편차 분석
+  - 2초 간격 폴링 기반 실시간 업데이트
+
+### 동적 조정 자동화 (완료)
+- [x] 자동 조정 설정 API (GET/PUT /api/adjustment/config)
+- [x] 수동 조정 실행 API (POST /api/adjustment/execute)
+- [x] 조정 이력 API (GET /api/adjustment/history)
+- [x] SettingsTab에 DynamicAdjuster 섹션 추가
+  - 자동 조정 활성화 토글
+  - 편차 임계값/조정률 설정
+  - 수동 조정 실행 버튼
+  - 조정 이력 표시
+
+## 향후 작업 (P3)
+
+### 추가 기능
 - [ ] 다중 모델 전환 기능
-- [ ] 분석 리포트 생성 기능 (PDF/웹)
+- [ ] 시계열 예측 기반 사전 조정
+- [ ] 파레토 최적화 배분
+- [ ] 처리 결과 비교 분석 기능
 
 ## 특허 문서 저장 경로
 ```
