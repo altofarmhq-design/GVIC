@@ -2696,6 +2696,21 @@ async def list_pipeline_reports():
                 })
     return {"reports": sorted(reports, key=lambda x: x["created"], reverse=True)}
 
+@api_router.get("/pipeline/download/{filename}")
+async def direct_download_report(filename: str):
+    """PDF 리포트 직접 다운로드 - 가장 단순한 방식"""
+    file_path = f"/app/backend/data/reports/{filename}"
+    
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="Report not found")
+    
+    return FileResponse(
+        path=file_path,
+        filename=filename,
+        media_type="application/pdf"
+    )
+
+
 @api_router.get("/pipeline/report/{filename}")
 async def download_report(filename: str):
     """PDF 리포트 다운로드 - 강제 다운로드"""
