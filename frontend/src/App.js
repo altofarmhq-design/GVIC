@@ -117,6 +117,10 @@ function App() {
             <ModelsTab onModelChange={fetchData} />
           </TabsContent>
 
+          <TabsContent value="prediction">
+            <PredictionTab onUpdate={fetchData} />
+          </TabsContent>
+
           <TabsContent value="monitoring">
             <MonitoringTab />
           </TabsContent>
