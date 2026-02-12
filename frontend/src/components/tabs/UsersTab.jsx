@@ -215,9 +215,13 @@ export default function UsersTab() {
                 <SelectValue placeholder="역할 선택" />
               </SelectTrigger>
               <SelectContent className="bg-slate-700 border-slate-600">
-                <SelectItem value="admin">Admin (전체 권한)</SelectItem>
-                <SelectItem value="operator">Operator (처리/리포트)</SelectItem>
-                <SelectItem value="viewer">Viewer (읽기 전용)</SelectItem>
+                <SelectItem value="super_admin" disabled={currentUser?.role !== 'super_admin'}>최고관리자 (전체 권한 + 시스템 설정)</SelectItem>
+                <SelectItem value="admin">관리자 (전체 권한)</SelectItem>
+                <SelectItem value="operator">오퍼레이터 (처리/리포트)</SelectItem>
+                <SelectItem value="visitor">방문객 (읽기 전용)</SelectItem>
+                <SelectItem value="ext_admin">외부관리자 (읽기 전용)</SelectItem>
+                <SelectItem value="ext_operator">외부오퍼레이터 (읽기 전용)</SelectItem>
+                <SelectItem value="ext_visitor">외부방문객 (읽기 전용)</SelectItem>
               </SelectContent>
             </Select>
           </div>
