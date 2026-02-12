@@ -1266,6 +1266,259 @@ async def get_prediction_history(limit: int = 10):
         "last_prediction": prediction_data["last_prediction"]
     }
 
+# ==================== Pareto Optimization APIs (파레토 최적화 배분) ====================
+
+class ParetoObjective(BaseModel):
+    name: str
+    weight: float = 1.0
+    target: str  # "maximize" or "minimize"
+
+class ParetoConfig(BaseModel):
+    objectives: List[Dict] = []
+    population_size: int = 50
+    generations: int = 100
+
+pareto_config = {
+    "objectives": [
+        {"name": "balance", "weight": 1.0, "target": "maximize", "description": "균형 점수 최대화"},
+        {"name": "public_value", "weight": 0.8, "target": "maximize", "description": "공공 가치 최대화"},
+        {"name": "efficiency", "weight": 0.9, "target": "maximize", "description": "분배 효율성 최대화"},
+        {"name": "risk", "weight": 0.7, "target": "minimize", "description": "분배 리스크 최소화"}
+    ],
+    "population_size": 50,
+    "generations": 100
+}
+
+def evaluate_solution(sigma: List[float], omega: Dict) -> Dict[str, float]:
+    """솔루션 평가 함수 (목적 함수 값 계산)"""
+    # 균형 점수
+    target_sigma = [0.33, 0.34, 0.33]
+    balance = 1 - sum(abs(sigma[i] - target_sigma[i]) for i in range(3)) / 2
+    
+    # 공공 가치 (공공 비율이 높을수록 좋음)
+    public_value = sigma[0]
+    
+    # 효율성 (경계 조건 내에 있을수록 좋음)
+    efficiency = 1.0
+    if sigma[0] < omega.get("V_pub_min", 0.2) or sigma[0] > omega.get("V_pub_max", 0.5):
+        efficiency -= 0.2
+    if sigma[1] < omega.get("V_pro_min", 0.2) or sigma[1] > omega.get("V_pro_max", 0.5):
+        efficiency -= 0.2
+    if sigma[2] < omega.get("V_ind_min", 0.1) or sigma[2] > omega.get("V_ind_max", 0.5):
+        efficiency -= 0.2
+    
+    # 리스크 (편차가 클수록 리스크 증가)
+    risk = sum((sigma[i] - target_sigma[i])**2 for i in range(3))
+    
+    return {
+        "balance": max(0, min(1, balance)),
+        "public_value": public_value,
+        "efficiency": max(0, efficiency),
+        "risk": risk
+    }
+
+def dominates(sol1: Dict[str, float], sol2: Dict[str, float], objectives: List[Dict]) -> bool:
+    """sol1이 sol2를 지배하는지 확인"""
+    dominated = False
+    at_least_one_better = False
+    
+    for obj in objectives:
+        name = obj["name"]
+        target = obj["target"]
+        
+        if target == "maximize":
+            if sol1.get(name, 0) < sol2.get(name, 0):
+                return False
+            if sol1.get(name, 0) > sol2.get(name, 0):
+                at_least_one_better = True
+        else:  # minimize
+            if sol1.get(name, 0) > sol2.get(name, 0):
+                return False
+            if sol1.get(name, 0) < sol2.get(name, 0):
+                at_least_one_better = True
+    
+    return at_least_one_better
+
+def find_pareto_front(solutions: List[Dict]) -> List[Dict]:
+    """파레토 프론트 찾기"""
+    objectives = pareto_config["objectives"]
+    pareto_front = []
+    
+    for i, sol1 in enumerate(solutions):
+        is_dominated = False
+        for j, sol2 in enumerate(solutions):
+            if i != j:
+                if dominates(sol2["scores"], sol1["scores"], objectives):
+                    is_dominated = True
+                    break
+        if not is_dominated:
+            pareto_front.append(sol1)
+    
+    return pareto_front
+
+@api_router.get("/pareto/config")
+async def get_pareto_config():
+    """파레토 최적화 설정 조회"""
+    return pareto_config
+
+@api_router.put("/pareto/config")
+async def update_pareto_config(config: ParetoConfig):
+    """파레토 최적화 설정 업데이트"""
+    pareto_config["population_size"] = config.population_size
+    pareto_config["generations"] = config.generations
+    if config.objectives:
+        pareto_config["objectives"] = config.objectives
+    
+    return {"success": True, "config": pareto_config}
+
+@api_router.post("/pareto/optimize")
+async def run_pareto_optimization():
+    """파레토 최적화 실행"""
+    omega = config_mgr.get_omega()
+    current_sigma = config_mgr.get_sigma()
+    
+    # 솔루션 생성
+    solutions = []
+    
+    # 현재 솔루션 추가
+    current_scores = evaluate_solution(current_sigma, omega)
+    solutions.append({
+        "sigma": current_sigma,
+        "scores": current_scores,
+        "label": "현재"
+    })
+    
+    # 랜덤 솔루션 생성
+    for i in range(pareto_config["population_size"]):
+        # 경계 조건 내에서 랜덤 생성
+        pub = random.uniform(omega.get("V_pub_min", 0.2), omega.get("V_pub_max", 0.5))
+        pro = random.uniform(omega.get("V_pro_min", 0.2), omega.get("V_pro_max", 0.5))
+        ind = random.uniform(omega.get("V_ind_min", 0.1), omega.get("V_ind_max", 0.5))
+        
+        # 정규화
+        total = pub + pro + ind
+        sigma = [pub/total, pro/total, ind/total]
+        
+        scores = evaluate_solution(sigma, omega)
+        solutions.append({
+            "sigma": sigma,
+            "scores": scores,
+            "label": f"후보 {i+1}"
+        })
+    
+    # 사전 정의된 전략 추가
+    strategies = [
+        {"sigma": [0.33, 0.34, 0.33], "label": "균형"},
+        {"sigma": [0.45, 0.30, 0.25], "label": "공공 우선"},
+        {"sigma": [0.25, 0.50, 0.25], "label": "생산 우선"},
+        {"sigma": [0.25, 0.30, 0.45], "label": "개인 우선"},
+        {"sigma": [0.20, 0.40, 0.40], "label": "성장"}
+    ]
+    
+    for strat in strategies:
+        scores = evaluate_solution(strat["sigma"], omega)
+        solutions.append({
+            "sigma": strat["sigma"],
+            "scores": scores,
+            "label": strat["label"]
+        })
+    
+    # 파레토 프론트 계산
+    pareto_front = find_pareto_front(solutions)
+    
+    # 가중 점수 계산 및 정렬
+    for sol in pareto_front:
+        weighted_score = 0
+        for obj in pareto_config["objectives"]:
+            name = obj["name"]
+            weight = obj["weight"]
+            target = obj["target"]
+            score = sol["scores"].get(name, 0)
+            
+            if target == "minimize":
+                score = 1 - score  # 최소화 목표는 반전
+            
+            weighted_score += score * weight
+        
+        sol["weighted_score"] = weighted_score / sum(obj["weight"] for obj in pareto_config["objectives"])
+    
+    # 가중 점수로 정렬
+    pareto_front.sort(key=lambda x: x["weighted_score"], reverse=True)
+    
+    # 최적 솔루션
+    best_solution = pareto_front[0] if pareto_front else None
+    
+    tracker.log("파레토", "최적화 실행", {
+        "solutions_count": len(solutions),
+        "pareto_front_size": len(pareto_front),
+        "best_weighted_score": best_solution["weighted_score"] if best_solution else 0
+    })
+    
+    return {
+        "success": True,
+        "current_sigma": current_sigma,
+        "current_scores": current_scores,
+        "pareto_front": pareto_front[:10],  # 상위 10개만
+        "best_solution": best_solution,
+        "total_solutions": len(solutions),
+        "objectives": pareto_config["objectives"],
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
+
+@api_router.post("/pareto/apply/{index}")
+async def apply_pareto_solution(index: int = 0):
+    """파레토 최적 솔루션 적용"""
+    # 최근 최적화 결과에서 적용
+    # 간단히 구현: 인덱스 기반 적용
+    
+    omega = config_mgr.get_omega()
+    current_sigma = config_mgr.get_sigma()
+    
+    # 재계산
+    solutions = []
+    for i in range(pareto_config["population_size"]):
+        pub = random.uniform(omega.get("V_pub_min", 0.2), omega.get("V_pub_max", 0.5))
+        pro = random.uniform(omega.get("V_pro_min", 0.2), omega.get("V_pro_max", 0.5))
+        ind = random.uniform(omega.get("V_ind_min", 0.1), omega.get("V_ind_max", 0.5))
+        total = pub + pro + ind
+        sigma = [pub/total, pro/total, ind/total]
+        scores = evaluate_solution(sigma, omega)
+        solutions.append({"sigma": sigma, "scores": scores})
+    
+    pareto_front = find_pareto_front(solutions)
+    
+    for sol in pareto_front:
+        weighted_score = 0
+        for obj in pareto_config["objectives"]:
+            name = obj["name"]
+            weight = obj["weight"]
+            target = obj["target"]
+            score = sol["scores"].get(name, 0)
+            if target == "minimize":
+                score = 1 - score
+            weighted_score += score * weight
+        sol["weighted_score"] = weighted_score / sum(obj["weight"] for obj in pareto_config["objectives"])
+    
+    pareto_front.sort(key=lambda x: x["weighted_score"], reverse=True)
+    
+    if index >= len(pareto_front):
+        raise HTTPException(status_code=400, detail="Invalid solution index")
+    
+    new_sigma = pareto_front[index]["sigma"]
+    config_mgr.update_sigma(new_sigma)
+    
+    tracker.log("파레토", "솔루션 적용", {
+        "old_sigma": current_sigma,
+        "new_sigma": new_sigma
+    })
+    
+    return {
+        "success": True,
+        "old_sigma": current_sigma,
+        "new_sigma": new_sigma,
+        "applied_solution": pareto_front[index]
+    }
+
 # Include the router in the main app
 app.include_router(api_router)
 
