@@ -33,6 +33,7 @@ require_role = auth_router.require_role
 # Import GVIC modules
 from core import GVICEngine, InternalControlSystem, IOInterface, GVICVisualizer, WorkflowManager
 from core import MultiDomainIntegrationSystem
+from core.data_hub import init_data_hub, get_data_hub
 from utils import ConfigManager, ProgressTracker
 
 # Initialize components
@@ -44,6 +45,9 @@ io_interface = IOInterface()
 visualizer = GVICVisualizer()
 workflow_mgr = WorkflowManager()
 integration_system = MultiDomainIntegrationSystem()
+
+# Initialize Data Hub (모든 탭 연동)
+data_hub = init_data_hub(db)
 
 # Create the main app
 app = FastAPI(title="GVIC Engine API", version="1.0.0")
