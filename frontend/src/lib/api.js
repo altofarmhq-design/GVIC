@@ -3,7 +3,33 @@ import axios from "axios";
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+// Configure axios defaults
+axios.defaults.withCredentials = true;
+
+// Add token to requests
+axios.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 export const api = {
+  // Auth APIs
+  register: (email, password, name) => axios.post(`${API}/auth/register`, { email, password, name }),
+  login: (email, password) => axios.post(`${API}/auth/login`, { email, password }),
+  googleSession: (sessionId) => axios.post(`${API}/auth/google/session`, { session_id: sessionId }),
+  getMe: () => axios.get(`${API}/auth/me`),
+  logout: () => axios.post(`${API}/auth/logout`),
+  changePassword: (currentPassword, newPassword) => axios.put(`${API}/auth/password`, { current_password: currentPassword, new_password: newPassword }),
+  getRoles: () => axios.get(`${API}/auth/roles`),
+  // User Management (Admin)
+  getUsers: () => axios.get(`${API}/auth/users`),
+  getUser: (userId) => axios.get(`${API}/auth/users/${userId}`),
+  updateUser: (userId, data) => axios.put(`${API}/auth/users/${userId}`, data),
+  deleteUser: (userId) => axios.delete(`${API}/auth/users/${userId}`),
+  // Dashboard APIs
   getDashboard: () => axios.get(`${API}/dashboard`),
   process: (value) => axios.post(`${API}/process`, { value }),
   getProcessHistory: (limit = 20) => axios.get(`${API}/process/history?limit=${limit}`),
