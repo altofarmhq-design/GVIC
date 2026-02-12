@@ -245,16 +245,24 @@ def create_auth_router(db):
         user = await db.users.find_one({"email": data.email}, {"_id": 0})
         
         if not user:
-            raise HTTPException(status_code=401, detail="Invalid credentials")
+            raise HTTPException(status_code=401, detail="이메일 또는 비밀번호가 올바르지 않습니다")
+        
+        # Check if user is pending approval
+        if user.get("status") == "pending":
+            raise HTTPException(status_code=403, detail="관리자 승인 대기 중입니다. 승인 후 로그인할 수 있습니다.")
+        
+        # Check if user is rejected
+        if user.get("status") == "rejected":
+            raise HTTPException(status_code=403, detail="가입이 거부되었습니다. 관리자에게 문의하세요.")
         
         # Check password (for local auth users)
         if user.get("auth_provider") == "local":
             if not user.get("password_hash"):
-                raise HTTPException(status_code=401, detail="Invalid credentials")
+                raise HTTPException(status_code=401, detail="이메일 또는 비밀번호가 올바르지 않습니다")
             if not verify_password(data.password, user["password_hash"]):
-                raise HTTPException(status_code=401, detail="Invalid credentials")
+                raise HTTPException(status_code=401, detail="이메일 또는 비밀번호가 올바르지 않습니다")
         else:
-            raise HTTPException(status_code=400, detail="Please use Google login for this account")
+            raise HTTPException(status_code=400, detail="Google 로그인을 사용해주세요")
         
         # Create JWT token
         token = create_jwt_token(user["user_id"], user["email"], user["role"])
