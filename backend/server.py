@@ -21,6 +21,7 @@ db = client[os.environ['DB_NAME']]
 
 # Import GVIC modules
 from core import GVICEngine, InternalControlSystem, IOInterface, GVICVisualizer, WorkflowManager
+from core import MultiDomainIntegrationSystem, DomainType, ProtocolType
 from utils import ConfigManager, ProgressTracker
 
 # Initialize components
@@ -31,6 +32,7 @@ control_system = InternalControlSystem()
 io_interface = IOInterface()
 visualizer = GVICVisualizer()
 workflow_mgr = WorkflowManager()
+integration_system = MultiDomainIntegrationSystem()
 
 # Create the main app
 app = FastAPI(title="GVIC Engine API", version="1.0.0")
