@@ -50,6 +50,26 @@ V_ind_min: 0.1 (10%), V_ind_max: 0.5 (50%)
 └── workflow.py                  # 워크플로우
 ```
 
+## 프론트엔드 모듈 구조 (리팩토링 완료)
+
+```
+/app/frontend/src/
+├── App.js                       # 메인 앱 컴포넌트 (135줄)
+├── lib/
+│   └── api.js                   # API 함수 모듈
+├── components/
+│   ├── MetricCard.jsx           # 공통 메트릭 카드 컴포넌트
+│   └── tabs/
+│       ├── index.js             # 탭 컴포넌트 내보내기
+│       ├── DashboardTab.jsx     # 대시보드 탭 (226줄)
+│       ├── ProcessingTab.jsx    # 처리 탭 (238줄)
+│       ├── IntegrationTab.jsx   # 통합 탭 (290줄)
+│       ├── DataTab.jsx          # 데이터 탭 (119줄)
+│       ├── AlertsTab.jsx        # 알림 탭 (86줄)
+│       └── SettingsTab.jsx      # 설정 탭 (236줄)
+└── components/ui/               # Shadcn UI 컴포넌트
+```
+
 ## API 엔드포인트
 
 ### 대시보드
