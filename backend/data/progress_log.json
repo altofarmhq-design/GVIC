@@ -984,5 +984,25 @@
       "success": false,
       "value": null
     }
+  },
+  {
+    "timestamp": "2026-02-12T14:07:18.404244",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T14:07:36.973033",
+    "phase": "파레토",
+    "action": "최적화 실행",
+    "data": {
+      "solutions_count": 56,
+      "pareto_front_size": 11,
+      "best_weighted_score": 0.8423529411764704
+    }
   }
 ]
