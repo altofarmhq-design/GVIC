@@ -4,13 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, 
   CartesianGrid, Tooltip as RechartsTooltip, Legend, BarChart, Bar, Cell
 } from 'recharts';
 import { 
   GitCompare, Play, RefreshCw, TrendingUp, TrendingDown, 
-  Minus, AlertTriangle, BarChart3
+  Minus, AlertTriangle, BarChart3, Globe, Database
 } from 'lucide-react';
 import { MetricCard } from "@/components/MetricCard";
 import { api } from "@/lib/api";
@@ -31,6 +32,27 @@ export const ComparisonTab = () => {
   const [limit, setLimit] = useState(10);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState("processing");
+  
+  // DataHub 연동: URL 분석 세션 비교 데이터
+  const [hubComparison, setHubComparison] = useState(null);
+  const [hubLoading, setHubLoading] = useState(false);
+
+  // DataHub 비교 데이터 불러오기
+  const fetchHubComparison = useCallback(async () => {
+    setHubLoading(true);
+    try {
+      const response = await api.getHubComparison();
+      setHubComparison(response.data);
+    } catch (error) {
+      console.error("Hub comparison fetch error:", error);
+    }
+    setHubLoading(false);
+  }, []);
+
+  useEffect(() => {
+    fetchHubComparison();
+  }, [fetchHubComparison]);
 
   const handleAnalyze = async () => {
     setLoading(true);
