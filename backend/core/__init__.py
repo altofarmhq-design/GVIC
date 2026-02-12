@@ -10,6 +10,12 @@ from .control import InternalControlSystem, AlertManager, AlertLevel, Alert
 from .io_interface import IOInterface, ProcessedInput
 from .visualization import GVICVisualizer
 from .workflow import WorkflowManager
+from .multi_domain_integration import (
+    MultiDomainIntegrationSystem, 
+    DomainType, 
+    ProtocolType,
+    CommonDataModel
+)
 
 __all__ = [
     'GVICEngine',
@@ -22,5 +28,6 @@ __all__ = [
     'InternalControlSystem', 'AlertManager', 'AlertLevel', 'Alert',
     'IOInterface', 'ProcessedInput',
     'GVICVisualizer',
-    'WorkflowManager'
+    'WorkflowManager',
+    'MultiDomainIntegrationSystem', 'DomainType', 'ProtocolType', 'CommonDataModel'
 ]
