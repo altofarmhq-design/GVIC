@@ -61,12 +61,18 @@ V_ind_min: 0.1 (10%), V_ind_max: 0.5 (50%)
 │   ├── MetricCard.jsx           # 공통 메트릭 카드 컴포넌트
 │   └── tabs/
 │       ├── index.js             # 탭 컴포넌트 내보내기
-│       ├── DashboardTab.jsx     # 대시보드 탭 (226줄)
-│       ├── ProcessingTab.jsx    # 처리 탭 (238줄)
-│       ├── IntegrationTab.jsx   # 통합 탭 (290줄)
-│       ├── DataTab.jsx          # 데이터 탭 (119줄)
-│       ├── AlertsTab.jsx        # 알림 탭 (86줄)
-│       └── SettingsTab.jsx      # 설정 탭 (236줄)
+│       ├── DashboardTab.jsx     # 대시보드 탭
+│       ├── ProcessingTab.jsx    # 처리 탭
+│       ├── ModelsTab.jsx        # 모델 탭
+│       ├── PredictionTab.jsx    # 예측 탭
+│       ├── ParetoTab.jsx        # 파레토 탭
+│       ├── ComparisonTab.jsx    # 비교 탭
+│       ├── MonitoringTab.jsx    # 모니터링 탭
+│       ├── IntegrationTab.jsx   # 통합 탭
+│       ├── DataSourcesTab.jsx   # 외부소스 탭 (P4)
+│       ├── DataTab.jsx          # 데이터 탭
+│       ├── AlertsTab.jsx        # 알림 탭
+│       └── SettingsTab.jsx      # 설정 탭
 └── components/ui/               # Shadcn UI 컴포넌트
 ```
 
@@ -259,8 +265,40 @@ curl "/api/dashboard"
 ## 향후 작업 (P4)
 
 ### 추가 기능
-- [ ] 외부 데이터 소스 연동 (실제 API/센서)
+- [x] 외부 데이터 소스 연동 (실제 API/센서) - 완료 (2026-02-12)
 - [ ] 사용자 인증 및 권한 관리
+- [ ] 다국어 지원
+- [ ] 모바일 반응형 UI 개선
+
+## 구현 완료 (P4) - 2026-02-12
+
+### 외부 데이터 소스 연동 기능 (완료)
+- [x] 데이터 소스 CRUD API 구현
+  - GET/POST /api/datasources - 목록 조회/생성
+  - GET/PUT/DELETE /api/datasources/{source_id} - 상세/수정/삭제
+- [x] 데이터 수집 기능
+  - POST /api/datasources/{source_id}/fetch - 수동 데이터 가져오기
+  - POST /api/datasources/{source_id}/process - GVIC 엔진으로 처리
+  - POST /api/datasources/{source_id}/start/stop - 자동 폴링 시작/중지
+  - GET /api/datasources/collected - 수집된 데이터 조회
+- [x] DataSourcesTab 컴포넌트 신규 생성
+  - 데이터 소스 카드 목록 (상태 배지, URL, 폴링 간격, 수집 횟수)
+  - 소스 추가/수정 다이얼로그 (이름, 소스 유형, HTTP 메소드, URL, 인증 설정, 폴링 간격, 데이터 매핑 경로)
+  - 데이터 가져오기/GVIC 처리/자동 수집 시작-중지/수정/삭제 버튼
+  - 최근 수집 데이터 목록 (소스명, 추출값, 타임스탬프, 처리 상태)
+- [x] App.js에 "외부소스" 탭 추가 (Cloud 아이콘)
+- [x] api.js에 데이터 소스 관련 API 함수 추가
+
+### 테스트 결과 (P4)
+- 백엔드 API 테스트: 17/17 통과 (100%)
+- 프론트엔드 UI 테스트: 모든 컴포넌트 정상 작동 (100%)
+- 테스트 API: https://jsonplaceholder.typicode.com/posts/1
+
+## 향후 작업 (P5)
+
+### 추가 기능
+- [ ] 사용자 인증 및 역할 기반 접근 제어 (RBAC)
+- [ ] 대시보드 UI/UX 전면 개편
 - [ ] 다국어 지원
 - [ ] 모바일 반응형 UI 개선
 
