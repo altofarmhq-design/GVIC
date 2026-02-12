@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { 
   LayoutDashboard, Play, Database, Bell, Settings, 
-  Zap, RefreshCw, Network, Radio, Layers
+  Zap, RefreshCw, Network, Radio, Layers, Brain
 } from 'lucide-react';
 import { api } from "@/lib/api";
 import { 
@@ -15,7 +15,8 @@ import {
   AlertsTab, 
   SettingsTab,
   MonitoringTab,
-  ModelsTab
+  ModelsTab,
+  PredictionTab
 } from "@/components/tabs";
 
 function App() {
