@@ -25,7 +25,10 @@ export const api = {
     axios.post(`${API}/integration/exchange`, { data, source_domain, message_type }),
   getAdapters: () => axios.get(`${API}/integration/adapters`),
   getMappings: () => axios.get(`${API}/integration/mappings`),
-  getRoutingRules: () => axios.get(`${API}/integration/routing`)
+  getRoutingRules: () => axios.get(`${API}/integration/routing`),
+  // Report APIs
+  getReportSummary: () => axios.get(`${API}/report/summary`),
+  generateReport: (options = {}) => axios.post(`${API}/report/generate`, options, { responseType: 'blob' })
 };
 
 export default api;
