@@ -2511,6 +2511,188 @@ async def run_all_analysis_steps(session_id: str):
     }
 
 
+# ==================== Full Pipeline API (입력→GVIC→출력) ====================
+
+from adapters.input_adapter import ProductReviewAdapter, DataDomain, InputAdapterFactory
+from adapters.output_adapter import (
+    PDFReportAdapter, OutputType, OutputAdapterFactory, 
+    ModularAnalysisResult, FactorExtractor
+)
+
+class PipelineRequest(BaseModel):
+    file_path: Optional[str] = None
+    sample_size: int = 1000
+
+@api_router.post("/pipeline/run")
+async def run_full_pipeline_api(request: PipelineRequest):
+    """전체 파이프라인 실행 (입력→GVIC 분석→PDF 출력)"""
+    import uuid as uuid_module
+    
+    # 1. 데이터 파일 찾기
+    data_dir = "/app/backend/data"
+    if request.file_path and os.path.exists(request.file_path):
+        file_path = request.file_path
+    else:
+        files = [f for f in os.listdir(data_dir) if f.endswith('.xlsx') and 'oliveyoung' in f]
+        if not files:
+            raise HTTPException(status_code=404, detail="No data files found")
+        file_path = os.path.join(data_dir, sorted(files)[-1])
+    
+    # 2. 입력 어댑터
+    input_adapter = InputAdapterFactory.get_adapter(DataDomain.PRODUCT_REVIEW)
+    input_batch = input_adapter.process(file_path)
+    
+    # 3. 감성 분석
+    sentiment_counts = {"positive": 0, "neutral": 0, "negative": 0}
+    ratings = []
+    for record in input_batch.records:
+        ratings.append(record.metadata.get("original_rating", 3))
+        sentiment_counts[record.sentiment_hint] += 1
+    
+    total = len(input_batch.records)
+    sentiment_distribution = {
+        "positive": {"count": sentiment_counts["positive"], "ratio": sentiment_counts["positive"] / total},
+        "neutral": {"count": sentiment_counts["neutral"], "ratio": sentiment_counts["neutral"] / total},
+        "negative": {"count": sentiment_counts["negative"], "ratio": sentiment_counts["negative"] / total}
+    }
+    
+    # 4. 요인 추출
+    factor_extractor = FactorExtractor()
+    records_for_extraction = [r.to_dict() for r in input_batch.records]
+    positive_factors, negative_factors = factor_extractor.extract_factors(records_for_extraction)
+    
+    # 5. GVIC 분석
+    gvic_results = {}
+    
+    # 수렴 제어
+    V_input = np.array([
+        sentiment_distribution["positive"]["ratio"],
+        sentiment_distribution["neutral"]["ratio"],
+        sentiment_distribution["negative"]["ratio"]
+    ])
+    controller = ConvergenceController(
+        default_ratio=[0.33, 0.34, 0.33],
+        omega={'lower_bounds': [0.1, 0.05, 0.01], 'upper_bounds': [0.95, 0.5, 0.5], 'sum_constraint': 1.0}
+    )
+    V_output, conv_metadata = controller.converge(V_input)
+    gvic_results["convergence"] = {
+        "status": conv_metadata.get("status"),
+        "balance_index": conv_metadata.get("balance_index", 0)
+    }
+    
+    # 신호 처리
+    preprocessor = SignalPreprocessor(dimension=64, threshold=0.7)
+    conforming_count = 0
+    sample_size = min(100, len(input_batch.records))
+    for record in input_batch.records[:sample_size]:
+        signal_data = {'rating': record.metadata.get("original_rating", 3)}
+        modules = preprocessor.process(signal_data, SignalType.BEHAVIOR)
+        for m in modules:
+            if m.conformance_status.value == 'conforming':
+                conforming_count += 1
+    gvic_results["signal"] = {
+        "total_processed": sample_size,
+        "conformance_rate": conforming_count / sample_size if sample_size > 0 else 0
+    }
+    
+    # 가중 분배
+    base_ratio = [
+        sentiment_distribution["positive"]["ratio"],
+        sentiment_distribution["neutral"]["ratio"] + 0.1,
+        sentiment_distribution["negative"]["ratio"] + 0.1
+    ]
+    total_ratio = sum(base_ratio)
+    base_ratio = [r / total_ratio for r in base_ratio]
+    distributor = WeightedDistributionSystem(base_ratio=base_ratio)
+    distribution = distributor.distribute(1000000)
+    analytics = distributor.get_analytics()
+    gvic_results["distribution"] = distribution
+    gvic_results["fairness_index"] = analytics.get("fairness_index", 0)
+    
+    # 6. 인사이트 생성
+    insights = []
+    recommendations = []
+    if sentiment_distribution["positive"]["ratio"] > 0.8:
+        insights.append(f"전체 리뷰의 {sentiment_distribution['positive']['ratio']*100:.0f}%가 긍정적입니다.")
+    if positive_factors:
+        insights.append(f"가장 많이 언급된 긍정 요인: '{positive_factors[0].category}' ({positive_factors[0].count}건)")
+    if negative_factors:
+        insights.append(f"주요 개선 필요 요인: '{negative_factors[0].category}' ({negative_factors[0].count}건)")
+        recommendations.append(f"'{negative_factors[0].category}' 관련 개선이 필요합니다.")
+    
+    # 7. PDF 생성
+    output_dir = "/app/backend/data/reports"
+    os.makedirs(output_dir, exist_ok=True)
+    
+    analysis_result = ModularAnalysisResult(
+        result_id=str(uuid_module.uuid4())[:8],
+        analysis_type="상품 후기 분석",
+        created_at=datetime.now(timezone.utc).isoformat(),
+        input_summary={
+            "total_records": input_batch.total_count,
+            "avg_rating": float(np.mean(ratings)),
+            "source": os.path.basename(file_path),
+            "analysis_date": datetime.now().strftime("%Y-%m-%d %H:%M")
+        },
+        sentiment_distribution=sentiment_distribution,
+        positive_factors=positive_factors,
+        negative_factors=negative_factors,
+        gvic_results=gvic_results,
+        insights=insights,
+        recommendations=recommendations
+    )
+    
+    output_file = os.path.join(output_dir, f"GVIC_Report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf")
+    output_adapter = OutputAdapterFactory.get_adapter(OutputType.PDF_REPORT)
+    formatted_data = output_adapter.format(analysis_result)
+    pdf_path = output_adapter.export(formatted_data, output_file)
+    
+    # public 폴더에 복사
+    public_pdf = f"/app/frontend/public/GVIC_Report_Latest.pdf"
+    import shutil
+    shutil.copy(pdf_path, public_pdf)
+    
+    tracker.log("파이프라인", "전체 분석 완료", {"records": total, "pdf": pdf_path})
+    
+    return {
+        "success": True,
+        "batch_id": input_batch.batch_id,
+        "total_records": input_batch.total_count,
+        "sentiment_distribution": sentiment_distribution,
+        "positive_factors": [{"category": f.category, "count": f.count, "ratio": f.ratio} for f in positive_factors],
+        "negative_factors": [{"category": f.category, "count": f.count, "ratio": f.ratio} for f in negative_factors],
+        "gvic_results": gvic_results,
+        "insights": insights,
+        "recommendations": recommendations,
+        "pdf_url": "/GVIC_Report_Latest.pdf"
+    }
+
+@api_router.get("/pipeline/reports")
+async def list_pipeline_reports():
+    """생성된 PDF 리포트 목록"""
+    report_dir = "/app/backend/data/reports"
+    reports = []
+    if os.path.exists(report_dir):
+        for f in os.listdir(report_dir):
+            if f.endswith('.pdf'):
+                file_path = os.path.join(report_dir, f)
+                reports.append({
+                    "name": f,
+                    "path": file_path,
+                    "size": os.path.getsize(file_path),
+                    "created": datetime.fromtimestamp(os.path.getctime(file_path)).isoformat()
+                })
+    return {"reports": sorted(reports, key=lambda x: x["created"], reverse=True)}
+
+@api_router.get("/pipeline/report/{filename}")
+async def download_report(filename: str):
+    """PDF 리포트 다운로드"""
+    file_path = f"/app/backend/data/reports/{filename}"
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="Report not found")
+    return FileResponse(file_path, media_type="application/pdf", filename=filename)
+
+
 # 서버 시작 시 저장된 데이터 소스 로드
 @app.on_event("startup")
 async def load_data_sources():
