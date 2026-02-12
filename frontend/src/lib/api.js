@@ -28,7 +28,10 @@ export const api = {
   getRoutingRules: () => axios.get(`${API}/integration/routing`),
   // Report APIs
   getReportSummary: () => axios.get(`${API}/report/summary`),
-  generateReport: (options = {}) => axios.post(`${API}/report/generate`, options, { responseType: 'blob' })
+  generateReport: (options = {}) => axios.post(`${API}/report/generate`, options, { responseType: 'blob' }),
+  // Monitoring APIs
+  getRealtimeMonitoring: () => axios.get(`${API}/monitor/realtime`),
+  getDistributionMonitor: () => axios.get(`${API}/monitor/distribution`)
 };
 
 export default api;
