@@ -406,6 +406,188 @@ async def create_routing_rule(request: RoutingRuleCreate):
     tracker.log("통합", "라우팅 규칙 추가", {"name": request.name})
     return {"success": True, "rule": rule}
 
+# ==================== Report Generation APIs ====================
+
+class ReportRequest(BaseModel):
+    record_id: Optional[str] = None
+    include_history: bool = True
+    limit: int = 10
+
+@api_router.post("/report/generate")
+async def generate_report(request: ReportRequest):
+    """PDF 분석 리포트 생성"""
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib import colors
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image
+    from reportlab.lib.units import cm
+    from reportlab.pdfbase import pdfmetrics
+    from reportlab.pdfbase.ttfonts import TTFont
+    
+    # 데이터 수집
+    if request.record_id:
+        record = await db.processing_history.find_one({"id": request.record_id}, {"_id": 0})
+        if not record:
+            raise HTTPException(status_code=404, detail="Record not found")
+        records = [record]
+    else:
+        records = await db.processing_history.find(
+            {}, {"_id": 0}
+        ).sort("timestamp", -1).limit(request.limit).to_list(request.limit)
+    
+    # 시스템 상태
+    status = engine.get_system_status()
+    sigma = config_mgr.get_sigma()
+    omega = config_mgr.get_omega()
+    balance_score = engine.convergence.calculate_balance_index()
+    
+    # PDF 생성
+    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+    doc = SimpleDocTemplate(temp_file.name, pagesize=A4, rightMargin=2*cm, leftMargin=2*cm, topMargin=2*cm, bottomMargin=2*cm)
+    
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle('Title', parent=styles['Heading1'], fontSize=24, spaceAfter=30, textColor=colors.HexColor('#1e293b'))
+    heading_style = ParagraphStyle('Heading', parent=styles['Heading2'], fontSize=16, spaceAfter=12, textColor=colors.HexColor('#334155'))
+    normal_style = ParagraphStyle('Normal', parent=styles['Normal'], fontSize=11, spaceAfter=8)
+    
+    elements = []
+    
+    # 제목
+    elements.append(Paragraph("GVIC Engine Analysis Report", title_style))
+    elements.append(Paragraph(f"Generated: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}", normal_style))
+    elements.append(Spacer(1, 20))
+    
+    # 시스템 개요
+    elements.append(Paragraph("1. System Overview", heading_style))
+    overview_data = [
+        ["Metric", "Value"],
+        ["Total Processed", str(status.get("total_processed", 0))],
+        ["Success Rate", f"{status.get('success_rate', 0) * 100:.1f}%"],
+        ["Balance Score", f"{balance_score * 100:.1f}%"],
+        ["System Status", "Active" if status.get("success_rate", 0) >= 0.5 else "Degraded"]
+    ]
+    overview_table = Table(overview_data, colWidths=[8*cm, 8*cm])
+    overview_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#3b82f6')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTSIZE', (0, 0), (-1, 0), 12),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f1f5f9')),
+        ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#cbd5e1'))
+    ]))
+    elements.append(overview_table)
+    elements.append(Spacer(1, 20))
+    
+    # Sigma (분배 비율)
+    elements.append(Paragraph("2. Distribution Ratio (Sigma)", heading_style))
+    sigma_data = [
+        ["Category", "Ratio", "Percentage"],
+        ["Public (V_pub)", f"{sigma[0]:.3f}", f"{sigma[0]*100:.1f}%"],
+        ["Productive (V_pro)", f"{sigma[1]:.3f}", f"{sigma[1]*100:.1f}%"],
+        ["Individual (V_ind)", f"{sigma[2]:.3f}", f"{sigma[2]*100:.1f}%"],
+        ["Total", f"{sum(sigma):.3f}", f"{sum(sigma)*100:.1f}%"]
+    ]
+    sigma_table = Table(sigma_data, colWidths=[6*cm, 5*cm, 5*cm])
+    sigma_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#10b981')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('BACKGROUND', (0, 1), (-1, -2), colors.HexColor('#f1f5f9')),
+        ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor('#d1fae5')),
+        ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#cbd5e1'))
+    ]))
+    elements.append(sigma_table)
+    elements.append(Spacer(1, 20))
+    
+    # Omega (경계 조건)
+    elements.append(Paragraph("3. Boundary Conditions (Omega)", heading_style))
+    omega_data = [
+        ["Parameter", "Min", "Max"],
+        ["V_pub", f"{omega.get('V_pub_min', 0.2):.2f}", f"{omega.get('V_pub_max', 0.5):.2f}"],
+        ["V_pro", f"{omega.get('V_pro_min', 0.2):.2f}", f"{omega.get('V_pro_max', 0.5):.2f}"],
+        ["V_ind", f"{omega.get('V_ind_min', 0.1):.2f}", f"{omega.get('V_ind_max', 0.5):.2f}"]
+    ]
+    omega_table = Table(omega_data, colWidths=[6*cm, 5*cm, 5*cm])
+    omega_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#8b5cf6')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f1f5f9')),
+        ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#cbd5e1'))
+    ]))
+    elements.append(omega_table)
+    elements.append(Spacer(1, 20))
+    
+    # 처리 이력
+    if records:
+        elements.append(Paragraph(f"4. Processing History (Last {len(records)} records)", heading_style))
+        history_data = [["Timestamp", "Input", "Asset Value", "Balance", "Status"]]
+        for rec in records:
+            history_data.append([
+                rec.get("timestamp", "")[:19].replace("T", " "),
+                str(rec.get("input_value", "-")),
+                f"{rec.get('data', {}).get('asset', {}).get('value', 0):.3f}" if rec.get("success") else "-",
+                f"{rec.get('data', {}).get('balance_score', 0) * 100:.1f}%" if rec.get("success") else "-",
+                "Success" if rec.get("success") else "Failed"
+            ])
+        history_table = Table(history_data, colWidths=[4*cm, 2.5*cm, 3*cm, 3*cm, 2.5*cm])
+        history_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#f59e0b')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTSIZE', (0, 0), (-1, -1), 9),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f1f5f9')),
+            ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#cbd5e1'))
+        ]))
+        elements.append(history_table)
+    
+    # Footer
+    elements.append(Spacer(1, 30))
+    elements.append(Paragraph("Generated by GVIC Engine v2.0.0 - 7 Patent Module Integration System", 
+                             ParagraphStyle('Footer', fontSize=9, textColor=colors.gray)))
+    
+    doc.build(elements)
+    
+    tracker.log("리포트", "PDF 생성", {"records": len(records)})
+    
+    return FileResponse(
+        temp_file.name, 
+        media_type="application/pdf",
+        filename=f"gvic_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+    )
+
+@api_router.get("/report/summary")
+async def get_report_summary():
+    """리포트 요약 데이터 조회"""
+    # 최근 처리 통계
+    total_count = await db.processing_history.count_documents({})
+    success_count = await db.processing_history.count_documents({"success": True})
+    
+    # 최근 10건 평균
+    recent = await db.processing_history.find(
+        {"success": True}, {"_id": 0}
+    ).sort("timestamp", -1).limit(10).to_list(10)
+    
+    avg_asset = 0
+    avg_balance = 0
+    if recent:
+        values = [r.get("data", {}).get("asset", {}).get("value", 0) for r in recent]
+        balances = [r.get("data", {}).get("balance_score", 0) for r in recent]
+        avg_asset = sum(values) / len(values)
+        avg_balance = sum(balances) / len(balances)
+    
+    return {
+        "total_records": total_count,
+        "success_records": success_count,
+        "success_rate": success_count / total_count if total_count > 0 else 0,
+        "recent_avg_asset": avg_asset,
+        "recent_avg_balance": avg_balance,
+        "sigma": config_mgr.get_sigma(),
+        "omega": config_mgr.get_omega(),
+        "balance_score": engine.convergence.calculate_balance_index()
+    }
+
 # Include the router in the main app
 app.include_router(api_router)
 
