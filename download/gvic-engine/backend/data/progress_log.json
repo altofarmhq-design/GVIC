@@ -1,0 +1,1152 @@
+[
+  {
+    "timestamp": "2026-02-12T05:32:42.042831",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 0.75,
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T05:33:09.829901",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 0.75,
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T05:34:45.464237",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 0.75,
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T05:34:45.595911",
+    "phase": "설정",
+    "action": "Σ 업데이트",
+    "data": {
+      "sigma": [
+        0.3,
+        0.35,
+        0.35
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-02-12T05:34:45.709701",
+    "phase": "설정",
+    "action": "Ω 업데이트",
+    "data": {
+      "V_pub_min": 0.2,
+      "V_pub_max": 0.5,
+      "V_pro_min": 0.2,
+      "V_pro_max": 0.5,
+      "V_ind_min": 0.1,
+      "V_ind_max": 0.5,
+      "sum_constraint": 1.0
+    }
+  },
+  {
+    "timestamp": "2026-02-12T05:34:45.789031",
+    "phase": "데이터",
+    "action": "IO 처리",
+    "data": {
+      "format": "json"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T05:34:45.827798",
+    "phase": "데이터",
+    "action": "IO 처리",
+    "data": {
+      "format": "csv"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T05:34:45.864507",
+    "phase": "데이터",
+    "action": "IO 처리",
+    "data": {
+      "format": "key_value"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T05:34:46.018375",
+    "phase": "알림",
+    "action": "헬스체크 실행",
+    "data": {}
+  },
+  {
+    "timestamp": "2026-02-12T05:34:46.087315",
+    "phase": "테스트",
+    "action": "API 테스트 실행",
+    "data": {
+      "test": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T05:35:13.651014",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 0.85,
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T05:35:15.567805",
+    "phase": "데이터",
+    "action": "IO 처리",
+    "data": {
+      "format": "csv"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T05:35:18.734492",
+    "phase": "알림",
+    "action": "헬스체크 실행",
+    "data": {}
+  },
+  {
+    "timestamp": "2026-02-12T05:42:10.855493",
+    "phase": "통합",
+    "action": "데이터 교환",
+    "data": {
+      "source": "erp",
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T05:42:41.876776",
+    "phase": "통합",
+    "action": "데이터 교환",
+    "data": {
+      "source": "erp",
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T06:28:38.644050",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 0.75,
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T12:41:01.082327",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 5.0,
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T12:50:16.954556",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 0.75,
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T12:57:20.801595",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 5.0,
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T12:58:19.358313",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 10.0,
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T12:58:28.050700",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 10.0,
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:00:38.716835",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 5.0,
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:01:23.985503",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 5.0,
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:01:24.031134",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 0.0,
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:01:24.072039",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 10.0,
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:01:24.337608",
+    "phase": "설정",
+    "action": "Σ 업데이트",
+    "data": {
+      "sigma": [
+        0.33,
+        0.34,
+        0.33
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:01:24.376127",
+    "phase": "설정",
+    "action": "Σ 업데이트",
+    "data": {
+      "sigma": [
+        0.3,
+        0.35,
+        0.35
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:01:24.618676",
+    "phase": "설정",
+    "action": "Ω 업데이트",
+    "data": {
+      "V_pub_min": 0.2,
+      "V_pub_max": 0.5,
+      "V_pro_min": 0.2,
+      "V_pro_max": 0.5,
+      "V_ind_min": 0.1,
+      "V_ind_max": 0.5,
+      "sum_constraint": 1.0
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:01:24.656428",
+    "phase": "설정",
+    "action": "Ω 업데이트",
+    "data": {
+      "V_pub_min": 0.2,
+      "V_pub_max": 0.5,
+      "V_pro_min": 0.2,
+      "V_pro_max": 0.5,
+      "V_ind_min": 0.1,
+      "V_ind_max": 0.5,
+      "sum_constraint": 1.0
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:01:24.729073",
+    "phase": "데이터",
+    "action": "IO 처리",
+    "data": {
+      "format": "json"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:01:24.770707",
+    "phase": "데이터",
+    "action": "IO 처리",
+    "data": {
+      "format": "csv"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:01:24.810619",
+    "phase": "데이터",
+    "action": "IO 처리",
+    "data": {
+      "format": "key_value"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:01:24.963300",
+    "phase": "알림",
+    "action": "헬스체크 실행",
+    "data": {}
+  },
+  {
+    "timestamp": "2026-02-12T13:01:25.088382",
+    "phase": "테스트",
+    "action": "API 테스트 실행",
+    "data": {
+      "test": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:01:25.353363",
+    "phase": "통합",
+    "action": "데이터 교환",
+    "data": {
+      "source": "erp",
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:01:25.431066",
+    "phase": "통합",
+    "action": "어댑터 추가",
+    "data": {
+      "domain_id": "test_domain"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:02:14.377417",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 7.5,
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:02:37.990035",
+    "phase": "데이터",
+    "action": "IO 처리",
+    "data": {
+      "format": "json"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:03:16.958330",
+    "phase": "알림",
+    "action": "헬스체크 실행",
+    "data": {}
+  },
+  {
+    "timestamp": "2026-02-12T13:03:57.051312",
+    "phase": "통합",
+    "action": "데이터 교환",
+    "data": {
+      "source": "erp",
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:08:04.691724",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 5.0,
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:08:24.747899",
+    "phase": "통합",
+    "action": "데이터 교환",
+    "data": {
+      "source": "erp",
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:09:02.601072",
+    "phase": "데이터",
+    "action": "IO 처리",
+    "data": {
+      "format": "json"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:09:04.062247",
+    "phase": "데이터",
+    "action": "IO 처리",
+    "data": {
+      "format": "json"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:09:05.566075",
+    "phase": "데이터",
+    "action": "IO 처리",
+    "data": {
+      "format": "json"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:09:11.788450",
+    "phase": "알림",
+    "action": "헬스체크 실행",
+    "data": {}
+  },
+  {
+    "timestamp": "2026-02-12T13:11:54.761826",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 5.0,
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:12:05.780197",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 5.0,
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:19:52.525632",
+    "phase": "리포트",
+    "action": "PDF 생성",
+    "data": {
+      "records": 5
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:20:01.340234",
+    "phase": "리포트",
+    "action": "PDF 생성",
+    "data": {
+      "records": 5
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:20:36.983919",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 5.0,
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:22:41.726543",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 5.0,
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:22:42.828409",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 5.0,
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:22:55.497817",
+    "phase": "통합",
+    "action": "데이터 교환",
+    "data": {
+      "source": "erp",
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:25:59.052965",
+    "phase": "알림",
+    "action": "헬스체크 실행",
+    "data": {}
+  },
+  {
+    "timestamp": "2026-02-12T13:26:19.679665",
+    "phase": "설정",
+    "action": "Σ 업데이트",
+    "data": {
+      "sigma": [
+        0.3,
+        0.35,
+        0.35
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:33:42.684735",
+    "phase": "예측",
+    "action": "분석 완료",
+    "data": {
+      "confidence": 0.9999185793201045,
+      "adjustment_needed": false
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:36:55.390503",
+    "phase": "파레토",
+    "action": "최적화 실행",
+    "data": {
+      "solutions_count": 56,
+      "pareto_front_size": 16,
+      "best_weighted_score": 0.8423529411764704
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:37:13.214902",
+    "phase": "파레토",
+    "action": "최적화 실행",
+    "data": {
+      "solutions_count": 56,
+      "pareto_front_size": 20,
+      "best_weighted_score": 0.8423529411764704
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:37:31.410205",
+    "phase": "파레토",
+    "action": "최적화 실행",
+    "data": {
+      "solutions_count": 56,
+      "pareto_front_size": 12,
+      "best_weighted_score": 0.8423529411764704
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:37:57.165222",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 5.0,
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:38:48.078850",
+    "phase": "파레토",
+    "action": "최적화 실행",
+    "data": {
+      "solutions_count": 56,
+      "pareto_front_size": 21,
+      "best_weighted_score": 0.8423529411764704
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:40:23.867067",
+    "phase": "비교",
+    "action": "분석 완료",
+    "data": {
+      "records_count": 10
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:40:31.479824",
+    "phase": "비교",
+    "action": "분석 완료",
+    "data": {
+      "records_count": 10
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:41:15.329452",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 5.0,
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:51:12.155672",
+    "phase": "데이터소스",
+    "action": "소스 등록",
+    "data": {
+      "source_id": "ds_a3ae82f3",
+      "name": "테스트 API 소스"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:51:18.534619",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_a3ae82f3",
+      "success": true,
+      "value": 1.0
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:53:28.416651",
+    "phase": "데이터소스",
+    "action": "소스 등록",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "name": ""
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:53:41.359359",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:53:49.829448",
+    "phase": "데이터소스",
+    "action": "폴링 시작",
+    "data": {
+      "source_id": "ds_0a6c69cb"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:53:49.832474",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:54:48.931803",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:54:51.580514",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:55:01.012727",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 5.0,
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:55:12.068298",
+    "phase": "데이터소스",
+    "action": "소스 등록",
+    "data": {
+      "source_id": "ds_130d7ef8",
+      "name": "TEST_JSONPlaceholder API"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:55:12.435915",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_a3ae82f3",
+      "success": true,
+      "value": 1.0
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:55:12.747544",
+    "phase": "데이터소스",
+    "action": "소스 삭제",
+    "data": {
+      "source_id": "ds_130d7ef8"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:55:12.943641",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_a3ae82f3",
+      "success": true,
+      "value": 1.0
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:55:13.147349",
+    "phase": "데이터소스",
+    "action": "폴링 시작",
+    "data": {
+      "source_id": "ds_a3ae82f3"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:55:13.199558",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_a3ae82f3",
+      "success": true,
+      "value": 1.0
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:55:13.219883",
+    "phase": "데이터소스",
+    "action": "폴링 중지",
+    "data": {
+      "source_id": "ds_a3ae82f3"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:55:26.756210",
+    "phase": "데이터소스",
+    "action": "소스 등록",
+    "data": {
+      "source_id": "ds_cdfe9e54",
+      "name": "TEST_JSONPlaceholder API"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:55:27.127192",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_a3ae82f3",
+      "success": true,
+      "value": 1.0
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:55:27.530930",
+    "phase": "데이터소스",
+    "action": "소스 삭제",
+    "data": {
+      "source_id": "ds_cdfe9e54"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:55:27.752316",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_a3ae82f3",
+      "success": true,
+      "value": 1.0
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:55:27.994172",
+    "phase": "데이터소스",
+    "action": "폴링 시작",
+    "data": {
+      "source_id": "ds_a3ae82f3"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:55:28.055573",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_a3ae82f3",
+      "success": true,
+      "value": 1.0
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:55:28.109888",
+    "phase": "데이터소스",
+    "action": "폴링 중지",
+    "data": {
+      "source_id": "ds_a3ae82f3"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:55:45.482680",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:56:14.193333",
+    "phase": "데이터소스",
+    "action": "소스 등록",
+    "data": {
+      "source_id": "ds_66dc4ab6",
+      "name": "TEST_Playwright Source"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:56:33.987743",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:56:37.718863",
+    "phase": "데이터소스",
+    "action": "폴링 시작",
+    "data": {
+      "source_id": "ds_0a6c69cb"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:56:39.553374",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:56:42.456091",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_66dc4ab6",
+      "success": true,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:56:44.449810",
+    "phase": "데이터소스",
+    "action": "폴링 시작",
+    "data": {
+      "source_id": "ds_66dc4ab6"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:56:44.499141",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_66dc4ab6",
+      "success": true,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:57:01.550292",
+    "phase": "데이터소스",
+    "action": "소스 삭제",
+    "data": {
+      "source_id": "ds_66dc4ab6"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:57:42.722593",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:58:44.875529",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:59:47.265099",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:59:55.035076",
+    "phase": "리포트",
+    "action": "PDF 생성",
+    "data": {
+      "records": 20
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:59:58.168932",
+    "phase": "리포트",
+    "action": "PDF 생성",
+    "data": {
+      "records": 20
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:59:59.595195",
+    "phase": "리포트",
+    "action": "PDF 생성",
+    "data": {
+      "records": 20
+    }
+  },
+  {
+    "timestamp": "2026-02-12T14:00:49.030927",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T14:01:51.395205",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T14:02:53.815943",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T14:06:13.849425",
+    "phase": "데이터소스",
+    "action": "폴링 시작",
+    "data": {
+      "source_id": "ds_0a6c69cb"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T14:06:16.007128",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T14:06:22.270886",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T14:07:18.404244",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T14:07:36.973033",
+    "phase": "파레토",
+    "action": "최적화 실행",
+    "data": {
+      "solutions_count": 56,
+      "pareto_front_size": 11,
+      "best_weighted_score": 0.8423529411764704
+    }
+  },
+  {
+    "timestamp": "2026-02-12T14:08:03.072747",
+    "phase": "데이터",
+    "action": "IO 처리",
+    "data": {
+      "format": "json"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T14:08:19.661582",
+    "phase": "리포트",
+    "action": "PDF 생성",
+    "data": {
+      "records": 20
+    }
+  },
+  {
+    "timestamp": "2026-02-12T14:08:20.560936",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T14:08:20.942966",
+    "phase": "리포트",
+    "action": "PDF 생성",
+    "data": {
+      "records": 20
+    }
+  },
+  {
+    "timestamp": "2026-02-12T14:09:22.844390",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T14:10:25.205186",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T14:11:27.369149",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T14:12:29.719102",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T14:13:31.883359",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T14:14:34.054745",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T14:15:35.847588",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T14:16:37.990666",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T14:17:40.431416",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T14:18:42.600665",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-12T14:29:37.133819",
+    "phase": "파레토",
+    "action": "최적화 실행",
+    "data": {
+      "solutions_count": 56,
+      "pareto_front_size": 16,
+      "best_weighted_score": 0.8423529411764704
+    }
+  }
+]
