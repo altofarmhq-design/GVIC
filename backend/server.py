@@ -1665,6 +1665,388 @@ async def get_comparison_records(limit: int = 20):
         "total": await db.processing_history.count_documents({"success": True})
     }
 
+# ==================== External Data Source APIs (외부 데이터 소스 연동) ====================
+
+import aiohttp
+import asyncio
+from typing import Literal
+
+# 데이터 소스 저장소
+data_sources = {}
+
+# 수집된 데이터 저장소
+collected_data = {
+    "history": [],
+    "last_collection": None
+}
+
+# 백그라운드 태스크 관리
+background_tasks = {}
+
+class DataSourceConfig(BaseModel):
+    name: str
+    source_type: Literal["api", "webhook", "manual"] = "api"
+    url: Optional[str] = None
+    method: Literal["GET", "POST"] = "GET"
+    headers: Optional[Dict[str, str]] = None
+    body: Optional[Dict[str, Any]] = None
+    auth_type: Optional[Literal["none", "api_key", "bearer", "basic"]] = "none"
+    auth_value: Optional[str] = None
+    polling_interval: int = 60  # 초 단위
+    data_mapping: Optional[Dict[str, str]] = None  # 응답 데이터 매핑
+    enabled: bool = True
+
+@api_router.get("/datasources")
+async def get_data_sources():
+    """등록된 데이터 소스 목록 조회"""
+    sources_list = []
+    for source_id, source in data_sources.items():
+        sources_list.append({
+            "id": source_id,
+            **source,
+            "is_running": source_id in background_tasks
+        })
+    return {
+        "sources": sources_list,
+        "total": len(sources_list)
+    }
+
+@api_router.post("/datasources")
+async def create_data_source(config: DataSourceConfig):
+    """새 데이터 소스 등록"""
+    source_id = f"ds_{uuid.uuid4().hex[:8]}"
+    
+    source_data = {
+        "name": config.name,
+        "source_type": config.source_type,
+        "url": config.url,
+        "method": config.method,
+        "headers": config.headers or {},
+        "body": config.body,
+        "auth_type": config.auth_type,
+        "auth_value": config.auth_value,
+        "polling_interval": config.polling_interval,
+        "data_mapping": config.data_mapping or {"value": "value"},
+        "enabled": config.enabled,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "last_fetch": None,
+        "last_status": None,
+        "fetch_count": 0,
+        "error_count": 0
+    }
+    
+    data_sources[source_id] = source_data
+    
+    # MongoDB에 저장
+    await db.data_sources.update_one(
+        {"id": source_id},
+        {"$set": {**source_data, "id": source_id}},
+        upsert=True
+    )
+    
+    tracker.log("데이터소스", "소스 등록", {"source_id": source_id, "name": config.name})
+    
+    return {"success": True, "source_id": source_id, "source": source_data}
+
+@api_router.get("/datasources/{source_id}")
+async def get_data_source(source_id: str):
+    """특정 데이터 소스 조회"""
+    if source_id not in data_sources:
+        raise HTTPException(status_code=404, detail="Data source not found")
+    return {"source": data_sources[source_id], "id": source_id}
+
+@api_router.put("/datasources/{source_id}")
+async def update_data_source(source_id: str, config: DataSourceConfig):
+    """데이터 소스 수정"""
+    if source_id not in data_sources:
+        raise HTTPException(status_code=404, detail="Data source not found")
+    
+    source = data_sources[source_id]
+    source.update({
+        "name": config.name,
+        "source_type": config.source_type,
+        "url": config.url,
+        "method": config.method,
+        "headers": config.headers or {},
+        "body": config.body,
+        "auth_type": config.auth_type,
+        "auth_value": config.auth_value,
+        "polling_interval": config.polling_interval,
+        "data_mapping": config.data_mapping or {"value": "value"},
+        "enabled": config.enabled
+    })
+    
+    # MongoDB 업데이트
+    await db.data_sources.update_one(
+        {"id": source_id},
+        {"$set": source}
+    )
+    
+    return {"success": True, "source": source}
+
+@api_router.delete("/datasources/{source_id}")
+async def delete_data_source(source_id: str):
+    """데이터 소스 삭제"""
+    if source_id not in data_sources:
+        raise HTTPException(status_code=404, detail="Data source not found")
+    
+    # 실행 중이면 중지
+    if source_id in background_tasks:
+        background_tasks[source_id].cancel()
+        del background_tasks[source_id]
+    
+    del data_sources[source_id]
+    
+    # MongoDB에서 삭제
+    await db.data_sources.delete_one({"id": source_id})
+    
+    tracker.log("데이터소스", "소스 삭제", {"source_id": source_id})
+    
+    return {"success": True, "deleted_source_id": source_id}
+
+async def fetch_data_from_source(source_id: str, source: Dict) -> Dict:
+    """외부 소스에서 데이터 가져오기"""
+    if source["source_type"] != "api" or not source["url"]:
+        return {"success": False, "error": "Invalid source configuration"}
+    
+    headers = dict(source.get("headers", {}))
+    
+    # 인증 헤더 추가
+    if source["auth_type"] == "api_key" and source["auth_value"]:
+        headers["X-API-Key"] = source["auth_value"]
+    elif source["auth_type"] == "bearer" and source["auth_value"]:
+        headers["Authorization"] = f"Bearer {source['auth_value']}"
+    elif source["auth_type"] == "basic" and source["auth_value"]:
+        headers["Authorization"] = f"Basic {source['auth_value']}"
+    
+    try:
+        async with aiohttp.ClientSession() as session:
+            if source["method"] == "GET":
+                async with session.get(source["url"], headers=headers, timeout=30) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        return {"success": True, "data": data, "status_code": response.status}
+                    else:
+                        return {"success": False, "error": f"HTTP {response.status}", "status_code": response.status}
+            else:  # POST
+                async with session.post(source["url"], headers=headers, json=source.get("body"), timeout=30) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        return {"success": True, "data": data, "status_code": response.status}
+                    else:
+                        return {"success": False, "error": f"HTTP {response.status}", "status_code": response.status}
+    except asyncio.TimeoutError:
+        return {"success": False, "error": "Request timeout"}
+    except aiohttp.ClientError as e:
+        return {"success": False, "error": str(e)}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+def extract_value_from_data(data: Any, mapping: Dict[str, str]) -> Optional[float]:
+    """응답 데이터에서 값 추출"""
+    try:
+        # 기본 매핑: value 필드 찾기
+        value_path = mapping.get("value", "value")
+        
+        # 점 표기법 지원 (예: "data.result.value")
+        keys = value_path.split(".")
+        result = data
+        for key in keys:
+            if isinstance(result, dict):
+                result = result.get(key)
+            elif isinstance(result, list) and key.isdigit():
+                result = result[int(key)]
+            else:
+                return None
+        
+        if result is not None:
+            return float(result)
+        return None
+    except (ValueError, TypeError, KeyError, IndexError):
+        return None
+
+@api_router.post("/datasources/{source_id}/fetch")
+async def fetch_data_source(source_id: str):
+    """데이터 소스에서 수동으로 데이터 가져오기"""
+    if source_id not in data_sources:
+        raise HTTPException(status_code=404, detail="Data source not found")
+    
+    source = data_sources[source_id]
+    result = await fetch_data_from_source(source_id, source)
+    
+    # 상태 업데이트
+    source["last_fetch"] = datetime.now(timezone.utc).isoformat()
+    source["last_status"] = "success" if result["success"] else "error"
+    source["fetch_count"] += 1
+    if not result["success"]:
+        source["error_count"] += 1
+    
+    # 성공 시 값 추출 및 처리
+    processed_value = None
+    if result["success"] and result.get("data"):
+        value = extract_value_from_data(result["data"], source.get("data_mapping", {}))
+        if value is not None:
+            processed_value = value
+            
+            # 수집 데이터 저장
+            collection_record = {
+                "source_id": source_id,
+                "source_name": source["name"],
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "raw_data": result["data"],
+                "extracted_value": value
+            }
+            collected_data["history"].append(collection_record)
+            if len(collected_data["history"]) > 1000:
+                collected_data["history"] = collected_data["history"][-1000:]
+            collected_data["last_collection"] = collection_record
+            
+            # MongoDB에 저장
+            await db.collected_data.insert_one({
+                **collection_record,
+                "id": f"cd_{uuid.uuid4().hex[:8]}"
+            })
+    
+    tracker.log("데이터소스", "데이터 수집", {
+        "source_id": source_id,
+        "success": result["success"],
+        "value": processed_value
+    })
+    
+    return {
+        "success": result["success"],
+        "source_id": source_id,
+        "raw_data": result.get("data") if result["success"] else None,
+        "extracted_value": processed_value,
+        "error": result.get("error"),
+        "timestamp": source["last_fetch"]
+    }
+
+@api_router.post("/datasources/{source_id}/process")
+async def process_collected_data(source_id: str):
+    """수집된 데이터를 GVIC 파이프라인으로 처리"""
+    if source_id not in data_sources:
+        raise HTTPException(status_code=404, detail="Data source not found")
+    
+    source = data_sources[source_id]
+    
+    # 먼저 데이터 가져오기
+    result = await fetch_data_from_source(source_id, source)
+    
+    if not result["success"]:
+        return {"success": False, "error": result.get("error")}
+    
+    # 값 추출
+    value = extract_value_from_data(result["data"], source.get("data_mapping", {}))
+    
+    if value is None:
+        return {"success": False, "error": "Could not extract value from data"}
+    
+    # GVIC 엔진으로 처리
+    try:
+        process_result = engine.process(value)
+        
+        # 처리 이력 저장
+        history_record = {
+            "id": str(uuid.uuid4()),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "input_value": value,
+            "source": "external",
+            "source_id": source_id,
+            "source_name": source["name"],
+            "success": True,
+            "data": process_result
+        }
+        await db.processing_history.insert_one(history_record)
+        
+        tracker.log("데이터소스", "파이프라인 처리", {
+            "source_id": source_id,
+            "input_value": value,
+            "success": True
+        })
+        
+        return {
+            "success": True,
+            "source_id": source_id,
+            "input_value": value,
+            "result": process_result
+        }
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+@api_router.get("/datasources/collected")
+async def get_collected_data(source_id: Optional[str] = None, limit: int = 50):
+    """수집된 데이터 조회"""
+    query = {}
+    if source_id:
+        query["source_id"] = source_id
+    
+    records = await db.collected_data.find(
+        query, {"_id": 0}
+    ).sort("timestamp", -1).limit(limit).to_list(limit)
+    
+    return {
+        "records": records,
+        "total": len(records),
+        "last_collection": collected_data["last_collection"]
+    }
+
+@api_router.post("/datasources/{source_id}/start")
+async def start_polling(source_id: str):
+    """폴링 시작"""
+    if source_id not in data_sources:
+        raise HTTPException(status_code=404, detail="Data source not found")
+    
+    if source_id in background_tasks:
+        return {"success": False, "message": "Polling already running"}
+    
+    source = data_sources[source_id]
+    
+    async def polling_task():
+        while True:
+            try:
+                await fetch_data_source(source_id)
+                await asyncio.sleep(source["polling_interval"])
+            except asyncio.CancelledError:
+                break
+            except Exception as e:
+                logging.error(f"Polling error for {source_id}: {e}")
+                await asyncio.sleep(source["polling_interval"])
+    
+    task = asyncio.create_task(polling_task())
+    background_tasks[source_id] = task
+    
+    tracker.log("데이터소스", "폴링 시작", {"source_id": source_id})
+    
+    return {"success": True, "message": f"Polling started for {source_id}"}
+
+@api_router.post("/datasources/{source_id}/stop")
+async def stop_polling(source_id: str):
+    """폴링 중지"""
+    if source_id not in background_tasks:
+        return {"success": False, "message": "Polling not running"}
+    
+    background_tasks[source_id].cancel()
+    del background_tasks[source_id]
+    
+    tracker.log("데이터소스", "폴링 중지", {"source_id": source_id})
+    
+    return {"success": True, "message": f"Polling stopped for {source_id}"}
+
+# 서버 시작 시 저장된 데이터 소스 로드
+@app.on_event("startup")
+async def load_data_sources():
+    """저장된 데이터 소스 로드"""
+    try:
+        sources = await db.data_sources.find({}, {"_id": 0}).to_list(100)
+        for source in sources:
+            source_id = source.pop("id", None)
+            if source_id:
+                data_sources[source_id] = source
+        logging.info(f"Loaded {len(data_sources)} data sources")
+    except Exception as e:
+        logging.error(f"Error loading data sources: {e}")
+
 # Include the router in the main app
 app.include_router(api_router)
 
