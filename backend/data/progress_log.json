@@ -1401,5 +1401,13 @@
       "pareto_front_size": 14,
       "best_weighted_score": 0.8423529411764704
     }
+  },
+  {
+    "timestamp": "2026-02-12T15:57:57.344854",
+    "phase": "비교",
+    "action": "분석 완료",
+    "data": {
+      "records_count": 10
+    }
   }
 ]
