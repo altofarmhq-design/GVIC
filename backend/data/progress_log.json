@@ -350,5 +350,14 @@
     "phase": "알림",
     "action": "헬스체크 실행",
     "data": {}
+  },
+  {
+    "timestamp": "2026-02-12T13:03:57.051312",
+    "phase": "통합",
+    "action": "데이터 교환",
+    "data": {
+      "source": "erp",
+      "success": true
+    }
   }
 ]
