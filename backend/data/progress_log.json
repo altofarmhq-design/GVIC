@@ -16,5 +16,78 @@
       "value": 0.75,
       "success": true
     }
+  },
+  {
+    "timestamp": "2026-02-12T05:34:45.464237",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 0.75,
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T05:34:45.595911",
+    "phase": "설정",
+    "action": "Σ 업데이트",
+    "data": {
+      "sigma": [
+        0.3,
+        0.35,
+        0.35
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-02-12T05:34:45.709701",
+    "phase": "설정",
+    "action": "Ω 업데이트",
+    "data": {
+      "V_pub_min": 0.2,
+      "V_pub_max": 0.5,
+      "V_pro_min": 0.2,
+      "V_pro_max": 0.5,
+      "V_ind_min": 0.1,
+      "V_ind_max": 0.5,
+      "sum_constraint": 1.0
+    }
+  },
+  {
+    "timestamp": "2026-02-12T05:34:45.789031",
+    "phase": "데이터",
+    "action": "IO 처리",
+    "data": {
+      "format": "json"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T05:34:45.827798",
+    "phase": "데이터",
+    "action": "IO 처리",
+    "data": {
+      "format": "csv"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T05:34:45.864507",
+    "phase": "데이터",
+    "action": "IO 처리",
+    "data": {
+      "format": "key_value"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T05:34:46.018375",
+    "phase": "알림",
+    "action": "헬스체크 실행",
+    "data": {}
+  },
+  {
+    "timestamp": "2026-02-12T05:34:46.087315",
+    "phase": "테스트",
+    "action": "API 테스트 실행",
+    "data": {
+      "test": true
+    }
   }
 ]
