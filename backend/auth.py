@@ -216,14 +216,14 @@ def create_auth_router(db):
             "name": data.name,
             "password_hash": hash_password(data.password),
             "picture": None,
-            "role": "viewer",  # Default role
+            "role": "visitor",  # Default role for new users
             "auth_provider": "local",
             "created_at": datetime.now(timezone.utc).isoformat()
         }
         await db.users.insert_one(user)
         
         # Create JWT token
-        token = create_jwt_token(user_id, data.email, "viewer")
+        token = create_jwt_token(user_id, data.email, "visitor")
         
         # Set cookie
         response.set_cookie(
