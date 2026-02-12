@@ -66,7 +66,7 @@ function Dashboard() {
   const [modules, setModules] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  const { user, logout, hasRole, hasPermission } = useAuth();
+  const { user, logout, hasRole, hasPermission, isAdmin } = useAuth();
   const navigate = useNavigate();
 
   const fetchData = useCallback(async () => {
