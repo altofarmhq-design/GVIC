@@ -2901,6 +2901,7 @@ async def analyze_url(request: URLAnalysisRequest):
     
     return {
         "success": True,
+        "session_id": session.session_id,
         "url": url,
         "product_name": product_name,
         "site_type": crawl_result.site_type.value,
@@ -2914,6 +2915,62 @@ async def analyze_url(request: URLAnalysisRequest):
         "pdf_url": "/GVIC_Report_Latest.pdf",
         "pdf_filename": os.path.basename(pdf_path)
     }
+
+
+# ==================== 통합 데이터 조회 API (모든 탭 연동) ====================
+
+@api_router.get("/hub/monitoring")
+async def get_hub_monitoring():
+    """모니터링 탭 데이터 - 실시간 이벤트 및 처리 이력"""
+    return await data_hub.get_monitoring_data()
+
+@api_router.get("/hub/predictions")
+async def get_hub_predictions():
+    """예측 탭 데이터 - GVIC 예측 결과"""
+    return await data_hub.get_prediction_data()
+
+@api_router.get("/hub/pareto")
+async def get_hub_pareto():
+    """파레토 탭 데이터 - 요인별 분석"""
+    return await data_hub.get_pareto_data()
+
+@api_router.get("/hub/comparison")
+async def get_hub_comparison():
+    """비교 탭 데이터 - 세션별 비교 분석"""
+    return await data_hub.get_comparison_data()
+
+@api_router.get("/hub/alerts")
+async def get_hub_alerts(unread_only: bool = False):
+    """알림 데이터"""
+    alerts = await data_hub.get_alerts(unread_only)
+    return {"alerts": alerts, "count": len(alerts)}
+
+@api_router.post("/hub/alerts/{alert_id}/read")
+async def mark_alert_read(alert_id: str):
+    """알림 읽음 처리"""
+    await db.alerts.update_one(
+        {'id': alert_id},
+        {'$set': {'read': True}}
+    )
+    return {"success": True}
+
+@api_router.get("/hub/sessions")
+async def get_analysis_sessions(limit: int = 20):
+    """분석 세션 목록 조회"""
+    sessions = await db.analysis_sessions.find(
+        {}, {'_id': 0}
+    ).sort('created_at', -1).limit(limit).to_list(limit)
+    return {"sessions": sessions, "count": len(sessions)}
+
+@api_router.get("/hub/sessions/{session_id}")
+async def get_session_detail(session_id: str):
+    """분석 세션 상세 조회"""
+    session = await db.analysis_sessions.find_one(
+        {'session_id': session_id}, {'_id': 0}
+    )
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+    return session
 
 
 # 서버 시작 시 저장된 데이터 소스 로드
