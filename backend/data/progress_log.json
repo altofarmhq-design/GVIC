@@ -1148,5 +1148,14 @@
       "pareto_front_size": 16,
       "best_weighted_score": 0.8423529411764704
     }
+  },
+  {
+    "timestamp": "2026-02-12T15:27:28.310829",
+    "phase": "파이프라인",
+    "action": "전체 분석 완료",
+    "data": {
+      "records": 1000,
+      "pdf": "/app/backend/data/reports/GVIC_Report_20260212_152728.pdf"
+    }
   }
 ]
