@@ -36,6 +36,17 @@ const PipelineTab = () => {
   const [inputMode, setInputMode] = useState('url'); // 'url' or 'file'
   const [urlInput, setUrlInput] = useState('');
   const [maxReviews, setMaxReviews] = useState(1000);
+  
+  // 출력 옵션 상태
+  const [outputOptions, setOutputOptions] = useState({
+    reportTitle: '',
+    includeInsights: true,
+    includeRecommendations: true,
+    includeSentiment: true,
+    includeFactors: true,
+    includeGvicAnalysis: true,
+    customNotes: ''
+  });
 
   const steps = [
     { id: 1, name: 'URL 크롤링', description: '데이터 수집' },
