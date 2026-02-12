@@ -1537,5 +1537,33 @@
       "records": 1000,
       "pdf": "/app/backend/data/reports/GVIC_Report_20260212_172710.pdf"
     }
+  },
+  {
+    "timestamp": "2026-02-12T17:40:19.181600",
+    "phase": "파이프라인",
+    "action": "전체 분석 완료",
+    "data": {
+      "records": 1000,
+      "pdf": "/app/backend/data/reports/GVIC_Report_20260212_174018.pdf"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T17:41:11.263892",
+    "phase": "URL분석",
+    "action": "시작",
+    "data": {
+      "url": "https://www.coupang.com/",
+      "max_reviews": 1000
+    }
+  },
+  {
+    "timestamp": "2026-02-12T17:41:12.696600",
+    "phase": "URL분석",
+    "action": "완료",
+    "data": {
+      "url": "https://www.coupang.com/",
+      "records": 1000,
+      "pdf": "/app/backend/data/reports/GVIC_URL_Report_20260212_174112.pdf"
+    }
   }
 ]
