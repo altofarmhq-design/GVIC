@@ -23,12 +23,56 @@ JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "gvic-engine-secret-key-change
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRY_DAYS = 7
 
-# Roles
+# Roles - 내부/외부 구분
 ROLES = {
-    "admin": {"level": 3, "permissions": ["*"]},
-    "operator": {"level": 2, "permissions": ["read", "write", "process", "report"]},
-    "viewer": {"level": 1, "permissions": ["read"]}
+    # 내부 시스템 역할
+    "super_admin": {
+        "level": 4, 
+        "type": "internal",
+        "label": "최고관리자",
+        "permissions": ["*", "system_config"]
+    },
+    "admin": {
+        "level": 3, 
+        "type": "internal",
+        "label": "관리자",
+        "permissions": ["*"]
+    },
+    "operator": {
+        "level": 2, 
+        "type": "internal",
+        "label": "오퍼레이터",
+        "permissions": ["read", "write", "process", "report"]
+    },
+    "visitor": {
+        "level": 1, 
+        "type": "internal",
+        "label": "방문객",
+        "permissions": ["read"]
+    },
+    # 외부 시스템 역할 (모두 visitor와 동일한 권한)
+    "ext_admin": {
+        "level": 1, 
+        "type": "external",
+        "label": "외부관리자",
+        "permissions": ["read"]
+    },
+    "ext_operator": {
+        "level": 1, 
+        "type": "external",
+        "label": "외부오퍼레이터",
+        "permissions": ["read"]
+    },
+    "ext_visitor": {
+        "level": 1, 
+        "type": "external",
+        "label": "외부방문객",
+        "permissions": ["read"]
+    }
 }
+
+# 내부 관리자 역할 목록
+INTERNAL_ADMIN_ROLES = ["super_admin", "admin"]
 
 # ==================== Models ====================
 
