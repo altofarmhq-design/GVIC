@@ -17,7 +17,7 @@ axios.interceptors.request.use((config) => {
 
 export const api = {
   // Auth APIs
-  register: (email, password, name) => axios.post(`${API}/auth/register`, { email, password, name }),
+  register: (email, password, passwordConfirm, name) => axios.post(`${API}/auth/register`, { email, password, password_confirm: passwordConfirm, name }),
   login: (email, password) => axios.post(`${API}/auth/login`, { email, password }),
   googleSession: (sessionId) => axios.post(`${API}/auth/google/session`, { session_id: sessionId }),
   getMe: () => axios.get(`${API}/auth/me`),
