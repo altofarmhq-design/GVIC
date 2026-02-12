@@ -133,6 +133,10 @@ function App() {
             <ParetoTab onUpdate={fetchData} />
           </TabsContent>
 
+          <TabsContent value="comparison">
+            <ComparisonTab />
+          </TabsContent>
+
           <TabsContent value="monitoring">
             <MonitoringTab />
           </TabsContent>
