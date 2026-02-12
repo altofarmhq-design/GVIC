@@ -2698,11 +2698,23 @@ async def list_pipeline_reports():
 
 @api_router.get("/pipeline/report/{filename}")
 async def download_report(filename: str):
-    """PDF 리포트 다운로드"""
+    """PDF 리포트 다운로드 - Content-Disposition으로 강제 다운로드"""
     file_path = f"/app/backend/data/reports/{filename}"
+    
+    # public 폴더에서도 확인
+    if not os.path.exists(file_path):
+        file_path = f"/app/frontend/public/{filename}"
+    
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="Report not found")
-    return FileResponse(file_path, media_type="application/pdf", filename=filename)
+    
+    # Content-Disposition: attachment로 강제 다운로드
+    return FileResponse(
+        file_path, 
+        media_type="application/pdf", 
+        filename=filename,
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
 
 
 # ==================== URL 기반 분석 API ====================
