@@ -36,13 +36,9 @@ export function AuthProvider({ children }) {
     return response.data;
   };
 
-  const register = async (email, password, name) => {
-    const response = await api.register(email, password, name);
-    if (response.data.success) {
-      localStorage.setItem('token', response.data.token);
-      setUser(response.data.user);
-      setIsAuthenticated(true);
-    }
+  const register = async (email, password, passwordConfirm, name) => {
+    const response = await api.register(email, password, passwordConfirm, name);
+    // 승인 대기 상태이므로 자동 로그인하지 않음
     return response.data;
   };
 
