@@ -294,9 +294,114 @@ async def get_module_status():
             {"name": "입출력", "status": "active", "description": "IO 인터페이스"},
             {"name": "내부통제", "status": "active", "description": "알림 및 헬스체크"},
             {"name": "워크플로우", "status": "active", "description": "워크플로우 관리"},
-            {"name": "시각화", "status": "active", "description": "차트 데이터 생성"}
+            {"name": "시각화", "status": "active", "description": "차트 데이터 생성"},
+            {"name": "다중도메인통합", "status": "active", "description": "도메인 통합 인터페이스"}
         ]
     }
+
+# ==================== Multi-Domain Integration APIs ====================
+
+class ExchangeRequest(BaseModel):
+    data: Dict[str, Any]
+    source_domain: str
+    message_type: str = "default"
+
+class AdapterCreate(BaseModel):
+    domain_id: str
+    domain_type: str = "custom"
+    protocol: str = "rest"
+    endpoint: str = ""
+
+class MappingCreate(BaseModel):
+    source_domain: str
+    source_field: str
+    target_domain: str
+    target_field: str
+    similarity_score: float = 1.0
+
+class RoutingRuleCreate(BaseModel):
+    name: str
+    source_domain: str
+    message_type: str
+    target_domains: List[str]
+    priority: int = 0
+
+@api_router.get("/integration/status")
+async def get_integration_status():
+    """통합 시스템 상태 조회"""
+    return integration_system.get_system_status()
+
+@api_router.post("/integration/exchange")
+async def execute_exchange(request: ExchangeRequest):
+    """데이터 교환 실행"""
+    result = integration_system.exchange(
+        request.data, 
+        request.source_domain, 
+        request.message_type
+    )
+    
+    tracker.log("통합", "데이터 교환", {
+        "source": request.source_domain,
+        "success": result['success']
+    })
+    
+    return result
+
+@api_router.get("/integration/adapters")
+async def get_adapters():
+    """어댑터 목록 조회"""
+    return {"adapters": integration_system.get_adapters()}
+
+@api_router.post("/integration/adapters")
+async def create_adapter(request: AdapterCreate):
+    """어댑터 추가"""
+    adapter = integration_system.add_adapter(
+        request.domain_id,
+        request.domain_type,
+        request.protocol,
+        request.endpoint
+    )
+    tracker.log("통합", "어댑터 추가", {"domain_id": request.domain_id})
+    return {"success": True, "adapter": adapter}
+
+@api_router.get("/integration/mappings")
+async def get_mappings():
+    """의미 매핑 목록 조회"""
+    return {"mappings": integration_system.get_mappings()}
+
+@api_router.post("/integration/mappings")
+async def create_mapping(request: MappingCreate):
+    """의미 매핑 추가"""
+    mapping = integration_system.add_mapping(
+        request.source_domain,
+        request.source_field,
+        request.target_domain,
+        request.target_field,
+        request.similarity_score
+    )
+    tracker.log("통합", "매핑 추가", {
+        "source": f"{request.source_domain}.{request.source_field}",
+        "target": f"{request.target_domain}.{request.target_field}"
+    })
+    return {"success": True, "mapping": mapping}
+
+@api_router.get("/integration/routing")
+async def get_routing_rules():
+    """라우팅 규칙 목록 조회"""
+    return {"rules": integration_system.get_routing_rules()}
+
+@api_router.post("/integration/routing")
+async def create_routing_rule(request: RoutingRuleCreate):
+    """라우팅 규칙 추가"""
+    rule = integration_system.add_routing_rule(
+        request.name,
+        request.source_domain,
+        request.message_type,
+        request.target_domains,
+        request.priority
+    )
+    tracker.log("통합", "라우팅 규칙 추가", {"name": request.name})
+    return {"success": True, "rule": rule}
 
 # Include the router in the main app
 app.include_router(api_router)
