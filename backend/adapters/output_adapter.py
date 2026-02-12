@@ -205,16 +205,14 @@ class PDFReportAdapter(OutputAdapter):
         from reportlab.lib.units import cm
         from reportlab.pdfbase import pdfmetrics
         from reportlab.pdfbase.ttfonts import TTFont
-        from reportlab.pdfbase.cidfonts import UnicodeCIDFont
         
-        # 한글 폰트 등록 (Noto Sans CJK KR)
+        # 한글 폰트 등록 (나눔고딕)
         try:
-            # TTC 파일에서 특정 폰트 추출
-            from reportlab.pdfbase.ttfonts import TTFont
-            pdfmetrics.registerFont(TTFont('NotoSansKR', '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc', subfontIndex=1))
-            pdfmetrics.registerFont(TTFont('NotoSansKR-Bold', '/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc', subfontIndex=1))
-            korean_font = 'NotoSansKR'
-            korean_font_bold = 'NotoSansKR-Bold'
+            pdfmetrics.registerFont(TTFont('NanumGothic', '/usr/share/fonts/truetype/nanum/NanumGothic.ttf'))
+            pdfmetrics.registerFont(TTFont('NanumGothicBold', '/usr/share/fonts/truetype/nanum/NanumGothicBold.ttf'))
+            korean_font = 'NanumGothic'
+            korean_font_bold = 'NanumGothicBold'
+            logger.info("한글 폰트 등록 성공: NanumGothic")
         except Exception as e:
             logger.warning(f"한글 폰트 등록 실패: {e}, 기본 폰트 사용")
             korean_font = 'Helvetica'
