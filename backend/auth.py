@@ -499,6 +499,62 @@ def create_auth_router(db):
         """List available roles"""
         return {"roles": ROLES}
     
+    # ==================== User Approval (Admin Only) ====================
+    
+    @router.get("/pending")
+    async def list_pending_users(user: dict = Depends(require_role(INTERNAL_ADMIN_ROLES))):
+        """List users pending approval (Admin only)"""
+        users = await db.users.find(
+            {"status": "pending"},
+            {"_id": 0, "password_hash": 0}
+        ).to_list(100)
+        
+        return {"users": users, "total": len(users)}
+    
+    @router.post("/users/{user_id}/approve")
+    async def approve_user(user_id: str, user: dict = Depends(require_role(INTERNAL_ADMIN_ROLES))):
+        """Approve pending user (Admin only)"""
+        target_user = await db.users.find_one({"user_id": user_id}, {"_id": 0})
+        
+        if not target_user:
+            raise HTTPException(status_code=404, detail="사용자를 찾을 수 없습니다")
+        
+        if target_user.get("status") != "pending":
+            raise HTTPException(status_code=400, detail="승인 대기 중인 사용자가 아닙니다")
+        
+        await db.users.update_one(
+            {"user_id": user_id},
+            {"$set": {
+                "status": "approved",
+                "approved_by": user["user_id"],
+                "approved_at": datetime.now(timezone.utc).isoformat()
+            }}
+        )
+        
+        return {"success": True, "message": f"{target_user['name']}님의 가입이 승인되었습니다"}
+    
+    @router.post("/users/{user_id}/reject")
+    async def reject_user(user_id: str, user: dict = Depends(require_role(INTERNAL_ADMIN_ROLES))):
+        """Reject pending user (Admin only)"""
+        target_user = await db.users.find_one({"user_id": user_id}, {"_id": 0})
+        
+        if not target_user:
+            raise HTTPException(status_code=404, detail="사용자를 찾을 수 없습니다")
+        
+        if target_user.get("status") != "pending":
+            raise HTTPException(status_code=400, detail="승인 대기 중인 사용자가 아닙니다")
+        
+        await db.users.update_one(
+            {"user_id": user_id},
+            {"$set": {
+                "status": "rejected",
+                "rejected_by": user["user_id"],
+                "rejected_at": datetime.now(timezone.utc).isoformat()
+            }}
+        )
+        
+        return {"success": True, "message": f"{target_user['name']}님의 가입이 거부되었습니다"}
+    
     # Export dependencies for use in other routers
     router.get_current_user = get_current_user
     router.require_role = require_role
