@@ -108,17 +108,27 @@ const PipelineTab = () => {
     }
   };
 
-  // PDF 직접 다운로드 함수 - API를 통해 다운로드
+  // PDF 직접 다운로드 함수 - base64 방식
   const handleDownloadPdf = async (filename) => {
     if (!filename) return;
     
     try {
-      const response = await fetch(`/api/pipeline/report/${filename}`);
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/pipeline/report-base64/${filename}`);
       if (!response.ok) throw new Error('다운로드 실패');
       
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
+      const data = await response.json();
       
+      // base64를 blob으로 변환
+      const byteCharacters = atob(data.content);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: 'application/pdf' });
+      
+      // 다운로드 트리거
+      const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
       link.download = filename;
@@ -128,6 +138,7 @@ const PipelineTab = () => {
       window.URL.revokeObjectURL(url);
     } catch (err) {
       console.error('다운로드 오류:', err);
+      alert('다운로드 실패: ' + err.message);
     }
   };
 
