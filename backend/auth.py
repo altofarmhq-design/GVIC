@@ -425,7 +425,7 @@ def create_auth_router(db):
     # ==================== User Management (Admin Only) ====================
     
     @router.get("/users")
-    async def list_users(user: dict = Depends(require_role(["admin"]))):
+    async def list_users(user: dict = Depends(require_role(INTERNAL_ADMIN_ROLES))):
         """List all users (Admin only)"""
         users = await db.users.find(
             {},
@@ -435,7 +435,7 @@ def create_auth_router(db):
         return {"users": users, "total": len(users)}
     
     @router.get("/users/{user_id}")
-    async def get_user(user_id: str, user: dict = Depends(require_role(["admin"]))):
+    async def get_user(user_id: str, user: dict = Depends(require_role(INTERNAL_ADMIN_ROLES))):
         """Get specific user (Admin only)"""
         target_user = await db.users.find_one(
             {"user_id": user_id},
@@ -448,7 +448,7 @@ def create_auth_router(db):
         return target_user
     
     @router.put("/users/{user_id}")
-    async def update_user(user_id: str, data: UserUpdate, user: dict = Depends(require_role(["admin"]))):
+    async def update_user(user_id: str, data: UserUpdate, user: dict = Depends(require_role(INTERNAL_ADMIN_ROLES))):
         """Update user role or name (Admin only)"""
         target_user = await db.users.find_one({"user_id": user_id}, {"_id": 0})
         
@@ -461,6 +461,9 @@ def create_auth_router(db):
         if data.role:
             if data.role not in ROLES:
                 raise HTTPException(status_code=400, detail=f"Invalid role. Choose from: {list(ROLES.keys())}")
+            # super_admin 역할 변경은 super_admin만 가능
+            if data.role == "super_admin" and user["role"] != "super_admin":
+                raise HTTPException(status_code=403, detail="Only super_admin can assign super_admin role")
             update_data["role"] = data.role
         
         if update_data:
@@ -472,10 +475,14 @@ def create_auth_router(db):
         return {"success": True, "updated": update_data}
     
     @router.delete("/users/{user_id}")
-    async def delete_user(user_id: str, user: dict = Depends(require_role(["admin"]))):
+    async def delete_user(user_id: str, user: dict = Depends(require_role(INTERNAL_ADMIN_ROLES))):
         """Delete user (Admin only)"""
         if user_id == user["user_id"]:
             raise HTTPException(status_code=400, detail="Cannot delete yourself")
+        
+        target_user = await db.users.find_one({"user_id": user_id}, {"_id": 0})
+        if target_user and target_user["role"] == "super_admin":
+            raise HTTPException(status_code=403, detail="Cannot delete super_admin")
         
         result = await db.users.delete_one({"user_id": user_id})
         
