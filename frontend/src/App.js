@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { 
   LayoutDashboard, Play, Database, Bell, Settings, 
-  Zap, RefreshCw, Network
+  Zap, RefreshCw, Network, Radio
 } from 'lucide-react';
 import { api } from "@/lib/api";
 import { 
@@ -13,7 +13,8 @@ import {
   IntegrationTab, 
   DataTab, 
   AlertsTab, 
-  SettingsTab 
+  SettingsTab,
+  MonitoringTab
 } from "@/components/tabs";
 
 function App() {
@@ -79,6 +80,9 @@ function App() {
             <TabsTrigger value="processing" className="data-[state=active]:bg-slate-700">
               <Play className="w-4 h-4 mr-2" /> 처리
             </TabsTrigger>
+            <TabsTrigger value="monitoring" className="data-[state=active]:bg-slate-700">
+              <Radio className="w-4 h-4 mr-2" /> 모니터링
+            </TabsTrigger>
             <TabsTrigger value="integration" className="data-[state=active]:bg-slate-700">
               <Network className="w-4 h-4 mr-2" /> 통합
             </TabsTrigger>
@@ -99,6 +103,10 @@ function App() {
 
           <TabsContent value="processing">
             <ProcessingTab onProcess={fetchData} />
+          </TabsContent>
+
+          <TabsContent value="monitoring">
+            <MonitoringTab />
           </TabsContent>
 
           <TabsContent value="integration">
