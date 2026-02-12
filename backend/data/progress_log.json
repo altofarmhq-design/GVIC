@@ -1253,5 +1253,24 @@
       "records": 500,
       "pdf": "/app/backend/data/reports/GVIC_URL_Report_20260212_154142.pdf"
     }
+  },
+  {
+    "timestamp": "2026-02-12T15:42:28.605858",
+    "phase": "URL분석",
+    "action": "시작",
+    "data": {
+      "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000186204",
+      "max_reviews": 1000
+    }
+  },
+  {
+    "timestamp": "2026-02-12T15:42:29.194083",
+    "phase": "URL분석",
+    "action": "완료",
+    "data": {
+      "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000186204",
+      "records": 1000,
+      "pdf": "/app/backend/data/reports/GVIC_URL_Report_20260212_154229.pdf"
+    }
   }
 ]
