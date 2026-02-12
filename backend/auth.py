@@ -242,7 +242,7 @@ def create_auth_router(db):
                 "user_id": user_id,
                 "email": data.email,
                 "name": data.name,
-                "role": "viewer"
+                "role": "visitor"
             },
             "token": token
         }
