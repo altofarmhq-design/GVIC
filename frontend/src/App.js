@@ -89,6 +89,9 @@ function App() {
             <TabsTrigger value="prediction" className="data-[state=active]:bg-slate-700">
               <Brain className="w-4 h-4 mr-2" /> 예측
             </TabsTrigger>
+            <TabsTrigger value="pareto" className="data-[state=active]:bg-slate-700">
+              <Target className="w-4 h-4 mr-2" /> 파레토
+            </TabsTrigger>
             <TabsTrigger value="monitoring" className="data-[state=active]:bg-slate-700">
               <Radio className="w-4 h-4 mr-2" /> 모니터링
             </TabsTrigger>
