@@ -20,7 +20,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { 
-  Users, Shield, Trash2, RefreshCw, Crown, Eye, Settings2
+  Users, Shield, Trash2, RefreshCw, Crown, Eye, Settings2, UserCheck, UserX, Clock
 } from 'lucide-react';
 
 export default function UsersTab() {
