@@ -328,9 +328,9 @@ def create_auth_router(db):
             user_id = user["user_id"]
             role = user["role"]
         else:
-            # Create new user
+            # Create new user (외부 사용자로 기본 설정)
             user_id = f"user_{uuid.uuid4().hex[:12]}"
-            role = "viewer"  # Default role for new users
+            role = "ext_visitor"  # 외부 방문객으로 기본 설정
             
             new_user = {
                 "user_id": user_id,
