@@ -1748,6 +1748,23 @@ async def create_data_source(config: DataSourceConfig):
     
     return {"success": True, "source_id": source_id, "source": source_data}
 
+@api_router.get("/datasources/collected")
+async def get_collected_data(source_id_filter: Optional[str] = None, limit: int = 50):
+    """수집된 데이터 조회"""
+    query = {}
+    if source_id_filter:
+        query["source_id"] = source_id_filter
+    
+    records = await db.collected_data.find(
+        query, {"_id": 0}
+    ).sort("timestamp", -1).limit(limit).to_list(limit)
+    
+    return {
+        "data": records,
+        "total": len(records),
+        "last_collection": collected_data.get("last_collection")
+    }
+
 @api_router.get("/datasources/{source_id}")
 async def get_data_source(source_id: str):
     """특정 데이터 소스 조회"""
