@@ -203,13 +203,17 @@ def create_auth_router(db):
     
     @router.post("/register")
     async def register(data: UserRegister, response: Response):
-        """Register new user with email/password"""
+        """Register new user with email/password (requires admin approval)"""
+        # Validate password confirmation
+        if data.password != data.password_confirm:
+            raise HTTPException(status_code=400, detail="비밀번호가 일치하지 않습니다")
+        
         # Check if email exists
         existing = await db.users.find_one({"email": data.email}, {"_id": 0})
         if existing:
-            raise HTTPException(status_code=400, detail="Email already registered")
+            raise HTTPException(status_code=400, detail="이미 등록된 이메일입니다")
         
-        # Create user
+        # Create user with pending status
         user_id = f"user_{uuid.uuid4().hex[:12]}"
         user = {
             "user_id": user_id,
@@ -219,33 +223,20 @@ def create_auth_router(db):
             "picture": None,
             "role": "visitor",  # Default role for new users
             "auth_provider": "local",
+            "status": "pending",  # 승인 대기 상태
             "created_at": datetime.now(timezone.utc).isoformat()
         }
         await db.users.insert_one(user)
         
-        # Create JWT token
-        token = create_jwt_token(user_id, data.email, "visitor")
-        
-        # Set cookie
-        response.set_cookie(
-            key="session_token",
-            value=token,
-            httponly=True,
-            secure=True,
-            samesite="none",
-            path="/",
-            max_age=JWT_EXPIRY_DAYS * 24 * 60 * 60
-        )
-        
         return {
             "success": True,
+            "message": "회원가입 신청이 완료되었습니다. 관리자 승인 후 로그인할 수 있습니다.",
             "user": {
                 "user_id": user_id,
                 "email": data.email,
                 "name": data.name,
-                "role": "visitor"
-            },
-            "token": token
+                "status": "pending"
+            }
         }
     
     @router.post("/login")
