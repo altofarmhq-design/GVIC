@@ -1228,5 +1228,11 @@
       "success": false,
       "value": null
     }
+  },
+  {
+    "timestamp": "2026-02-12T15:40:12.369134",
+    "phase": "알림",
+    "action": "헬스체크 실행",
+    "data": {}
   }
 ]
