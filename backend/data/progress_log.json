@@ -663,5 +663,68 @@
       "value": 5.0,
       "success": true
     }
+  },
+  {
+    "timestamp": "2026-02-12T13:55:12.068298",
+    "phase": "데이터소스",
+    "action": "소스 등록",
+    "data": {
+      "source_id": "ds_130d7ef8",
+      "name": "TEST_JSONPlaceholder API"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:55:12.435915",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_a3ae82f3",
+      "success": true,
+      "value": 1.0
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:55:12.747544",
+    "phase": "데이터소스",
+    "action": "소스 삭제",
+    "data": {
+      "source_id": "ds_130d7ef8"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:55:12.943641",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_a3ae82f3",
+      "success": true,
+      "value": 1.0
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:55:13.147349",
+    "phase": "데이터소스",
+    "action": "폴링 시작",
+    "data": {
+      "source_id": "ds_a3ae82f3"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:55:13.199558",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_a3ae82f3",
+      "success": true,
+      "value": 1.0
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:55:13.219883",
+    "phase": "데이터소스",
+    "action": "폴링 중지",
+    "data": {
+      "source_id": "ds_a3ae82f3"
+    }
   }
 ]
