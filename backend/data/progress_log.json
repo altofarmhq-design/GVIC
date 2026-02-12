@@ -495,5 +495,14 @@
         0.35
       ]
     }
+  },
+  {
+    "timestamp": "2026-02-12T13:33:42.684735",
+    "phase": "예측",
+    "action": "분석 완료",
+    "data": {
+      "confidence": 0.9999185793201045,
+      "adjustment_needed": false
+    }
   }
 ]
