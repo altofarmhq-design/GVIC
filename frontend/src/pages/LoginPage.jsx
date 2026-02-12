@@ -34,7 +34,19 @@ export default function LoginPage() {
       await login(email, password);
       navigate(from, { replace: true });
     } catch (err) {
-      setError(err.response?.data?.detail || '로그인에 실패했습니다');
+      // detail이 객체/배열인 경우 문자열로 변환
+      let errorMsg = '로그인에 실패했습니다';
+      if (err.response?.data?.detail) {
+        const detail = err.response.data.detail;
+        if (typeof detail === 'string') {
+          errorMsg = detail;
+        } else if (Array.isArray(detail)) {
+          errorMsg = detail.map(d => d.msg || String(d)).join(', ');
+        } else if (typeof detail === 'object') {
+          errorMsg = detail.msg || JSON.stringify(detail);
+        }
+      }
+      setError(errorMsg);
     }
     setLoading(false);
   };
@@ -62,7 +74,19 @@ export default function LoginPage() {
       setPassword('');
       setPasswordConfirm('');
     } catch (err) {
-      setError(err.response?.data?.detail || '회원가입에 실패했습니다');
+      // detail이 객체/배열인 경우 문자열로 변환
+      let errorMsg = '회원가입에 실패했습니다';
+      if (err.response?.data?.detail) {
+        const detail = err.response.data.detail;
+        if (typeof detail === 'string') {
+          errorMsg = detail;
+        } else if (Array.isArray(detail)) {
+          errorMsg = detail.map(d => d.msg || String(d)).join(', ');
+        } else if (typeof detail === 'object') {
+          errorMsg = detail.msg || JSON.stringify(detail);
+        }
+      }
+      setError(errorMsg);
     }
     setLoading(false);
   };
