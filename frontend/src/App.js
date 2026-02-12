@@ -19,7 +19,8 @@ import {
 import { 
   LayoutDashboard, Play, Database, Bell, Settings, 
   Activity, CheckCircle, AlertTriangle, Zap, RefreshCw,
-  FileText, Trash2, Heart
+  FileText, Trash2, Heart, Network, ArrowRightLeft, 
+  GitBranch, Link2, Send
 } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -40,7 +41,14 @@ const api = {
   getAlerts: () => axios.get(`${API}/alerts`),
   runHealthCheck: () => axios.post(`${API}/health-check`),
   resolveAlert: (alertId) => axios.post(`${API}/alerts/resolve`, { alert_id: alertId }),
-  getModules: () => axios.get(`${API}/modules`)
+  getModules: () => axios.get(`${API}/modules`),
+  // Integration APIs
+  getIntegrationStatus: () => axios.get(`${API}/integration/status`),
+  executeExchange: (data, source_domain, message_type) => 
+    axios.post(`${API}/integration/exchange`, { data, source_domain, message_type }),
+  getAdapters: () => axios.get(`${API}/integration/adapters`),
+  getMappings: () => axios.get(`${API}/integration/mappings`),
+  getRoutingRules: () => axios.get(`${API}/integration/routing`)
 };
 
 // ==================== Metric Card Component ====================
