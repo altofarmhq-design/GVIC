@@ -88,44 +88,75 @@ export const ComparisonTab = () => {
 
   const stats = result?.statistics;
 
+  // DataHub 차트 데이터 준비
+  const hubChartData = hubComparison?.comparisons?.map((item, idx) => ({
+    name: item.product_name?.substring(0, 10) || `#${idx + 1}`,
+    positive: (item.metrics?.positive_ratio || 0) * 100,
+    fairness: (item.metrics?.fairness_index || 0) * 100,
+    balance: (item.metrics?.balance_index || 0) * 100,
+    records: item.metrics?.total_records || 0
+  })).reverse() || [];
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-bold text-slate-100 flex items-center gap-2">
-            <GitCompare className="w-6 h-6 text-cyan-400" /> 처리 결과 비교 분석
+            <GitCompare className="w-6 h-6 text-cyan-400" /> 비교 분석
           </h2>
-          <p className="text-slate-400 text-sm">과거 처리 결과의 통계 및 트렌드 분석</p>
+          <p className="text-slate-400 text-sm">처리 결과 및 URL 분석 세션 비교</p>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <span className="text-slate-400 text-sm">분석 개수:</span>
-            <Slider
-              value={[limit]}
-              onValueChange={([v]) => setLimit(v)}
-              min={5}
-              max={50}
-              step={5}
-              className="w-32 [&_[role=slider]]:bg-cyan-500"
-            />
-            <span className="text-cyan-400 w-8">{limit}</span>
-          </div>
-          <Button 
-            onClick={handleAnalyze} 
-            disabled={loading}
-            className="bg-cyan-600 hover:bg-cyan-500"
-            data-testid="comparison-analyze-button"
-          >
-            {loading ? (
-              <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-            ) : (
-              <Play className="w-4 h-4 mr-2" />
-            )}
-            분석 실행
-          </Button>
-        </div>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={fetchHubComparison}
+          disabled={hubLoading}
+        >
+          <RefreshCw className={`w-4 h-4 mr-1 ${hubLoading ? 'animate-spin' : ''}`} /> 새로고침
+        </Button>
       </div>
+
+      {/* 탭 선택 */}
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="bg-slate-800 border border-slate-700">
+          <TabsTrigger value="processing" className="data-[state=active]:bg-slate-700">
+            <Database className="w-4 h-4 mr-2" /> 처리 이력 비교
+          </TabsTrigger>
+          <TabsTrigger value="sessions" className="data-[state=active]:bg-slate-700">
+            <Globe className="w-4 h-4 mr-2" /> URL 분석 세션 비교
+          </TabsTrigger>
+        </TabsList>
+
+        {/* 처리 이력 비교 탭 */}
+        <TabsContent value="processing" className="space-y-6 mt-4">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <span className="text-slate-400 text-sm">분석 개수:</span>
+              <Slider
+                value={[limit]}
+                onValueChange={([v]) => setLimit(v)}
+                min={5}
+                max={50}
+                step={5}
+                className="w-32 [&_[role=slider]]:bg-cyan-500"
+              />
+              <span className="text-cyan-400 w-8">{limit}</span>
+            </div>
+            <Button 
+              onClick={handleAnalyze} 
+              disabled={loading}
+              className="bg-cyan-600 hover:bg-cyan-500"
+              data-testid="comparison-analyze-button"
+            >
+              {loading ? (
+                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Play className="w-4 h-4 mr-2" />
+              )}
+              분석 실행
+            </Button>
+          </div>
 
       {result?.success && (
         <>
