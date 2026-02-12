@@ -2908,7 +2908,10 @@ async def analyze_url(request: URLAnalysisRequest):
     
     output_file = os.path.join(output_dir, f"GVIC_URL_Report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf")
     output_adapter = OutputAdapterFactory.get_adapter(OutputType.PDF_REPORT)
-    formatted_data = output_adapter.format(analysis_result)
+    
+    # 출력 옵션을 딕셔너리로 변환
+    output_opts = request.output_options.dict() if request.output_options else {}
+    formatted_data = output_adapter.format(analysis_result, output_opts)
     pdf_path = output_adapter.export(formatted_data, output_file)
     
     # public 폴더에 복사
