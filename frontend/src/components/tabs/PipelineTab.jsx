@@ -239,6 +239,86 @@ const PipelineTab = () => {
                   />
                 </div>
 
+                {/* 출력 옵션 섹션 */}
+                <div className="space-y-3 p-3 bg-slate-700/50 rounded-lg border border-slate-600">
+                  <div className="flex items-center gap-2 text-slate-200 font-medium">
+                    <Settings className="h-4 w-4 text-purple-400" />
+                    리포트 출력 옵션
+                  </div>
+                  
+                  {/* 리포트 제목 */}
+                  <div className="space-y-1">
+                    <Label className="text-slate-300 text-sm">리포트 제목 (선택)</Label>
+                    <Input
+                      type="text"
+                      placeholder="예: 2024년 1분기 고객 리뷰 분석"
+                      value={outputOptions.reportTitle}
+                      onChange={(e) => setOutputOptions({...outputOptions, reportTitle: e.target.value})}
+                      className="bg-slate-600 border-slate-500 text-slate-100 text-sm"
+                      data-testid="report-title-input"
+                    />
+                  </div>
+                  
+                  {/* 포함할 섹션 선택 */}
+                  <div className="space-y-2">
+                    <Label className="text-slate-300 text-sm">포함할 섹션</Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
+                        <Checkbox
+                          checked={outputOptions.includeSentiment}
+                          onCheckedChange={(checked) => setOutputOptions({...outputOptions, includeSentiment: checked})}
+                          className="border-slate-500"
+                        />
+                        감성 분석
+                      </label>
+                      <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
+                        <Checkbox
+                          checked={outputOptions.includeFactors}
+                          onCheckedChange={(checked) => setOutputOptions({...outputOptions, includeFactors: checked})}
+                          className="border-slate-500"
+                        />
+                        요인 분석
+                      </label>
+                      <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
+                        <Checkbox
+                          checked={outputOptions.includeGvicAnalysis}
+                          onCheckedChange={(checked) => setOutputOptions({...outputOptions, includeGvicAnalysis: checked})}
+                          className="border-slate-500"
+                        />
+                        GVIC 분석
+                      </label>
+                      <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
+                        <Checkbox
+                          checked={outputOptions.includeInsights}
+                          onCheckedChange={(checked) => setOutputOptions({...outputOptions, includeInsights: checked})}
+                          className="border-slate-500"
+                        />
+                        인사이트
+                      </label>
+                      <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer col-span-2">
+                        <Checkbox
+                          checked={outputOptions.includeRecommendations}
+                          onCheckedChange={(checked) => setOutputOptions({...outputOptions, includeRecommendations: checked})}
+                          className="border-slate-500"
+                        />
+                        권장 조치 사항
+                      </label>
+                    </div>
+                  </div>
+                  
+                  {/* 추가 메모 */}
+                  <div className="space-y-1">
+                    <Label className="text-slate-300 text-sm">추가 메모 (선택)</Label>
+                    <Textarea
+                      placeholder="리포트에 포함할 추가 사항..."
+                      value={outputOptions.customNotes}
+                      onChange={(e) => setOutputOptions({...outputOptions, customNotes: e.target.value})}
+                      className="bg-slate-600 border-slate-500 text-slate-100 text-sm min-h-[60px]"
+                      data-testid="custom-notes-input"
+                    />
+                  </div>
+                </div>
+
                 {/* URL 분석 버튼 */}
                 <Button 
                   className="w-full bg-blue-600 hover:bg-blue-700" 
