@@ -569,5 +569,14 @@
     "data": {
       "records_count": 10
     }
+  },
+  {
+    "timestamp": "2026-02-12T13:41:15.329452",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 5.0,
+      "success": true
+    }
   }
 ]
