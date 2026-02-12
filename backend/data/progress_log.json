@@ -1193,5 +1193,30 @@
       "records": 1000,
       "pdf": "/app/backend/data/reports/GVIC_Report_20260212_153515.pdf"
     }
+  },
+  {
+    "timestamp": "2026-02-12T15:35:29.408897",
+    "phase": "파이프라인",
+    "action": "전체 분석 완료",
+    "data": {
+      "records": 1000,
+      "pdf": "/app/backend/data/reports/GVIC_Report_20260212_153529.pdf"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T15:35:35.523660",
+    "phase": "리포트",
+    "action": "PDF 생성",
+    "data": {
+      "records": 20
+    }
+  },
+  {
+    "timestamp": "2026-02-12T15:35:36.885082",
+    "phase": "리포트",
+    "action": "PDF 생성",
+    "data": {
+      "records": 20
+    }
   }
 ]
