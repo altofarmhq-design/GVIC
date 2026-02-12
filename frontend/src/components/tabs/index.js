@@ -4,3 +4,4 @@ export { IntegrationTab } from './IntegrationTab';
 export { DataTab } from './DataTab';
 export { AlertsTab } from './AlertsTab';
 export { SettingsTab } from './SettingsTab';
+export { MonitoringTab } from './MonitoringTab';
