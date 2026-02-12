@@ -1218,5 +1218,15 @@
     "data": {
       "records": 20
     }
+  },
+  {
+    "timestamp": "2026-02-12T15:39:23.271109",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
   }
 ]

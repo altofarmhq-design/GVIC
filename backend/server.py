@@ -2693,6 +2693,174 @@ async def download_report(filename: str):
     return FileResponse(file_path, media_type="application/pdf", filename=filename)
 
 
+# ==================== URL 기반 분석 API ====================
+
+from crawlers.url_crawler import crawl_url, CrawlResult
+
+class URLAnalysisRequest(BaseModel):
+    url: str
+    max_reviews: int = 1000
+
+@api_router.post("/pipeline/analyze-url")
+async def analyze_url(request: URLAnalysisRequest):
+    """URL에서 데이터를 수집하여 분석하고 PDF 리포트 생성"""
+    import uuid as uuid_module
+    
+    url = request.url
+    max_reviews = min(request.max_reviews, 2000)  # 최대 2000건
+    
+    tracker.log("URL분석", "시작", {"url": url, "max_reviews": max_reviews})
+    
+    # 1. URL 크롤링
+    crawl_result = crawl_url(url, max_reviews)
+    
+    if not crawl_result.success or not crawl_result.reviews:
+        raise HTTPException(status_code=400, detail=f"URL에서 데이터를 수집할 수 없습니다: {crawl_result.error}")
+    
+    reviews = crawl_result.reviews
+    product_name = crawl_result.product_name
+    
+    # 2. 입력 어댑터로 표준화
+    input_adapter = InputAdapterFactory.get_adapter(DataDomain.PRODUCT_REVIEW)
+    input_batch = input_adapter.transform(reviews)
+    
+    # 3. 감성 분석
+    sentiment_counts = {"positive": 0, "neutral": 0, "negative": 0}
+    ratings = []
+    for record in input_batch.records:
+        ratings.append(record.metadata.get("original_rating", 3))
+        sentiment_counts[record.sentiment_hint] += 1
+    
+    total = len(input_batch.records)
+    sentiment_distribution = {
+        "positive": {"count": sentiment_counts["positive"], "ratio": sentiment_counts["positive"] / total},
+        "neutral": {"count": sentiment_counts["neutral"], "ratio": sentiment_counts["neutral"] / total},
+        "negative": {"count": sentiment_counts["negative"], "ratio": sentiment_counts["negative"] / total}
+    }
+    
+    # 4. 요인 추출
+    factor_extractor = FactorExtractor()
+    records_for_extraction = [r.to_dict() for r in input_batch.records]
+    positive_factors, negative_factors = factor_extractor.extract_factors(records_for_extraction)
+    
+    # 5. GVIC 분석
+    gvic_results = {}
+    
+    # 수렴 제어
+    V_input = np.array([
+        sentiment_distribution["positive"]["ratio"],
+        sentiment_distribution["neutral"]["ratio"],
+        sentiment_distribution["negative"]["ratio"]
+    ])
+    controller = ConvergenceController(
+        default_ratio=[0.33, 0.34, 0.33],
+        omega={'lower_bounds': [0.1, 0.05, 0.01], 'upper_bounds': [0.95, 0.5, 0.5], 'sum_constraint': 1.0}
+    )
+    V_output, conv_metadata = controller.converge(V_input)
+    gvic_results["convergence"] = {
+        "status": conv_metadata.get("status"),
+        "balance_index": conv_metadata.get("balance_index", 0)
+    }
+    
+    # 신호 처리
+    preprocessor = SignalPreprocessor(dimension=64, threshold=0.7)
+    conforming_count = 0
+    sample_size = min(100, len(input_batch.records))
+    for record in input_batch.records[:sample_size]:
+        signal_data = {'rating': record.metadata.get("original_rating", 3)}
+        modules = preprocessor.process(signal_data, SignalType.BEHAVIOR)
+        for m in modules:
+            if m.conformance_status.value == 'conforming':
+                conforming_count += 1
+    gvic_results["signal"] = {
+        "total_processed": sample_size,
+        "conformance_rate": conforming_count / sample_size if sample_size > 0 else 0
+    }
+    
+    # 가중 분배
+    base_ratio = [
+        sentiment_distribution["positive"]["ratio"],
+        sentiment_distribution["neutral"]["ratio"] + 0.1,
+        sentiment_distribution["negative"]["ratio"] + 0.1
+    ]
+    total_ratio = sum(base_ratio)
+    base_ratio = [r / total_ratio for r in base_ratio]
+    distributor = WeightedDistributionSystem(base_ratio=base_ratio)
+    distribution = distributor.distribute(1000000)
+    analytics = distributor.get_analytics()
+    gvic_results["distribution"] = distribution
+    gvic_results["fairness_index"] = analytics.get("fairness_index", 0)
+    
+    # 6. 인사이트 생성
+    insights = [f"'{product_name}' 상품에 대한 {total}건의 리뷰를 분석했습니다."]
+    recommendations = []
+    
+    if sentiment_distribution["positive"]["ratio"] > 0.8:
+        insights.append(f"전체 리뷰의 {sentiment_distribution['positive']['ratio']*100:.0f}%가 긍정적입니다.")
+    elif sentiment_distribution["positive"]["ratio"] < 0.5:
+        insights.append(f"긍정 리뷰 비율이 {sentiment_distribution['positive']['ratio']*100:.0f}%로 개선이 필요합니다.")
+    
+    if positive_factors:
+        insights.append(f"가장 많이 언급된 긍정 요인: '{positive_factors[0].category}' ({positive_factors[0].count}건)")
+    if negative_factors:
+        insights.append(f"주요 개선 필요 요인: '{negative_factors[0].category}' ({negative_factors[0].count}건)")
+        recommendations.append(f"'{negative_factors[0].category}' 관련 개선이 필요합니다.")
+    
+    recommendations.append("긍정 리뷰의 핵심 요인을 마케팅에 활용하세요.")
+    
+    # 7. PDF 생성
+    output_dir = "/app/backend/data/reports"
+    os.makedirs(output_dir, exist_ok=True)
+    
+    analysis_result = ModularAnalysisResult(
+        result_id=str(uuid_module.uuid4())[:8],
+        analysis_type="URL 기반 상품 후기 분석",
+        created_at=datetime.now(timezone.utc).isoformat(),
+        input_summary={
+            "total_records": total,
+            "avg_rating": float(np.mean(ratings)),
+            "source": url,
+            "product_name": product_name,
+            "site_type": crawl_result.site_type.value,
+            "analysis_date": datetime.now().strftime("%Y-%m-%d %H:%M")
+        },
+        sentiment_distribution=sentiment_distribution,
+        positive_factors=positive_factors,
+        negative_factors=negative_factors,
+        gvic_results=gvic_results,
+        insights=insights,
+        recommendations=recommendations
+    )
+    
+    output_file = os.path.join(output_dir, f"GVIC_URL_Report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf")
+    output_adapter = OutputAdapterFactory.get_adapter(OutputType.PDF_REPORT)
+    formatted_data = output_adapter.format(analysis_result)
+    pdf_path = output_adapter.export(formatted_data, output_file)
+    
+    # public 폴더에 복사
+    public_pdf = f"/app/frontend/public/GVIC_Report_Latest.pdf"
+    import shutil
+    shutil.copy(pdf_path, public_pdf)
+    
+    tracker.log("URL분석", "완료", {"url": url, "records": total, "pdf": pdf_path})
+    
+    return {
+        "success": True,
+        "url": url,
+        "product_name": product_name,
+        "site_type": crawl_result.site_type.value,
+        "total_records": total,
+        "sentiment_distribution": sentiment_distribution,
+        "positive_factors": [{"category": f.category, "count": f.count, "ratio": f.ratio} for f in positive_factors],
+        "negative_factors": [{"category": f.category, "count": f.count, "ratio": f.ratio} for f in negative_factors],
+        "gvic_results": gvic_results,
+        "insights": insights,
+        "recommendations": recommendations,
+        "pdf_url": "/GVIC_Report_Latest.pdf",
+        "pdf_filename": os.path.basename(pdf_path)
+    }
+
+
 # 서버 시작 시 저장된 데이터 소스 로드
 @app.on_event("startup")
 async def load_data_sources():
