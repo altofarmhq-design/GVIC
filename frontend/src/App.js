@@ -9,18 +9,18 @@ import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   PieChart, Pie, Cell, ResponsiveContainer, 
-  BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip,
-  RadialBarChart, RadialBar, Legend
+  BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, CartesianGrid,
+  RadialBarChart, RadialBar, LineChart, Line, Legend, AreaChart, Area
 } from 'recharts';
 import { 
   LayoutDashboard, Play, Database, Bell, Settings, 
   Activity, CheckCircle, AlertTriangle, Zap, RefreshCw,
   FileText, Trash2, Heart, Network, ArrowRightLeft, 
-  GitBranch, Link2, Send
+  GitBranch, Link2, Send, AlertCircle, TrendingUp,
+  Layers, Shield, BarChart3, PieChartIcon
 } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -42,6 +42,7 @@ const api = {
   runHealthCheck: () => axios.post(`${API}/health-check`),
   resolveAlert: (alertId) => axios.post(`${API}/alerts/resolve`, { alert_id: alertId }),
   getModules: () => axios.get(`${API}/modules`),
+  getStatus: () => axios.get(`${API}/status`),
   // Integration APIs
   getIntegrationStatus: () => axios.get(`${API}/integration/status`),
   executeExchange: (data, source_domain, message_type) => 
@@ -52,12 +53,14 @@ const api = {
 };
 
 // ==================== Metric Card Component ====================
-const MetricCard = ({ icon: Icon, label, value, variant = "cyan" }) => {
+const MetricCard = ({ icon: Icon, label, value, subValue, variant = "cyan" }) => {
   const variants = {
     cyan: "from-teal-600 to-teal-500 border-teal-400",
     teal: "from-emerald-700 to-emerald-600 border-emerald-500",
     amber: "from-amber-700 to-amber-600 border-amber-500",
-    purple: "from-violet-700 to-violet-600 border-violet-500"
+    purple: "from-violet-700 to-violet-600 border-violet-500",
+    blue: "from-blue-700 to-blue-600 border-blue-500",
+    rose: "from-rose-700 to-rose-600 border-rose-500"
   };
 
   return (
@@ -66,12 +69,13 @@ const MetricCard = ({ icon: Icon, label, value, variant = "cyan" }) => {
       <Icon className="w-6 h-6 text-white/80 mb-2" />
       <p className="text-white/70 text-sm mb-1">{label}</p>
       <p className="text-white text-2xl font-bold">{value}</p>
+      {subValue && <p className="text-white/60 text-xs mt-1">{subValue}</p>}
     </div>
   );
 };
 
 // ==================== Dashboard Tab ====================
-const DashboardTab = ({ dashboard, onRefresh }) => {
+const DashboardTab = ({ dashboard, systemStatus, onRefresh }) => {
   const pieData = dashboard?.charts?.distribution?.data || [
     { name: '공공', value: 33, color: '#3b82f6' },
     { name: '생산', value: 34, color: '#10b981' },
@@ -81,6 +85,9 @@ const DashboardTab = ({ dashboard, onRefresh }) => {
   const balanceScore = dashboard?.balance_score || 0.85;
   const gaugeData = [{ name: '균형', value: balanceScore * 100, fill: '#10b981' }];
   const sigma = dashboard?.sigma || [0.33, 0.34, 0.33];
+
+  // 모듈 상태
+  const moduleStats = systemStatus?.modules || {};
 
   return (
     <div className="space-y-6">
@@ -100,8 +107,9 @@ const DashboardTab = ({ dashboard, onRefresh }) => {
         />
         <MetricCard 
           icon={AlertTriangle} 
-          label="활성 알림" 
-          value={dashboard?.metrics?.active_alerts || 0}
+          label="비적합 감지" 
+          value={moduleStats?.nonconform?.nonconform_count || 0}
+          subValue={`비율: ${((moduleStats?.nonconform?.nonconform_rate || 0) * 100).toFixed(1)}%`}
           variant="amber"
         />
         <MetricCard 
@@ -118,8 +126,11 @@ const DashboardTab = ({ dashboard, onRefresh }) => {
         <Card className="bg-slate-800/50 border-slate-700">
           <CardHeader>
             <CardTitle className="text-slate-100 flex items-center gap-2">
-              <Activity className="w-5 h-5" /> 분배 비율
+              <PieChartIcon className="w-5 h-5" /> 분배 비율 (Σ)
             </CardTitle>
+            <CardDescription className="text-slate-400">
+              특허 6: 가중 분배 모델 기반
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="h-64" data-testid="distribution-chart">
@@ -160,8 +171,11 @@ const DashboardTab = ({ dashboard, onRefresh }) => {
         <Card className="bg-slate-800/50 border-slate-700">
           <CardHeader>
             <CardTitle className="text-slate-100 flex items-center gap-2">
-              <CheckCircle className="w-5 h-5" /> 균형 상태
+              <CheckCircle className="w-5 h-5" /> 균형 상태 (Ω)
             </CardTitle>
+            <CardDescription className="text-slate-400">
+              특허 1: 경계 조건 기반 수렴 제어
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="h-64" data-testid="balance-gauge">
@@ -197,21 +211,102 @@ const DashboardTab = ({ dashboard, onRefresh }) => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Module Stats Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Convergence Stats */}
+        <Card className="bg-slate-800/50 border-slate-700">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-slate-100 text-sm flex items-center gap-2">
+              <Shield className="w-4 h-4 text-emerald-400" /> 수렴 제어 (특허1)
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-slate-400">총 처리</span>
+              <span className="text-slate-200">{moduleStats?.convergence?.total_operations || 0}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-slate-400">유효 비율</span>
+              <span className="text-emerald-400">{((moduleStats?.convergence?.valid_rate || 0) * 100).toFixed(1)}%</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-slate-400">위반 횟수</span>
+              <span className="text-amber-400">{moduleStats?.convergence?.violation_count || 0}</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Distributor Stats */}
+        <Card className="bg-slate-800/50 border-slate-700">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-slate-100 text-sm flex items-center gap-2">
+              <BarChart3 className="w-4 h-4 text-blue-400" /> 가중 분배 (특허6)
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-slate-400">분배 횟수</span>
+              <span className="text-slate-200">{moduleStats?.distributor?.count || 0}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-slate-400">총 분배량</span>
+              <span className="text-blue-400">{(moduleStats?.distributor?.total_distributed || 0).toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-slate-400">현재 비율</span>
+              <span className="text-slate-300 text-xs">
+                {moduleStats?.distributor?.current_ratio?.map(r => (r*100).toFixed(0)+'%').join(' / ') || '-'}
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Assetizer Stats */}
+        <Card className="bg-slate-800/50 border-slate-700">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-slate-100 text-sm flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-violet-400" /> 자산화 (특허3)
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-slate-400">자산 생성</span>
+              <span className="text-slate-200">{moduleStats?.assetizer?.count || 0}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-slate-400">총 가치</span>
+              <span className="text-violet-400">{(moduleStats?.assetizer?.total_value || 0).toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-slate-400">평균 가치</span>
+              <span className="text-slate-300">{(moduleStats?.assetizer?.average || 0).toFixed(3)}</span>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
 
 // ==================== Processing Tab ====================
 const ProcessingTab = ({ onProcess }) => {
-  const [inputValue, setInputValue] = useState(0.75);
+  const [inputValue, setInputValue] = useState(5.0);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [history, setHistory] = useState([]);
 
   const handleProcess = async () => {
     setLoading(true);
     try {
       const response = await api.process(inputValue);
       setResult(response.data);
+      setHistory(prev => [...prev.slice(-9), {
+        time: new Date().toLocaleTimeString(),
+        input: inputValue,
+        value: response.data?.data?.asset?.value || 0,
+        balance: response.data?.data?.balance_score || 0
+      }]);
       if (onProcess) onProcess();
     } catch (error) {
       console.error("Process error:", error);
@@ -225,110 +320,211 @@ const ProcessingTab = ({ onProcess }) => {
     { name: '개인', value: result.data.distribution.individual, fill: '#f59e0b' }
   ] : [];
 
-  return (
-    <Card className="bg-slate-800/50 border-slate-700">
-      <CardHeader>
-        <CardTitle className="text-slate-100 flex items-center gap-2">
-          <Play className="w-5 h-5" /> GVIC 엔진 처리
-        </CardTitle>
-        <CardDescription className="text-slate-400">
-          값을 입력하고 처리 실행을 클릭하세요
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Input Section */}
-          <div className="space-y-6">
-            <div>
-              <label className="text-slate-300 text-sm mb-2 block">처리할 값</label>
-              <Input
-                type="number"
-                min={0}
-                max={10}
-                step={0.05}
-                value={inputValue}
-                onChange={(e) => setInputValue(parseFloat(e.target.value) || 0)}
-                className="bg-slate-900 border-slate-600 text-slate-100"
-                data-testid="process-input"
-              />
-            </div>
-            <Button 
-              onClick={handleProcess} 
-              disabled={loading}
-              className="w-full bg-emerald-600 hover:bg-emerald-500"
-              data-testid="process-button"
-            >
-              {loading ? <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> : <Play className="w-4 h-4 mr-2" />}
-              처리 실행
-            </Button>
-          </div>
+  const convergenceData = result?.data?.convergence ? [
+    { name: '입력', pub: result.data.convergence.input_ratio[0]*100, pro: result.data.convergence.input_ratio[1]*100, ind: result.data.convergence.input_ratio[2]*100 },
+    { name: '출력', pub: result.data.convergence.output_ratio[0]*100, pro: result.data.convergence.output_ratio[1]*100, ind: result.data.convergence.output_ratio[2]*100 }
+  ] : [];
 
-          {/* Result Section */}
-          <div className="space-y-4">
-            {result?.success ? (
-              <>
-                <div className="grid grid-cols-3 gap-3" data-testid="process-result">
-                  <div className="bg-slate-900/50 rounded-lg p-3 text-center">
-                    <p className="text-slate-400 text-xs">자산 가치</p>
-                    <p className="text-slate-100 text-lg font-bold">
-                      {result.data?.asset?.value?.toFixed(3) || 0}
-                    </p>
+  return (
+    <div className="space-y-6">
+      <Card className="bg-slate-800/50 border-slate-700">
+        <CardHeader>
+          <CardTitle className="text-slate-100 flex items-center gap-2">
+            <Play className="w-5 h-5" /> GVIC 엔진 처리
+          </CardTitle>
+          <CardDescription className="text-slate-400">
+            7개 특허 모듈 통합 파이프라인
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Input Section */}
+            <div className="space-y-6">
+              <div>
+                <label className="text-slate-300 text-sm mb-2 block">처리할 값</label>
+                <Input
+                  type="number"
+                  min={0}
+                  max={100}
+                  step={0.5}
+                  value={inputValue}
+                  onChange={(e) => setInputValue(parseFloat(e.target.value) || 0)}
+                  className="bg-slate-900 border-slate-600 text-slate-100 text-lg"
+                  data-testid="process-input"
+                />
+              </div>
+              <Button 
+                onClick={handleProcess} 
+                disabled={loading}
+                className="w-full bg-emerald-600 hover:bg-emerald-500 h-12"
+                data-testid="process-button"
+              >
+                {loading ? <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> : <Play className="w-4 h-4 mr-2" />}
+                처리 실행
+              </Button>
+
+              {/* Processing Pipeline Info */}
+              <div className="bg-slate-900/50 rounded-lg p-3 text-xs text-slate-400 space-y-1">
+                <p>1. 입력 인터페이스 (특허6-J)</p>
+                <p>2. 비적합 감지 (특허5 - 3000)</p>
+                <p>3. 신호 전처리 (특허2)</p>
+                <p>4. 신호 자산화 (특허3)</p>
+                <p>5. 가중 분배 (특허6 - 4000)</p>
+                <p>6. 수렴 제어 (특허1)</p>
+              </div>
+            </div>
+
+            {/* Result Section */}
+            <div className="lg:col-span-2 space-y-4">
+              {result?.success ? (
+                <>
+                  {/* Key Metrics */}
+                  <div className="grid grid-cols-4 gap-3" data-testid="process-result">
+                    <div className="bg-slate-900/50 rounded-lg p-3 text-center">
+                      <p className="text-slate-400 text-xs">자산 가치</p>
+                      <p className="text-slate-100 text-xl font-bold">
+                        {result.data?.asset?.value?.toFixed(3) || 0}
+                      </p>
+                    </div>
+                    <div className="bg-slate-900/50 rounded-lg p-3 text-center">
+                      <p className="text-slate-400 text-xs">품질 점수</p>
+                      <p className="text-blue-400 text-xl font-bold">
+                        {((result.data?.asset?.quality_score || 0) * 100).toFixed(0)}%
+                      </p>
+                    </div>
+                    <div className="bg-slate-900/50 rounded-lg p-3 text-center">
+                      <p className="text-slate-400 text-xs">균형 점수</p>
+                      <p className="text-emerald-400 text-xl font-bold">
+                        {((result.data?.balance_score || 0) * 100).toFixed(1)}%
+                      </p>
+                    </div>
+                    <div className="bg-slate-900/50 rounded-lg p-3 text-center">
+                      <p className="text-slate-400 text-xs">수렴 상태</p>
+                      <p className={`text-xl font-bold ${result.data?.convergence?.is_valid ? 'text-emerald-400' : 'text-amber-400'}`}>
+                        {result.data?.convergence?.is_valid ? "✓ 유효" : "⚠ 조정"}
+                      </p>
+                    </div>
                   </div>
-                  <div className="bg-slate-900/50 rounded-lg p-3 text-center">
-                    <p className="text-slate-400 text-xs">균형 점수</p>
-                    <p className="text-slate-100 text-lg font-bold">
-                      {((result.data?.balance_score || 0) * 100).toFixed(1)}%
-                    </p>
+
+                  {/* Nonconformance Alert */}
+                  {result.data?.nonconformance?.detected && (
+                    <div className="bg-amber-900/30 border border-amber-600/50 rounded-lg p-3 flex items-center gap-3">
+                      <AlertCircle className="w-5 h-5 text-amber-400" />
+                      <div>
+                        <p className="text-amber-300 font-medium">비적합 데이터 감지 (특허5)</p>
+                        <p className="text-amber-400/70 text-sm">
+                          조정값: {result.data.nonconformance.adjustment.toFixed(3)} → 2차 자산화 처리됨
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Distribution Chart */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-slate-900/30 rounded-lg p-3">
+                      <p className="text-slate-400 text-xs mb-2">분배 결과</p>
+                      <div className="h-40">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart data={distData}>
+                            <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} />
+                            <YAxis stroke="#94a3b8" fontSize={10} />
+                            <RechartsTooltip 
+                              contentStyle={{ background: '#1e293b', border: '1px solid #475569', borderRadius: '8px' }}
+                            />
+                            <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                              {distData.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={entry.fill} />
+                              ))}
+                            </Bar>
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+
+                    <div className="bg-slate-900/30 rounded-lg p-3">
+                      <p className="text-slate-400 text-xs mb-2">수렴 변환</p>
+                      <div className="h-40">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart data={convergenceData} layout="vertical">
+                            <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                            <XAxis type="number" stroke="#94a3b8" fontSize={10} />
+                            <YAxis dataKey="name" type="category" stroke="#94a3b8" fontSize={12} />
+                            <RechartsTooltip 
+                              contentStyle={{ background: '#1e293b', border: '1px solid #475569', borderRadius: '8px' }}
+                            />
+                            <Bar dataKey="pub" fill="#3b82f6" name="공공" stackId="a" />
+                            <Bar dataKey="pro" fill="#10b981" name="생산" stackId="a" />
+                            <Bar dataKey="ind" fill="#f59e0b" name="개인" stackId="a" />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
                   </div>
-                  <div className="bg-slate-900/50 rounded-lg p-3 text-center">
-                    <p className="text-slate-400 text-xs">수렴 상태</p>
-                    <p className="text-emerald-400 text-lg font-bold">
-                      {result.data?.convergence?.is_valid ? "✓ 유효" : "⚠ 조정됨"}
-                    </p>
+
+                  {/* Preprocessing Info */}
+                  <div className="bg-slate-900/30 rounded-lg p-3">
+                    <p className="text-slate-400 text-xs mb-2">전처리 결과 (특허2)</p>
+                    <div className="flex gap-4 text-sm">
+                      <span className="text-slate-300">
+                        생성 모듈: <span className="text-blue-400">{result.data?.preprocessing?.modules_generated || 0}</span>
+                      </span>
+                      <span className="text-slate-300">
+                        정합: <span className="text-emerald-400">{result.data?.preprocessing?.conforming || 0}</span>
+                      </span>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="flex items-center justify-center h-64 text-slate-500">
+                  <div className="text-center">
+                    <Layers className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <p>왼쪽에서 값을 입력하고 '처리 실행'을 클릭하세요</p>
                   </div>
                 </div>
-
-                {distData.length > 0 && (
-                  <div className="h-48">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={distData}>
-                        <XAxis dataKey="name" stroke="#94a3b8" />
-                        <YAxis stroke="#94a3b8" />
-                        <RechartsTooltip 
-                          contentStyle={{ background: '#1e293b', border: '1px solid #475569', borderRadius: '8px' }}
-                        />
-                        <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-                          {distData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.fill} />
-                          ))}
-                        </Bar>
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                )}
-              </>
-            ) : (
-              <div className="flex items-center justify-center h-48 text-slate-500">
-                <p>왼쪽에서 값을 입력하고 '처리 실행'을 클릭하세요</p>
-              </div>
-            )}
+              )}
+            </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+
+      {/* History Chart */}
+      {history.length > 0 && (
+        <Card className="bg-slate-800/50 border-slate-700">
+          <CardHeader>
+            <CardTitle className="text-slate-100 text-sm">처리 이력</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-48">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={history}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                  <XAxis dataKey="time" stroke="#94a3b8" fontSize={10} />
+                  <YAxis stroke="#94a3b8" fontSize={10} />
+                  <RechartsTooltip 
+                    contentStyle={{ background: '#1e293b', border: '1px solid #475569', borderRadius: '8px' }}
+                  />
+                  <Area type="monotone" dataKey="value" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.3} name="자산 가치" />
+                  <Area type="monotone" dataKey="balance" stroke="#10b981" fill="#10b981" fillOpacity={0.2} name="균형 점수" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
   );
 };
 
 // ==================== Data Tab ====================
 const DataTab = ({ logs, onLogsRefresh }) => {
   const [ioFormat, setIoFormat] = useState("json");
-  const [ioData, setIoData] = useState('{"value": 0.75, "type": "market"}');
+  const [ioData, setIoData] = useState('{"value": 10.5, "type": "market"}');
   const [ioResult, setIoResult] = useState(null);
 
   const defaultInputs = {
-    json: '{"value": 0.75, "type": "market"}',
-    csv: "value,type\n0.75,market",
-    key_value: "value=0.75\ntype=market"
+    json: '{"value": 10.5, "type": "market"}',
+    csv: "value,type\n10.5,market",
+    key_value: "value=10.5\ntype=market"
   };
 
   const handleIOProcess = async () => {
@@ -559,7 +755,7 @@ const SettingsTab = ({ sigma, omega, modules, onUpdate }) => {
           <CardTitle className="text-slate-100 flex items-center gap-2">
             <span className="text-xl">Σ</span> 시그마 설정
           </CardTitle>
-          <CardDescription className="text-slate-400">가치 분배 목표 비율</CardDescription>
+          <CardDescription className="text-slate-400">특허6: 가중 분배 모델 - 목표 비율</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div>
@@ -615,7 +811,7 @@ const SettingsTab = ({ sigma, omega, modules, onUpdate }) => {
             className="w-full"
             data-testid="save-sigma-button"
           >
-            💾 Σ 저장
+            Σ 저장
           </Button>
         </CardContent>
       </Card>
@@ -626,7 +822,7 @@ const SettingsTab = ({ sigma, omega, modules, onUpdate }) => {
           <CardTitle className="text-slate-100 flex items-center gap-2">
             <span className="text-xl">Ω</span> 오메가 설정
           </CardTitle>
-          <CardDescription className="text-slate-400">경계 조건 설정</CardDescription>
+          <CardDescription className="text-slate-400">특허1: 경계 조건 기반 수렴 제어</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
@@ -657,6 +853,42 @@ const SettingsTab = ({ sigma, omega, modules, onUpdate }) => {
               />
             </div>
             <div>
+              <label className="text-slate-300 text-sm mb-1 block">V_pro 최소</label>
+              <Input
+                type="number"
+                min={0}
+                max={1}
+                step={0.05}
+                value={omegaValues.V_pro_min}
+                onChange={(e) => setOmegaValues({...omegaValues, V_pro_min: parseFloat(e.target.value)})}
+                className="bg-slate-900 border-slate-600 text-slate-100"
+              />
+            </div>
+            <div>
+              <label className="text-slate-300 text-sm mb-1 block">V_pro 최대</label>
+              <Input
+                type="number"
+                min={0}
+                max={1}
+                step={0.05}
+                value={omegaValues.V_pro_max}
+                onChange={(e) => setOmegaValues({...omegaValues, V_pro_max: parseFloat(e.target.value)})}
+                className="bg-slate-900 border-slate-600 text-slate-100"
+              />
+            </div>
+            <div>
+              <label className="text-slate-300 text-sm mb-1 block">V_ind 최소</label>
+              <Input
+                type="number"
+                min={0}
+                max={1}
+                step={0.05}
+                value={omegaValues.V_ind_min}
+                onChange={(e) => setOmegaValues({...omegaValues, V_ind_min: parseFloat(e.target.value)})}
+                className="bg-slate-900 border-slate-600 text-slate-100"
+              />
+            </div>
+            <div>
               <label className="text-slate-300 text-sm mb-1 block">V_ind 최대</label>
               <Input
                 type="number"
@@ -677,7 +909,7 @@ const SettingsTab = ({ sigma, omega, modules, onUpdate }) => {
             className="w-full"
             data-testid="save-omega-button"
           >
-            💾 Ω 저장
+            Ω 저장
           </Button>
 
           <div className="mt-6">
@@ -787,7 +1019,7 @@ const IntegrationTab = ({ onRefresh }) => {
               <Send className="w-5 h-5" /> 데이터 교환 테스트
             </CardTitle>
             <CardDescription className="text-slate-400">
-              도메인 간 데이터 교환을 시뮬레이션합니다
+              특허6-J: 도메인 간 데이터 교환 시뮬레이션
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -849,11 +1081,6 @@ const IntegrationTab = ({ onRefresh }) => {
                 {exchangeResult.target_domains && (
                   <p className="text-slate-300 text-sm">
                     대상 도메인: {exchangeResult.target_domains.join(', ')}
-                  </p>
-                )}
-                {exchangeResult.transformations && (
-                  <p className="text-slate-400 text-xs mt-1">
-                    변환: {exchangeResult.transformations.length}건
                   </p>
                 )}
               </div>
@@ -985,6 +1212,7 @@ const IntegrationTab = ({ onRefresh }) => {
 function App() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [dashboard, setDashboard] = useState(null);
+  const [systemStatus, setSystemStatus] = useState(null);
   const [logs, setLogs] = useState([]);
   const [alerts, setAlerts] = useState(null);
   const [modules, setModules] = useState([]);
@@ -992,13 +1220,15 @@ function App() {
 
   const fetchData = useCallback(async () => {
     try {
-      const [dashRes, logsRes, alertsRes, modulesRes] = await Promise.all([
+      const [dashRes, statusRes, logsRes, alertsRes, modulesRes] = await Promise.all([
         api.getDashboard(),
+        api.getStatus().catch(() => ({ data: {} })),
         api.getLogs(10),
         api.getAlerts(),
         api.getModules()
       ]);
       setDashboard(dashRes.data);
+      setSystemStatus(statusRes.data);
       setLogs(logsRes.data.logs);
       setAlerts(alertsRes.data);
       setModules(modulesRes.data.modules);
@@ -1022,7 +1252,7 @@ function App() {
           </div>
           <div>
             <h1 className="text-xl font-bold text-slate-100" data-testid="app-title">GVIC Engine</h1>
-            <p className="text-slate-400 text-sm">통합 제어 대시보드</p>
+            <p className="text-slate-400 text-sm">7개 특허 모듈 통합 시스템</p>
           </div>
           <div className="ml-auto">
             <Button variant="outline" size="sm" onClick={fetchData} data-testid="refresh-button">
@@ -1057,7 +1287,7 @@ function App() {
           </TabsList>
 
           <TabsContent value="dashboard">
-            <DashboardTab dashboard={dashboard} onRefresh={fetchData} />
+            <DashboardTab dashboard={dashboard} systemStatus={systemStatus} onRefresh={fetchData} />
           </TabsContent>
 
           <TabsContent value="processing">
@@ -1089,7 +1319,7 @@ function App() {
 
       {/* Footer */}
       <footer className="border-t border-slate-800 py-6 text-center text-slate-500 text-sm">
-        GVIC Engine v1.0.0 • 6개 특허 모듈 통합 시스템
+        GVIC Engine v2.0.0 • 7개 특허 모듈 통합 시스템 (특허1-6, 6-J)
       </footer>
     </div>
   );
