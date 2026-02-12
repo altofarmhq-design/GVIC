@@ -864,5 +864,13 @@
       "success": true,
       "value": null
     }
+  },
+  {
+    "timestamp": "2026-02-12T13:57:01.550292",
+    "phase": "데이터소스",
+    "action": "소스 삭제",
+    "data": {
+      "source_id": "ds_66dc4ab6"
+    }
   }
 ]
