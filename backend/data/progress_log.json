@@ -534,5 +534,14 @@
       "pareto_front_size": 12,
       "best_weighted_score": 0.8423529411764704
     }
+  },
+  {
+    "timestamp": "2026-02-12T13:37:57.165222",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 5.0,
+      "success": true
+    }
   }
 ]

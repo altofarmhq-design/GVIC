@@ -53,7 +53,10 @@ export const api = {
   getParetoConfig: () => axios.get(`${API}/pareto/config`),
   updateParetoConfig: (config) => axios.put(`${API}/pareto/config`, config),
   runParetoOptimization: () => axios.post(`${API}/pareto/optimize`),
-  applyParetoSolution: (index) => axios.post(`${API}/pareto/apply/${index}`)
+  applyParetoSolution: (index) => axios.post(`${API}/pareto/apply/${index}`),
+  // Comparison APIs
+  analyzeComparison: (options = {}) => axios.post(`${API}/comparison/analyze`, options),
+  getComparisonRecords: (limit = 20) => axios.get(`${API}/comparison/records?limit=${limit}`)
 };
 
 export default api;
