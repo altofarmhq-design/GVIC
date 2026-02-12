@@ -617,9 +617,11 @@ const PipelineTab = () => {
                         </div>
                         <a 
                           href={`${process.env.REACT_APP_BACKEND_URL}/api/pipeline/report/${report.name}`}
-                          download={report.name}
-                          className="text-blue-400 hover:text-blue-300 hover:bg-blue-500/20 p-2 rounded"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-400 hover:text-blue-300 hover:bg-blue-500/20 p-2 rounded inline-flex items-center"
                           data-testid={`download-report-${idx}`}
+                          title="PDF 다운로드 (새 탭에서 열림)"
                         >
                           <FileDown className="h-5 w-5" />
                         </a>
