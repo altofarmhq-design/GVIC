@@ -2041,6 +2041,476 @@ async def stop_polling(source_id: str):
     
     return {"success": True, "message": f"Polling stopped for {source_id}"}
 
+
+
+# ==================== Review Analysis APIs (실시간 GVIC 분석) ====================
+
+import pandas as pd
+import numpy as np
+from core.patent1_convergence import ConvergenceController
+from core.patent2_signal import SignalPreprocessor, SignalType
+from core.patent4_nonconform import NonConformingDataAssetizationSystem
+from core.patent5_distribution import WeightedDistributionSystem
+
+# 분석 진행 상태 저장
+analysis_sessions = {}
+
+class ReviewAnalysisRequest(BaseModel):
+    file_path: Optional[str] = None
+    use_sample: bool = True
+    sample_size: int = 100
+
+class AnalysisStepRequest(BaseModel):
+    session_id: str
+    step: str  # 'sentiment', 'convergence', 'signal', 'nonconform', 'distribution', 'pipeline'
+
+@api_router.get("/analysis/files")
+async def get_available_files():
+    """분석 가능한 데이터 파일 목록"""
+    data_dir = "/app/backend/data"
+    files = []
+    if os.path.exists(data_dir):
+        for f in os.listdir(data_dir):
+            if f.endswith('.xlsx') and 'oliveyoung' in f:
+                file_path = os.path.join(data_dir, f)
+                files.append({
+                    "name": f,
+                    "path": file_path,
+                    "size": os.path.getsize(file_path),
+                    "created": datetime.fromtimestamp(os.path.getctime(file_path)).isoformat()
+                })
+    return {"files": files}
+
+@api_router.post("/analysis/start")
+async def start_analysis(request: ReviewAnalysisRequest):
+    """분석 세션 시작"""
+    session_id = str(uuid.uuid4())[:8]
+    
+    # 데이터 로드
+    data_dir = "/app/backend/data"
+    if request.file_path and os.path.exists(request.file_path):
+        file_path = request.file_path
+    else:
+        # 가장 최신 파일 사용
+        files = [f for f in os.listdir(data_dir) if f.endswith('.xlsx') and 'oliveyoung' in f]
+        if not files:
+            raise HTTPException(status_code=404, detail="No data files found")
+        file_path = os.path.join(data_dir, sorted(files)[-1])
+    
+    df = pd.read_excel(file_path)
+    
+    # 샘플 추출
+    if request.sample_size < len(df):
+        df = df.sample(n=request.sample_size, random_state=42)
+    
+    analysis_sessions[session_id] = {
+        "id": session_id,
+        "file_path": file_path,
+        "data": df.to_dict('records'),
+        "total_records": len(df),
+        "status": "initialized",
+        "results": {},
+        "current_step": 0,
+        "steps": ["sentiment", "convergence", "signal", "nonconform", "distribution", "pipeline"],
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    tracker.log("분석", "세션 시작", {"session_id": session_id, "records": len(df)})
+    
+    return {
+        "session_id": session_id,
+        "total_records": len(df),
+        "file_name": os.path.basename(file_path),
+        "steps": analysis_sessions[session_id]["steps"]
+    }
+
+@api_router.get("/analysis/{session_id}/status")
+async def get_analysis_status(session_id: str):
+    """분석 세션 상태 조회"""
+    if session_id not in analysis_sessions:
+        raise HTTPException(status_code=404, detail="Session not found")
+    
+    session = analysis_sessions[session_id]
+    return {
+        "session_id": session_id,
+        "status": session["status"],
+        "current_step": session["current_step"],
+        "total_steps": len(session["steps"]),
+        "completed_steps": list(session["results"].keys()),
+        "total_records": session["total_records"]
+    }
+
+@api_router.post("/analysis/{session_id}/step/{step_name}")
+async def run_analysis_step(session_id: str, step_name: str):
+    """특정 분석 단계 실행"""
+    if session_id not in analysis_sessions:
+        raise HTTPException(status_code=404, detail="Session not found")
+    
+    session = analysis_sessions[session_id]
+    df = pd.DataFrame(session["data"])
+    
+    result = {}
+    
+    if step_name == "sentiment":
+        # 감성 분석
+        df['sentiment'] = df['rating'].apply(lambda x: 'positive' if x >= 4 else ('neutral' if x == 3 else 'negative'))
+        sentiment_counts = df['sentiment'].value_counts()
+        total = len(df)
+        
+        result = {
+            "step": "sentiment",
+            "title": "감성 분포 분석",
+            "description": "리뷰 평점을 기반으로 긍정/중립/부정 분류",
+            "data": {
+                "positive": {"count": int(sentiment_counts.get('positive', 0)), "ratio": sentiment_counts.get('positive', 0) / total},
+                "neutral": {"count": int(sentiment_counts.get('neutral', 0)), "ratio": sentiment_counts.get('neutral', 0) / total},
+                "negative": {"count": int(sentiment_counts.get('negative', 0)), "ratio": sentiment_counts.get('negative', 0) / total},
+            },
+            "summary": {
+                "total_reviews": total,
+                "avg_rating": float(df['rating'].mean()),
+                "rating_distribution": df['rating'].value_counts().to_dict()
+            },
+            "status": "completed"
+        }
+        
+    elif step_name == "convergence":
+        # 수렴 제어 (특허 1)
+        sentiment = session["results"].get("sentiment", {}).get("data", {})
+        if not sentiment:
+            raise HTTPException(status_code=400, detail="Run sentiment step first")
+        
+        V_input = np.array([
+            sentiment.get("positive", {}).get("ratio", 0.33),
+            sentiment.get("neutral", {}).get("ratio", 0.34),
+            sentiment.get("negative", {}).get("ratio", 0.33)
+        ])
+        
+        controller = ConvergenceController(
+            default_ratio=[0.33, 0.34, 0.33],
+            omega={
+                'lower_bounds': [0.1, 0.05, 0.01],
+                'upper_bounds': [0.95, 0.5, 0.5],
+                'sum_constraint': 1.0
+            }
+        )
+        
+        V_output, metadata = controller.converge(V_input)
+        is_valid = controller.omega.is_valid(V_output)
+        
+        result = {
+            "step": "convergence",
+            "title": "전역 수렴 제어 (특허 1)",
+            "description": "OBC 경계 조건을 기반으로 입력 데이터를 수렴 변환",
+            "data": {
+                "input_vector": V_input.tolist(),
+                "output_vector": V_output.tolist(),
+                "transformation": {
+                    "applied": metadata.get("transformed", False),
+                    "status": metadata.get("status", "unknown"),
+                    "balance_index": metadata.get("balance_index", 0)
+                },
+                "boundary_check": {
+                    "is_valid": bool(is_valid),
+                    "lower_bounds": [0.1, 0.05, 0.01],
+                    "upper_bounds": [0.95, 0.5, 0.5]
+                }
+            },
+            "status": "completed"
+        }
+        
+    elif step_name == "signal":
+        # 신호 전처리 (특허 2)
+        preprocessor = SignalPreprocessor(dimension=64, threshold=0.7)
+        sample_size = min(100, len(df))
+        
+        modules_result = {
+            "total_processed": 0,
+            "conforming": 0,
+            "non_conforming": 0,
+            "unclassified": 0,
+            "processed_samples": []
+        }
+        
+        for idx, row in df.head(sample_size).iterrows():
+            signal_data = {
+                'rating': row['rating'],
+                'review_length': row['review_length'],
+                'helpful_count': row['helpful_count'],
+                'is_repurchase': 1 if row.get('is_repurchase', False) else 0,
+                'mentions_effect': 1 if row.get('mentions_effect', False) else 0
+            }
+            
+            modules = preprocessor.process(signal_data, SignalType.BEHAVIOR)
+            modules_result["total_processed"] += 1
+            
+            for module in modules:
+                status = module.conformance_status.value
+                if status == 'conforming':
+                    modules_result["conforming"] += 1
+                elif status == 'non_conforming':
+                    modules_result["non_conforming"] += 1
+                else:
+                    modules_result["unclassified"] += 1
+            
+            if len(modules_result["processed_samples"]) < 10:
+                modules_result["processed_samples"].append({
+                    "index": int(idx),
+                    "rating": int(row['rating']),
+                    "status": modules[0].conformance_status.value if modules else "unknown"
+                })
+        
+        total_modules = modules_result["conforming"] + modules_result["non_conforming"] + modules_result["unclassified"]
+        
+        result = {
+            "step": "signal",
+            "title": "다단계 신호 전처리 (특허 2)",
+            "description": "리뷰 데이터를 신호로 변환하고 정합성 판별",
+            "data": {
+                "total_processed": modules_result["total_processed"],
+                "modules_generated": total_modules,
+                "conforming": modules_result["conforming"],
+                "non_conforming": modules_result["non_conforming"],
+                "unclassified": modules_result["unclassified"],
+                "conformance_rate": modules_result["conforming"] / total_modules if total_modules > 0 else 0,
+                "samples": modules_result["processed_samples"]
+            },
+            "status": "completed"
+        }
+        
+    elif step_name == "nonconform":
+        # 비적합 데이터 자산화 (특허 5)
+        nc_system = NonConformingDataAssetizationSystem(value_threshold=0.5, retention_days=30)
+        sample_size = min(100, len(df))
+        
+        nc_result = {
+            "total_processed": 0,
+            "conforming": 0,
+            "nonconforming": 0,
+            "assets_created": 0,
+            "nc_types": {},
+            "asset_samples": []
+        }
+        
+        for idx, row in df.head(sample_size).iterrows():
+            context = {
+                'required_fields': ['rating', 'content'],
+                'bounds': (1, 5),
+                'business_relevance': 0.7
+            }
+            
+            review_data = {
+                'rating': row['rating'],
+                'content': row.get('content', ''),
+                'review_length': row.get('review_length', 0),
+                'helpful_count': row.get('helpful_count', 0)
+            }
+            
+            proc_result = nc_system.process(review_data, context)
+            nc_result["total_processed"] += 1
+            
+            if proc_result['is_conforming']:
+                nc_result["conforming"] += 1
+            else:
+                nc_result["nonconforming"] += 1
+                for nc in proc_result.get('non_conformances', []):
+                    nc_type = nc.get('type', 'unknown')
+                    nc_result["nc_types"][nc_type] = nc_result["nc_types"].get(nc_type, 0) + 1
+                
+                nc_result["assets_created"] += len(proc_result.get('assets_created', []))
+                
+                if len(nc_result["asset_samples"]) < 5:
+                    nc_result["asset_samples"].append({
+                        "index": int(idx),
+                        "type": proc_result.get('non_conformances', [{}])[0].get('type', 'unknown'),
+                        "value": proc_result.get('assets_created', [{}])[0].get('value', 0) if proc_result.get('assets_created') else 0
+                    })
+        
+        result = {
+            "step": "nonconform",
+            "title": "비적합 데이터 자산화 (특허 5)",
+            "description": "비적합 데이터를 감지하고 2차 자산으로 변환",
+            "data": {
+                "total_processed": nc_result["total_processed"],
+                "conforming": nc_result["conforming"],
+                "nonconforming": nc_result["nonconforming"],
+                "assets_created": nc_result["assets_created"],
+                "nc_types": nc_result["nc_types"],
+                "asset_samples": nc_result["asset_samples"],
+                "assetization_rate": nc_result["assets_created"] / nc_result["nonconforming"] if nc_result["nonconforming"] > 0 else 0
+            },
+            "status": "completed"
+        }
+        
+    elif step_name == "distribution":
+        # 가중 분배 (특허 6)
+        sentiment = session["results"].get("sentiment", {}).get("data", {})
+        if not sentiment:
+            raise HTTPException(status_code=400, detail="Run sentiment step first")
+        
+        base_ratio = [
+            sentiment.get("positive", {}).get("ratio", 0.33),
+            sentiment.get("neutral", {}).get("ratio", 0.34) + 0.1,
+            sentiment.get("negative", {}).get("ratio", 0.33) + 0.1
+        ]
+        total = sum(base_ratio)
+        base_ratio = [r / total for r in base_ratio]
+        
+        distributor = WeightedDistributionSystem(base_ratio=base_ratio)
+        total_value = 1000000
+        
+        distribution = distributor.distribute(total_value)
+        analytics = distributor.get_analytics()
+        
+        # 소비 시뮬레이션
+        consumptions = {
+            'public': distribution.get('public', 0) * 0.85,
+            'productive': distribution.get('productive', 0) * 1.1,
+            'individual': distribution.get('individual', 0) * 0.9
+        }
+        adjustment = distributor.update_with_consumption(consumptions)
+        
+        result = {
+            "step": "distribution",
+            "title": "가중 분배 모델 (특허 6)",
+            "description": "감성 비율을 기반으로 자원을 영역별 분배",
+            "data": {
+                "total_value": total_value,
+                "base_ratio": base_ratio,
+                "distribution": {
+                    "public": distribution.get("public", 0),
+                    "productive": distribution.get("productive", 0),
+                    "individual": distribution.get("individual", 0)
+                },
+                "analytics": {
+                    "fairness_index": analytics.get("fairness_index", 0),
+                    "weighted_fairness": analytics.get("weighted_fairness", 0),
+                    "efficiency": analytics.get("efficiency", 0),
+                    "utilization": analytics.get("utilization", 0)
+                },
+                "adjustment": {
+                    "applied": adjustment.get("adjusted", False),
+                    "consumptions": consumptions
+                }
+            },
+            "status": "completed"
+        }
+        
+    elif step_name == "pipeline":
+        # 전체 파이프라인 (GVIC 엔진)
+        sample_size = min(50, len(df))
+        
+        pipeline_result = {
+            "total_processed": 0,
+            "success": 0,
+            "failure": 0,
+            "balance_scores": [],
+            "distribution_totals": {"public": 0, "productive": 0, "individual": 0},
+            "processed_samples": []
+        }
+        
+        for idx, row in df.head(sample_size).iterrows():
+            input_data = {
+                'value': row['rating'] * 20,
+                'amount': row.get('helpful_count', 0),
+                'quality': row.get('review_length', 0) / 100,
+                'metadata': {
+                    'is_repurchase': row.get('is_repurchase', False),
+                    'mentions_effect': row.get('mentions_effect', False)
+                }
+            }
+            
+            proc_result = engine.process(input_data, source_type="review")
+            pipeline_result["total_processed"] += 1
+            
+            if proc_result.success:
+                pipeline_result["success"] += 1
+                balance_score = proc_result.data.get('balance_score', 0)
+                pipeline_result["balance_scores"].append(balance_score)
+                
+                dist = proc_result.data.get('distribution', {})
+                for key in ['public', 'productive', 'individual']:
+                    pipeline_result["distribution_totals"][key] += dist.get(key, 0)
+                
+                if len(pipeline_result["processed_samples"]) < 10:
+                    pipeline_result["processed_samples"].append({
+                        "index": int(idx),
+                        "input_value": input_data["value"],
+                        "balance_score": balance_score,
+                        "success": True
+                    })
+            else:
+                pipeline_result["failure"] += 1
+        
+        avg_balance = np.mean(pipeline_result["balance_scores"]) if pipeline_result["balance_scores"] else 0
+        
+        result = {
+            "step": "pipeline",
+            "title": "전체 GVIC 파이프라인",
+            "description": "모든 특허 모듈을 통합한 전체 처리 흐름",
+            "data": {
+                "total_processed": pipeline_result["total_processed"],
+                "success": pipeline_result["success"],
+                "failure": pipeline_result["failure"],
+                "success_rate": pipeline_result["success"] / pipeline_result["total_processed"] if pipeline_result["total_processed"] > 0 else 0,
+                "avg_balance_score": avg_balance,
+                "distribution_totals": pipeline_result["distribution_totals"],
+                "samples": pipeline_result["processed_samples"]
+            },
+            "status": "completed"
+        }
+    
+    else:
+        raise HTTPException(status_code=400, detail=f"Unknown step: {step_name}")
+    
+    # 결과 저장
+    session["results"][step_name] = result
+    session["current_step"] = session["steps"].index(step_name) + 1 if step_name in session["steps"] else session["current_step"]
+    session["status"] = "completed" if session["current_step"] >= len(session["steps"]) else "in_progress"
+    
+    tracker.log("분석", f"단계 완료: {step_name}", {"session_id": session_id})
+    
+    return result
+
+@api_router.get("/analysis/{session_id}/results")
+async def get_analysis_results(session_id: str):
+    """전체 분석 결과 조회"""
+    if session_id not in analysis_sessions:
+        raise HTTPException(status_code=404, detail="Session not found")
+    
+    session = analysis_sessions[session_id]
+    return {
+        "session_id": session_id,
+        "status": session["status"],
+        "total_records": session["total_records"],
+        "results": session["results"],
+        "completed_steps": list(session["results"].keys())
+    }
+
+@api_router.post("/analysis/{session_id}/run-all")
+async def run_all_analysis_steps(session_id: str):
+    """모든 분석 단계 순차 실행"""
+    if session_id not in analysis_sessions:
+        raise HTTPException(status_code=404, detail="Session not found")
+    
+    session = analysis_sessions[session_id]
+    results = {}
+    
+    for step in session["steps"]:
+        try:
+            result = await run_analysis_step(session_id, step)
+            results[step] = result
+        except Exception as e:
+            results[step] = {"status": "error", "error": str(e)}
+            break
+    
+    return {
+        "session_id": session_id,
+        "status": session["status"],
+        "results": results
+    }
+
+
 # 서버 시작 시 저장된 데이터 소스 로드
 @app.on_event("startup")
 async def load_data_sources():
