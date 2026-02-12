@@ -96,7 +96,16 @@ export const api = {
   processDataSource: (sourceId) => axios.post(`${API}/datasources/${sourceId}/process`),
   getCollectedData: (limit = 50) => axios.get(`${API}/datasources/collected?limit=${limit}`),
   startDataSource: (sourceId) => axios.post(`${API}/datasources/${sourceId}/start`),
-  stopDataSource: (sourceId) => axios.post(`${API}/datasources/${sourceId}/stop`)
+  stopDataSource: (sourceId) => axios.post(`${API}/datasources/${sourceId}/stop`),
+  // Pipeline APIs
+  runPipeline: (config) => axios.post(`${API}/pipeline/run`, config),
+  getAnalysisFiles: () => axios.get(`${API}/analysis/files`),
+  getPipelineReports: () => axios.get(`${API}/pipeline/reports`)
 };
+
+// Export individual functions for easier imports
+export const runPipeline = (config) => api.runPipeline(config).then(res => res.data);
+export const getAnalysisFiles = () => api.getAnalysisFiles().then(res => res.data);
+export const getPipelineReports = () => api.getPipelineReports().then(res => res.data);
 
 export default api;
