@@ -283,6 +283,10 @@ function Dashboard() {
             <DataSourcesTab onRefresh={fetchData} />
           </TabsContent>
 
+          <TabsContent value="pipeline">
+            <PipelineTab />
+          </TabsContent>
+
           <TabsContent value="data">
             <DataTab logs={logs} onLogsRefresh={fetchData} />
           </TabsContent>
