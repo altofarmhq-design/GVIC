@@ -29,6 +29,9 @@ export const api = {
   getUser: (userId) => axios.get(`${API}/auth/users/${userId}`),
   updateUser: (userId, data) => axios.put(`${API}/auth/users/${userId}`, data),
   deleteUser: (userId) => axios.delete(`${API}/auth/users/${userId}`),
+  getPendingUsers: () => axios.get(`${API}/auth/pending`),
+  approveUser: (userId) => axios.post(`${API}/auth/users/${userId}/approve`),
+  rejectUser: (userId) => axios.post(`${API}/auth/users/${userId}/reject`),
   // Dashboard APIs
   getDashboard: () => axios.get(`${API}/dashboard`),
   process: (value) => axios.post(`${API}/process`, { value }),
