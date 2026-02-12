@@ -25,7 +25,6 @@ from .patent1_convergence import (
 # 특허 2: 다단계 신호 전처리 시스템
 from .patent2_signal import (
     SignalPreprocessor,
-    SignalAssetizer,  # 하위 호환성 별칭
     SignalType,
     ConformanceStatus,
     SignalModule,
@@ -133,7 +132,6 @@ __all__ = [
     
     # 특허 2
     'SignalPreprocessor',
-    'SignalAssetizer',
     
     # 특허 3
     'SignalAssetizationPlatform',
