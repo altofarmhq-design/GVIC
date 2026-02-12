@@ -148,7 +148,20 @@ const PipelineTab = () => {
       setCurrentStep(5);
       loadData();
     } catch (err) {
-      setError(err.message || '파이프라인 실행 실패');
+      let errorMsg = '파이프라인 실행 실패';
+      if (err.response?.data?.detail) {
+        const detail = err.response.data.detail;
+        if (typeof detail === 'string') {
+          errorMsg = detail;
+        } else if (Array.isArray(detail)) {
+          errorMsg = detail.map(d => d.msg || JSON.stringify(d)).join(', ');
+        } else {
+          errorMsg = JSON.stringify(detail);
+        }
+      } else if (err.message) {
+        errorMsg = err.message;
+      }
+      setError(errorMsg);
       console.error('Pipeline error:', err);
     } finally {
       setIsRunning(false);
