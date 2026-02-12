@@ -504,5 +504,15 @@
       "confidence": 0.9999185793201045,
       "adjustment_needed": false
     }
+  },
+  {
+    "timestamp": "2026-02-12T13:36:55.390503",
+    "phase": "파레토",
+    "action": "최적화 실행",
+    "data": {
+      "solutions_count": 56,
+      "pareto_front_size": 16,
+      "best_weighted_score": 0.8423529411764704
+    }
   }
 ]
