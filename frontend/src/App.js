@@ -100,11 +100,24 @@ function Dashboard() {
 
   const getRoleBadge = (role) => {
     const styles = {
+      super_admin: 'bg-purple-500/20 text-purple-400',
       admin: 'bg-red-500/20 text-red-400',
       operator: 'bg-blue-500/20 text-blue-400',
-      viewer: 'bg-gray-500/20 text-gray-400'
+      visitor: 'bg-gray-500/20 text-gray-400',
+      ext_admin: 'bg-orange-500/20 text-orange-400',
+      ext_operator: 'bg-yellow-500/20 text-yellow-400',
+      ext_visitor: 'bg-slate-500/20 text-slate-400'
     };
-    return <Badge className={styles[role] || styles.viewer}>{role}</Badge>;
+    const labels = {
+      super_admin: '최고관리자',
+      admin: '관리자',
+      operator: '오퍼레이터',
+      visitor: '방문객',
+      ext_admin: '외부관리자',
+      ext_operator: '외부오퍼레이터',
+      ext_visitor: '외부방문객'
+    };
+    return <Badge className={styles[role] || styles.visitor}>{labels[role] || role}</Badge>;
   };
 
   return (
