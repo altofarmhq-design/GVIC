@@ -450,5 +450,23 @@
       "value": 5.0,
       "success": true
     }
+  },
+  {
+    "timestamp": "2026-02-12T13:22:41.726543",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 5.0,
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:22:42.828409",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 5.0,
+      "success": true
+    }
   }
 ]
