@@ -600,16 +600,15 @@ const PipelineTab = () => {
                             {new Date(report.created).toLocaleString('ko-KR')} · {(report.size / 1024).toFixed(1)} KB
                           </div>
                         </div>
-                        <Button 
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDownloadPdf(report.name)}
-                          className="text-blue-400 hover:text-blue-300 hover:bg-blue-500/20"
+                        <a 
+                          href={getDownloadUrl(report.name)}
+                          download={report.name}
+                          className="inline-flex items-center justify-center text-blue-400 hover:text-blue-300 hover:bg-blue-500/20 p-2 rounded"
                           data-testid={`download-report-${idx}`}
                           title="PDF 다운로드"
                         >
                           <FileDown className="h-5 w-5" />
-                        </Button>
+                        </a>
                       </div>
                     ))}
                   </div>
