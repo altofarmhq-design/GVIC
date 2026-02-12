@@ -1,4 +1,33 @@
-# GVIC Engine - Product Requirements Document
+# GVIC Engine PRD (Product Requirements Document)
+
+## 최근 업데이트: 2026-02-12
+
+### P6 - 입력/출력 어댑터 구현 완료
+- **입력 어댑터 (`/app/backend/adapters/input_adapter.py`)**
+  - 표준 입력 포맷 정의 (StandardInputRecord, StandardInputBatch)
+  - ProductReviewAdapter: 상품 후기 데이터 변환
+  - Excel, CSV, JSON 파일 지원
+  - URL 크롤링 확장 가능 구조
+
+- **출력 어댑터 (`/app/backend/adapters/output_adapter.py`)**
+  - PDF 리포트 생성 (PDFReportAdapter)
+  - 긍정/부정 요인 모듈화 (FactorExtractor)
+  - ModularAnalysisResult 구조화된 결과 형식
+
+- **전체 파이프라인 API**
+  - `POST /api/pipeline/run`: 입력→GVIC분석→PDF출력
+  - `GET /api/pipeline/reports`: 생성된 리포트 목록
+  - `GET /api/pipeline/report/{filename}`: PDF 다운로드
+
+- **프론트엔드 분석 탭 (`PipelineTab.jsx`)**
+  - 입력 데이터 선택
+  - 파이프라인 실행 버튼
+  - 분석 결과 시각화 (감성 분포, 긍정/부정 요인)
+  - PDF 리포트 다운로드
+
+### 테스트 데이터
+- 올리브영 상품 후기 1000건 (시뮬레이션 데이터)
+- 파일: `/app/backend/data/oliveyoung_reviews_*.xlsx`
 
 ## 프로젝트 개요
 GVIC(Global Value Integration Convergence) Engine은 7개의 특허를 기반으로 한 데이터 처리 및 가치 분배 시스템입니다.
