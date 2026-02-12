@@ -93,7 +93,8 @@ const PipelineTab = () => {
 
       const response = await analyzeUrl({
         url: urlInput,
-        max_reviews: maxReviews
+        max_reviews: maxReviews,
+        output_options: outputOptions
       });
 
       setResult(response);
@@ -105,6 +106,23 @@ const PipelineTab = () => {
     } finally {
       setIsRunning(false);
     }
+  };
+
+  // PDF 직접 다운로드 함수
+  const handleDownloadPdf = (pdfUrl) => {
+    if (!pdfUrl) return;
+    
+    // URL에서 파일명 추출
+    const filename = pdfUrl.split('/').pop();
+    const downloadUrl = `${process.env.REACT_APP_BACKEND_URL}/api/pipeline/report/${filename}`;
+    
+    // a 태그를 생성하여 다운로드 트리거
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const handleRunPipeline = async () => {
