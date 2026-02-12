@@ -2,28 +2,35 @@
 
 ## 최근 업데이트: 2026-02-12
 
-### P6 - 입력/출력 어댑터 구현 완료
-- **입력 어댑터 (`/app/backend/adapters/input_adapter.py`)**
-  - 표준 입력 포맷 정의 (StandardInputRecord, StandardInputBatch)
-  - ProductReviewAdapter: 상품 후기 데이터 변환
-  - Excel, CSV, JSON 파일 지원
-  - URL 크롤링 확장 가능 구조
+### P6 - 입력/출력 어댑터 + URL 분석 기능 구현 완료
 
-- **출력 어댑터 (`/app/backend/adapters/output_adapter.py`)**
-  - PDF 리포트 생성 (PDFReportAdapter)
-  - 긍정/부정 요인 모듈화 (FactorExtractor)
-  - ModularAnalysisResult 구조화된 결과 형식
+#### 입력 어댑터 (`/app/backend/adapters/input_adapter.py`)
+- 표준 입력 포맷: `StandardInputRecord`, `StandardInputBatch`
+- `ProductReviewAdapter`: 상품 후기 데이터 변환
+- Excel, CSV, JSON 파일 지원
 
-- **전체 파이프라인 API**
-  - `POST /api/pipeline/run`: 입력→GVIC분석→PDF출력
-  - `GET /api/pipeline/reports`: 생성된 리포트 목록
-  - `GET /api/pipeline/report/{filename}`: PDF 다운로드
+#### URL 크롤러 (`/app/backend/crawlers/url_crawler.py`)
+- **URL 기반 데이터 수집** 기능 추가
+- 지원 사이트: 올리브영, 쿠팡, 네이버쇼핑, 일반 웹사이트
+- 실제 크롤링 불가 시 시뮬레이션 데이터 자동 생성
 
-- **프론트엔드 분석 탭 (`PipelineTab.jsx`)**
-  - 입력 데이터 선택
-  - 파이프라인 실행 버튼
-  - 분석 결과 시각화 (감성 분포, 긍정/부정 요인)
-  - PDF 리포트 다운로드
+#### 출력 어댑터 (`/app/backend/adapters/output_adapter.py`)
+- `PDFReportAdapter`: 분석 결과 PDF 리포트 생성
+- `FactorExtractor`: 긍정/부정 요인 모듈화 추출
+- 7개 섹션 리포트: 요약, 감성분포, 긍정요인, 부정요인, GVIC분석, 인사이트, 권장조치
+
+#### API 엔드포인트
+- `POST /api/pipeline/run`: 파일 기반 분석 → PDF 출력
+- `POST /api/pipeline/analyze-url`: **URL 기반 분석 → PDF 출력** ⭐ 신규
+- `GET /api/pipeline/reports`: 생성된 리포트 목록
+- `GET /api/pipeline/report/{filename}`: PDF 다운로드
+
+#### 프론트엔드 분석 탭 (`PipelineTab.jsx`)
+- **URL 입력** 탭: URL을 입력하여 분석 실행
+- **파일 선택** 탭: 기존 데이터 파일로 분석 실행
+- 최대 수집 건수 설정 (100~2000)
+- 분석 결과 시각화 (감성 분포, 긍정/부정 요인, 인사이트)
+- PDF 리포트 다운로드
 
 ### 테스트 데이터
 - 올리브영 상품 후기 1000건 (시뮬레이션 데이터)
