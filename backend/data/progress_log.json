@@ -1445,5 +1445,37 @@
       "records": 1000,
       "pdf": "/app/backend/data/reports/GVIC_Report_20260212_160636.pdf"
     }
+  },
+  {
+    "timestamp": "2026-02-12T16:12:15.567958",
+    "phase": "리포트",
+    "action": "PDF 생성",
+    "data": {
+      "records": 20
+    }
+  },
+  {
+    "timestamp": "2026-02-12T16:12:16.712749",
+    "phase": "리포트",
+    "action": "PDF 생성",
+    "data": {
+      "records": 20
+    }
+  },
+  {
+    "timestamp": "2026-02-12T16:12:17.409701",
+    "phase": "리포트",
+    "action": "PDF 생성",
+    "data": {
+      "records": 20
+    }
+  },
+  {
+    "timestamp": "2026-02-12T16:12:17.968581",
+    "phase": "리포트",
+    "action": "PDF 생성",
+    "data": {
+      "records": 20
+    }
   }
 ]
