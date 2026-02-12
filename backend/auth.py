@@ -189,7 +189,11 @@ def create_auth_router(db):
     def require_role(allowed_roles: List[str]):
         """Dependency to check user role"""
         async def role_checker(user: dict = Depends(get_current_user)):
-            if user["role"] not in allowed_roles and "admin" not in user["role"]:
+            user_role = user["role"]
+            # super_admin과 admin은 모든 내부 권한 접근 가능
+            if user_role in INTERNAL_ADMIN_ROLES:
+                return user
+            if user_role not in allowed_roles:
                 raise HTTPException(status_code=403, detail="Insufficient permissions")
             return user
         return role_checker
