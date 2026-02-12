@@ -1,0 +1,16 @@
+{
+  "sigma": [0.33, 0.34, 0.33],
+  "omega": {
+    "V_pub_min": 0.2,
+    "V_pub_max": 0.5,
+    "V_pro_min": 0.2,
+    "V_pro_max": 0.5,
+    "V_ind_min": 0.1,
+    "V_ind_max": 0.5,
+    "sum_constraint": 1.0
+  },
+  "system": {
+    "max_alerts": 100,
+    "log_retention_days": 30
+  }
+}
