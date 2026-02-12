@@ -105,19 +105,25 @@ async def root():
 
 @api_router.get("/dashboard")
 async def get_dashboard():
-    """대시보드 데이터 조회"""
+    """대시보드 데이터 조회 (모든 분석 데이터 통합)"""
     status = engine.get_system_status()
     control_data = control_system.get_dashboard_data()
     
     sigma = config_mgr.get_sigma()
     balance_score = engine.convergence.calculate_balance_index()
     
+    # 데이터 허브에서 통합 데이터 조회
+    hub_data = await data_hub.get_dashboard_data()
+    
     return {
         "metrics": {
-            "total_processed": status.get("total_processed", 0),
+            "total_processed": hub_data.get("total_records_processed", status.get("total_processed", 0)),
             "success_rate": status.get("success_rate", 0),
             "active_alerts": control_data["alerts"]["statistics"].get("active", 0),
-            "system_status": "active" if status.get("success_rate", 0) >= 0.5 or status.get("total_processed", 0) == 0 else "degraded"
+            "system_status": "active" if status.get("success_rate", 0) >= 0.5 or status.get("total_processed", 0) == 0 else "degraded",
+            "total_sessions": hub_data.get("total_sessions", 0),
+            "avg_positive_ratio": hub_data.get("avg_positive_ratio", 0),
+            "avg_fairness_index": hub_data.get("avg_fairness_index", 0)
         },
         "sigma": sigma,
         "omega": config_mgr.get_omega(),
@@ -127,7 +133,9 @@ async def get_dashboard():
             "balance": visualizer.create_gauge_chart_data(balance_score * 100)
         },
         "health": control_data["health"],
-        "alerts": control_data["alerts"]
+        "alerts": control_data["alerts"],
+        "recent_sessions": hub_data.get("recent_sessions", []),
+        "last_updated": hub_data.get("last_updated", "")
     }
 
 @api_router.get("/status")
