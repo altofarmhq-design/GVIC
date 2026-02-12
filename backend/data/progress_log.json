@@ -193,5 +193,139 @@
       "value": 5.0,
       "success": true
     }
+  },
+  {
+    "timestamp": "2026-02-12T13:01:23.985503",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 5.0,
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:01:24.031134",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 0.0,
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:01:24.072039",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 10.0,
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:01:24.337608",
+    "phase": "설정",
+    "action": "Σ 업데이트",
+    "data": {
+      "sigma": [
+        0.33,
+        0.34,
+        0.33
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:01:24.376127",
+    "phase": "설정",
+    "action": "Σ 업데이트",
+    "data": {
+      "sigma": [
+        0.3,
+        0.35,
+        0.35
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:01:24.618676",
+    "phase": "설정",
+    "action": "Ω 업데이트",
+    "data": {
+      "V_pub_min": 0.2,
+      "V_pub_max": 0.5,
+      "V_pro_min": 0.2,
+      "V_pro_max": 0.5,
+      "V_ind_min": 0.1,
+      "V_ind_max": 0.5,
+      "sum_constraint": 1.0
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:01:24.656428",
+    "phase": "설정",
+    "action": "Ω 업데이트",
+    "data": {
+      "V_pub_min": 0.2,
+      "V_pub_max": 0.5,
+      "V_pro_min": 0.2,
+      "V_pro_max": 0.5,
+      "V_ind_min": 0.1,
+      "V_ind_max": 0.5,
+      "sum_constraint": 1.0
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:01:24.729073",
+    "phase": "데이터",
+    "action": "IO 처리",
+    "data": {
+      "format": "json"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:01:24.770707",
+    "phase": "데이터",
+    "action": "IO 처리",
+    "data": {
+      "format": "csv"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:01:24.810619",
+    "phase": "데이터",
+    "action": "IO 처리",
+    "data": {
+      "format": "key_value"
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:01:24.963300",
+    "phase": "알림",
+    "action": "헬스체크 실행",
+    "data": {}
+  },
+  {
+    "timestamp": "2026-02-12T13:01:25.088382",
+    "phase": "테스트",
+    "action": "API 테스트 실행",
+    "data": {
+      "test": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:01:25.353363",
+    "phase": "통합",
+    "action": "데이터 교환",
+    "data": {
+      "source": "erp",
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-12T13:01:25.431066",
+    "phase": "통합",
+    "action": "어댑터 추가",
+    "data": {
+      "domain_id": "test_domain"
+    }
   }
 ]
