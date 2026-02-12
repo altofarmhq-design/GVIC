@@ -2715,7 +2715,7 @@ class URLAnalysisRequest(BaseModel):
 
 @api_router.post("/pipeline/analyze-url")
 async def analyze_url(request: URLAnalysisRequest):
-    """URL에서 데이터를 수집하여 분석하고 PDF 리포트 생성"""
+    """URL에서 데이터를 수집하여 분석하고 PDF 리포트 생성 (모든 탭 연동)"""
     import uuid as uuid_module
     
     url = request.url
@@ -2732,9 +2732,22 @@ async def analyze_url(request: URLAnalysisRequest):
     reviews = crawl_result.reviews
     product_name = crawl_result.product_name
     
+    # ===== 데이터 허브: 세션 시작 (모든 탭 연동) =====
+    session = await data_hub.start_session(
+        source_type='url',
+        source_url=url,
+        product_name=product_name
+    )
+    
     # 2. 입력 어댑터로 표준화
     input_adapter = InputAdapterFactory.get_adapter(DataDomain.PRODUCT_REVIEW)
     input_batch = input_adapter.transform(reviews)
+    
+    # ===== 데이터 허브: 입력 데이터 업데이트 =====
+    await data_hub.update_input_summary(
+        total_records=input_batch.total_count,
+        valid_records=input_batch.valid_count
+    )
     
     # 3. 감성 분석
     sentiment_counts = {"positive": 0, "neutral": 0, "negative": 0}
@@ -2750,10 +2763,24 @@ async def analyze_url(request: URLAnalysisRequest):
         "negative": {"count": sentiment_counts["negative"], "ratio": sentiment_counts["negative"] / total}
     }
     
+    # ===== 데이터 허브: 감성 분석 업데이트 =====
+    await data_hub.update_sentiment_analysis(
+        positive=sentiment_counts["positive"],
+        neutral=sentiment_counts["neutral"],
+        negative=sentiment_counts["negative"],
+        avg_rating=float(np.mean(ratings))
+    )
+    
     # 4. 요인 추출
     factor_extractor = FactorExtractor()
     records_for_extraction = [r.to_dict() for r in input_batch.records]
     positive_factors, negative_factors = factor_extractor.extract_factors(records_for_extraction)
+    
+    # ===== 데이터 허브: 요인 분석 업데이트 =====
+    await data_hub.update_factors(
+        positive_factors=[{"category": f.category, "count": f.count, "ratio": f.ratio} for f in positive_factors],
+        negative_factors=[{"category": f.category, "count": f.count, "ratio": f.ratio} for f in negative_factors]
+    )
     
     # 5. GVIC 분석
     gvic_results = {}
@@ -2784,9 +2811,10 @@ async def analyze_url(request: URLAnalysisRequest):
         for m in modules:
             if m.conformance_status.value == 'conforming':
                 conforming_count += 1
+    conformance_rate = conforming_count / sample_size if sample_size > 0 else 0
     gvic_results["signal"] = {
         "total_processed": sample_size,
-        "conformance_rate": conforming_count / sample_size if sample_size > 0 else 0
+        "conformance_rate": conformance_rate
     }
     
     # 가중 분배
@@ -2802,6 +2830,15 @@ async def analyze_url(request: URLAnalysisRequest):
     analytics = distributor.get_analytics()
     gvic_results["distribution"] = distribution
     gvic_results["fairness_index"] = analytics.get("fairness_index", 0)
+    
+    # ===== 데이터 허브: GVIC 분석 결과 업데이트 =====
+    await data_hub.update_gvic_results(
+        convergence_status=conv_metadata.get("status", ""),
+        balance_index=conv_metadata.get("balance_index", 0),
+        conformance_rate=conformance_rate,
+        distribution=distribution,
+        fairness_index=analytics.get("fairness_index", 0)
+    )
     
     # 6. 인사이트 생성
     insights = [f"'{product_name}' 상품에 대한 {total}건의 리뷰를 분석했습니다."]
@@ -2820,12 +2857,15 @@ async def analyze_url(request: URLAnalysisRequest):
     
     recommendations.append("긍정 리뷰의 핵심 요인을 마케팅에 활용하세요.")
     
+    # ===== 데이터 허브: 인사이트 업데이트 =====
+    await data_hub.update_insights(insights, recommendations)
+    
     # 7. PDF 생성
     output_dir = "/app/backend/data/reports"
     os.makedirs(output_dir, exist_ok=True)
     
     analysis_result = ModularAnalysisResult(
-        result_id=str(uuid_module.uuid4())[:8],
+        result_id=session.session_id,
         analysis_type="URL 기반 상품 후기 분석",
         created_at=datetime.now(timezone.utc).isoformat(),
         input_summary={
@@ -2853,6 +2893,9 @@ async def analyze_url(request: URLAnalysisRequest):
     public_pdf = f"/app/frontend/public/GVIC_Report_Latest.pdf"
     import shutil
     shutil.copy(pdf_path, public_pdf)
+    
+    # ===== 데이터 허브: 세션 완료 =====
+    await data_hub.complete_session(pdf_path, "/GVIC_Report_Latest.pdf")
     
     tracker.log("URL분석", "완료", {"url": url, "records": total, "pdf": pdf_path})
     
