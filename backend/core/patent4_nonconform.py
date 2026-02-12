@@ -260,7 +260,6 @@ class NonConformanceClassifier:
         # 이미 감지 단계에서 기본 분류됨
         # 여기서는 세부 분류 수행
         
-        data = nc_data.original_data
         reason = nc_data.nc_reason.lower()
         
         # 세부 분류 로직
@@ -311,7 +310,7 @@ class ValueAssessor:
             detection_time = datetime.fromisoformat(nc_data.detection_time.replace('Z', '+00:00'))
             hours_ago = (datetime.now(timezone.utc) - detection_time).total_seconds() / 3600
             recency = np.exp(-0.1 * hours_ago)  # 최근일수록 높음
-        except:
+        except (ValueError, TypeError):
             recency = 0.5
         
         # 3. 패턴 신규성 (PatternNovelty)
@@ -640,7 +639,7 @@ class NonConformingDataAssetizationSystem:
     
     def get_rule_improvements(self) -> List[Dict]:
         """규칙 개선 제안 조회"""
-        new_suggestions = self.suggester.analyze_and_suggest()
+        self.suggester.analyze_and_suggest()
         top_suggestions = self.suggester.get_top_suggestions(10)
         
         return [

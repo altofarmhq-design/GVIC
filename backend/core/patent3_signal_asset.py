@@ -207,7 +207,7 @@ class SignalNormalizer:
             created = datetime.fromisoformat(signal.timestamp.replace('Z', '+00:00'))
             delta_t = (datetime.now(timezone.utc) - created).total_seconds() / 3600  # 시간 단위
             F = np.exp(-self.lambda_decay * delta_t)
-        except:
+        except (ValueError, TypeError):
             F = 1.0
         
         return self.w_c * C + self.w_a * A + self.w_f * F
@@ -308,7 +308,7 @@ class ValueCalculator:
             delta = abs((t_s - event_time).total_seconds() / 3600)  # 시간 단위
             x = alpha * (peak_window - delta)
             return 1 / (1 + np.exp(-x))
-        except:
+        except (ValueError, TypeError):
             return 0.5
     
     def calculate_total_value(self, signal: SignalObject, domain: str = None) -> Tuple[float, List[float]]:
@@ -526,7 +526,7 @@ class IntegrityManager:
             delta_t = (datetime.now(timezone.utc) - created).total_seconds() / 3600
             decay_factor = np.exp(-decay_lambda * delta_t)
             return asset.total_value * decay_factor
-        except:
+        except (ValueError, TypeError):
             return asset.total_value
 
 

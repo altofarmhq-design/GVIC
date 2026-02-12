@@ -37,7 +37,7 @@ class DomainInterface:
             elif isinstance(data, str):
                 try:
                     return json.loads(data)
-                except:
+                except (json.JSONDecodeError, ValueError):
                     return {'value': data, 'type': 'string'}
             elif isinstance(data, (int, float)):
                 return {'value': float(data), 'type': 'numeric'}
