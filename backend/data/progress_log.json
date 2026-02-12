@@ -433,5 +433,13 @@
     "data": {
       "records": 5
     }
+  },
+  {
+    "timestamp": "2026-02-12T13:20:01.340234",
+    "phase": "리포트",
+    "action": "PDF 생성",
+    "data": {
+      "records": 5
+    }
   }
 ]
