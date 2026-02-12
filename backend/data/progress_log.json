@@ -872,5 +872,15 @@
     "data": {
       "source_id": "ds_66dc4ab6"
     }
+  },
+  {
+    "timestamp": "2026-02-12T13:57:42.722593",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
   }
 ]
