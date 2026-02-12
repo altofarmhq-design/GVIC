@@ -2698,7 +2698,7 @@ async def list_pipeline_reports():
 
 @api_router.get("/pipeline/report/{filename}")
 async def download_report(filename: str):
-    """PDF 리포트 다운로드 - Content-Disposition으로 강제 다운로드"""
+    """PDF 리포트 다운로드 - 강제 다운로드"""
     file_path = f"/app/backend/data/reports/{filename}"
     
     # public 폴더에서도 확인
@@ -2708,12 +2708,15 @@ async def download_report(filename: str):
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="Report not found")
     
-    # Content-Disposition: attachment로 강제 다운로드
+    # application/octet-stream으로 강제 다운로드 (브라우저가 열지 않고 저장)
     return FileResponse(
         file_path, 
-        media_type="application/pdf", 
+        media_type="application/octet-stream", 
         filename=filename,
-        headers={"Content-Disposition": f"attachment; filename={filename}"}
+        headers={
+            "Content-Disposition": f"attachment; filename=\"{filename}\"",
+            "Content-Type": "application/octet-stream"
+        }
     )
 
 
