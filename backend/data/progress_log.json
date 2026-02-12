@@ -1328,5 +1328,14 @@
       "records": 300,
       "pdf": "/app/backend/data/reports/GVIC_URL_Report_20260212_154843.pdf"
     }
+  },
+  {
+    "timestamp": "2026-02-12T15:49:09.686766",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 5.0,
+      "success": true
+    }
   }
 ]

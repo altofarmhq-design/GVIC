@@ -101,7 +101,16 @@ export const api = {
   runPipeline: (config) => axios.post(`${API}/pipeline/run`, config),
   getAnalysisFiles: () => axios.get(`${API}/analysis/files`),
   getPipelineReports: () => axios.get(`${API}/pipeline/reports`),
-  analyzeUrl: (config) => axios.post(`${API}/pipeline/analyze-url`, config)
+  analyzeUrl: (config) => axios.post(`${API}/pipeline/analyze-url`, config),
+  // 데이터 허브 APIs (모든 탭 연동)
+  getHubMonitoring: () => axios.get(`${API}/hub/monitoring`),
+  getHubPredictions: () => axios.get(`${API}/hub/predictions`),
+  getHubPareto: () => axios.get(`${API}/hub/pareto`),
+  getHubComparison: () => axios.get(`${API}/hub/comparison`),
+  getHubAlerts: (unreadOnly = false) => axios.get(`${API}/hub/alerts?unread_only=${unreadOnly}`),
+  markAlertRead: (alertId) => axios.post(`${API}/hub/alerts/${alertId}/read`),
+  getAnalysisSessions: (limit = 20) => axios.get(`${API}/hub/sessions?limit=${limit}`),
+  getSessionDetail: (sessionId) => axios.get(`${API}/hub/sessions/${sessionId}`)
 };
 
 // Export individual functions for easier imports
@@ -109,5 +118,10 @@ export const runPipeline = (config) => api.runPipeline(config).then(res => res.d
 export const getAnalysisFiles = () => api.getAnalysisFiles().then(res => res.data);
 export const getPipelineReports = () => api.getPipelineReports().then(res => res.data);
 export const analyzeUrl = (config) => api.analyzeUrl(config).then(res => res.data);
+export const getHubMonitoring = () => api.getHubMonitoring().then(res => res.data);
+export const getHubPareto = () => api.getHubPareto().then(res => res.data);
+export const getHubComparison = () => api.getHubComparison().then(res => res.data);
+export const getHubAlerts = (unreadOnly) => api.getHubAlerts(unreadOnly).then(res => res.data);
+export const getAnalysisSessions = (limit) => api.getAnalysisSessions(limit).then(res => res.data);
 
 export default api;
