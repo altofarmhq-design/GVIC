@@ -2688,11 +2688,13 @@ async def list_pipeline_reports():
         for f in os.listdir(report_dir):
             if f.endswith('.pdf'):
                 file_path = os.path.join(report_dir, f)
+                # UTC 시간으로 반환 (프론트엔드에서 현지 시각으로 변환)
+                created_utc = datetime.fromtimestamp(os.path.getctime(file_path), tz=timezone.utc)
                 reports.append({
                     "name": f,
                     "path": file_path,
                     "size": os.path.getsize(file_path),
-                    "created": datetime.fromtimestamp(os.path.getctime(file_path)).isoformat()
+                    "created": created_utc.isoformat()
                 })
     return {"reports": sorted(reports, key=lambda x: x["created"], reverse=True)}
 
