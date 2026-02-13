@@ -492,12 +492,59 @@ class GVICDataHub:
         }
     
     async def get_comparison_data(self) -> Dict[str, Any]:
-        """비교 분석 데이터 조회"""
-        comparisons = await self.db.comparison_data.find(
+        """비교 분석 데이터 조회 - analysis_sessions 기반"""
+        # analysis_sessions에서 최근 세션들 가져오기
+        sessions = await self.db.analysis_sessions.find(
             {}, {'_id': 0}
-        ).sort('timestamp', -1).limit(20).to_list(20)
+        ).sort('created_at', -1).limit(20).to_list(20)
         
-        return {'comparisons': comparisons}
+        # 비교 데이터 형식으로 변환
+        comparisons = []
+        total_positive = 0
+        total_fairness = 0
+        total_balance = 0
+        
+        for session in sessions:
+            result = session.get('result', {})
+            sentiment_dist = result.get('sentiment_distribution', {})
+            gvic_result = result.get('gvic_result', {})
+            
+            total_records = sentiment_dist.get('total', 0) or session.get('total_records', 0)
+            positive = sentiment_dist.get('positive', 0)
+            
+            positive_ratio = positive / total_records if total_records > 0 else 0
+            fairness_index = gvic_result.get('fairness_index', 0.5)
+            balance_index = gvic_result.get('balance_index', 0.5)
+            
+            comparisons.append({
+                'session_id': session.get('session_id'),
+                'product_name': session.get('product_name', '분석 세션'),
+                'source_url': session.get('source_url'),
+                'analyzed_at': session.get('created_at'),
+                'metrics': {
+                    'total_records': total_records,
+                    'positive_ratio': positive_ratio,
+                    'fairness_index': fairness_index,
+                    'balance_index': balance_index
+                }
+            })
+            
+            total_positive += positive_ratio
+            total_fairness += fairness_index
+            total_balance += balance_index
+        
+        count = len(comparisons)
+        average_metrics = {
+            'positive_ratio': total_positive / count if count > 0 else 0,
+            'fairness_index': total_fairness / count if count > 0 else 0,
+            'balance_index': total_balance / count if count > 0 else 0
+        }
+        
+        return {
+            'comparisons': comparisons,
+            'total_sessions': count,
+            'average_metrics': average_metrics
+        }
     
     async def get_alerts(self, unread_only: bool = False) -> List[Dict]:
         """알림 조회"""
