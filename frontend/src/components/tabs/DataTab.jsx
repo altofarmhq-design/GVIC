@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,7 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Database, FileText, Trash2, RefreshCw } from 'lucide-react';
 import { api } from "@/lib/api";
 
-export const DataTab = ({ logs, onLogsRefresh }) => {
+export const DataTab = ({ logs = [], onLogsRefresh }) => {
   const [ioFormat, setIoFormat] = useState("json");
   const [ioData, setIoData] = useState('{"value": 10.5, "type": "market"}');
   const [ioResult, setIoResult] = useState(null);
@@ -17,6 +17,14 @@ export const DataTab = ({ logs, onLogsRefresh }) => {
     json: '{"value": 10.5, "type": "market"}',
     csv: "value,type\n10.5,market",
     key_value: "value=10.5\ntype=market"
+  };
+
+  // 로그 데이터 안정화
+  const stableLogs = useMemo(() => logs || [], [logs]);
+
+  const handleFormatChange = (v) => {
+    setIoFormat(v);
+    setIoData(defaultInputs[v]);
   };
 
   const handleIOProcess = async () => {
@@ -31,7 +39,7 @@ export const DataTab = ({ logs, onLogsRefresh }) => {
   const handleClearLogs = async () => {
     try {
       await api.clearLogs();
-      onLogsRefresh();
+      onLogsRefresh?.();
     } catch (error) {
       console.error("Clear logs error:", error);
     }
@@ -49,11 +57,11 @@ export const DataTab = ({ logs, onLogsRefresh }) => {
         <CardContent className="space-y-4">
           <div>
             <label className="text-slate-300 text-sm mb-2 block">형식</label>
-            <Select value={ioFormat} onValueChange={(v) => { setIoFormat(v); setIoData(defaultInputs[v]); }}>
+            <Select value={ioFormat} onValueChange={handleFormatChange}>
               <SelectTrigger className="bg-slate-900 border-slate-600 text-slate-100" data-testid="io-format-select">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-slate-800 border-slate-600">
                 <SelectItem value="json">JSON</SelectItem>
                 <SelectItem value="csv">CSV</SelectItem>
                 <SelectItem value="key_value">Key-Value</SelectItem>
@@ -94,15 +102,15 @@ export const DataTab = ({ logs, onLogsRefresh }) => {
         </CardHeader>
         <CardContent>
           <ScrollArea className="h-80" data-testid="logs-list">
-            {logs && logs.length > 0 ? (
+            {stableLogs.length > 0 ? (
               <div className="space-y-2">
-                {logs.map((log, idx) => (
-                  <div key={idx} className="bg-slate-900/50 rounded-lg p-3">
+                {stableLogs.map((log, idx) => (
+                  <div key={log.timestamp ? `${log.timestamp}-${idx}` : `log-${idx}`} className="bg-slate-900/50 rounded-lg p-3">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-blue-400 text-xs">{log.timestamp?.slice(0, 16)}</span>
-                      <Badge variant="outline" className="text-xs">{log.phase}</Badge>
+                      <span className="text-blue-400 text-xs">{log.timestamp?.slice(0, 16) || '-'}</span>
+                      <Badge variant="outline" className="text-xs">{log.phase || '-'}</Badge>
                     </div>
-                    <p className="text-slate-300 text-sm">{log.action}</p>
+                    <p className="text-slate-300 text-sm">{log.action || '-'}</p>
                   </div>
                 ))}
               </div>
