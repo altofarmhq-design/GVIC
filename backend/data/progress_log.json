@@ -1696,5 +1696,24 @@
       "pareto_front_size": 9,
       "best_weighted_score": 0.8423529411764704
     }
+  },
+  {
+    "timestamp": "2026-02-13T05:39:18.294891",
+    "phase": "URL분석",
+    "action": "시작",
+    "data": {
+      "url": "https://www.amazon.com/-/ko/",
+      "max_reviews": 20000
+    }
+  },
+  {
+    "timestamp": "2026-02-13T05:39:18.987942",
+    "phase": "URL분석",
+    "action": "완료",
+    "data": {
+      "url": "https://www.amazon.com/-/ko/",
+      "records": 20000,
+      "pdf": "/app/backend/data/reports/GVIC_Report_20260213_143918.pdf"
+    }
   }
 ]
