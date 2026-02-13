@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Button } from '../ui/button';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '../ui/card';
 import { Progress } from '../ui/progress';
@@ -12,12 +12,13 @@ import {
   Play, FileText, Download, CheckCircle, 
   TrendingUp, TrendingDown, BarChart3, 
   FileSpreadsheet, Loader2, RefreshCw, Link, Globe,
-  Settings, FileDown
+  Settings, FileDown, Search, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import {
   PieChart, Pie, Cell, ResponsiveContainer
 } from 'recharts';
 import { runPipeline, getAnalysisFiles, getPipelineReports, analyzeUrl } from '../../lib/api';
+import { api } from '../../lib/api';
 
 const COLORS = {
   positive: '#22c55e',
@@ -25,9 +26,12 @@ const COLORS = {
   negative: '#ef4444'
 };
 
+const ITEMS_PER_PAGE = 10;
+
 const PipelineTab = () => {
   const [files, setFiles] = useState([]);
   const [reports, setReports] = useState([]);
+  const [sessions, setSessions] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
