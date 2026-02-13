@@ -2775,6 +2775,7 @@ class URLAnalysisRequest(BaseModel):
     url: str
     max_reviews: int = 1000
     output_options: Optional[OutputOptionsModel] = None
+    timezone_offset: int = 0  # 사용자 타임존 오프셋 (분 단위, UTC 기준)
 
 @api_router.post("/pipeline/analyze-url")
 async def analyze_url(request: URLAnalysisRequest):
