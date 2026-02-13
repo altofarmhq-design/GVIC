@@ -121,19 +121,25 @@ export const MonitoringTab = () => {
           </CardHeader>
           <CardContent>
             <div className="h-64" data-testid="consumption-chart">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={history}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                  <XAxis dataKey="time" stroke="#94a3b8" fontSize={10} />
-                  <YAxis stroke="#94a3b8" fontSize={10} />
-                  <RechartsTooltip 
-                    contentStyle={{ background: '#1e293b', border: '1px solid #475569', borderRadius: '8px' }}
-                  />
-                  <Area type="monotone" dataKey="public" stackId="1" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.6} name="공공" />
-                  <Area type="monotone" dataKey="productive" stackId="1" stroke="#10b981" fill="#10b981" fillOpacity={0.6} name="생산" />
-                  <Area type="monotone" dataKey="individual" stackId="1" stroke="#f59e0b" fill="#f59e0b" fillOpacity={0.6} name="개인" />
-                </AreaChart>
-              </ResponsiveContainer>
+              {history.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%" key={`chart-${history.length}`}>
+                  <AreaChart data={history}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                    <XAxis dataKey="time" stroke="#94a3b8" fontSize={10} />
+                    <YAxis stroke="#94a3b8" fontSize={10} />
+                    <RechartsTooltip 
+                      contentStyle={{ background: '#1e293b', border: '1px solid #475569', borderRadius: '8px' }}
+                    />
+                    <Area type="monotone" dataKey="public" stackId="1" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.6} name="공공" />
+                    <Area type="monotone" dataKey="productive" stackId="1" stroke="#10b981" fill="#10b981" fillOpacity={0.6} name="생산" />
+                    <Area type="monotone" dataKey="individual" stackId="1" stroke="#f59e0b" fill="#f59e0b" fillOpacity={0.6} name="개인" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-full flex items-center justify-center text-slate-500">
+                  데이터 로딩 중...
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
