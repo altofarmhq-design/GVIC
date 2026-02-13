@@ -91,10 +91,14 @@ const PipelineTab = () => {
         await new Promise(resolve => setTimeout(resolve, 800));
       }
 
+      // 사용자 타임존 오프셋 (분 단위)
+      const timezoneOffset = new Date().getTimezoneOffset();
+
       const response = await analyzeUrl({
         url: urlInput,
         max_reviews: maxReviews,
-        output_options: outputOptions
+        output_options: outputOptions,
+        timezone_offset: timezoneOffset
       });
 
       setResult(response);
