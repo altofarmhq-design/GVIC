@@ -513,15 +513,15 @@ const PipelineTab = () => {
                 <Card className="bg-slate-800 border-slate-700">
                   <CardContent className="p-4">
                     <div className="text-sm text-slate-400">PDF 리포트</div>
-                    <a 
-                      href={getDownloadUrl(result.pdf_filename || 'GVIC_Report_Latest.pdf')}
-                      download
+                    <Button 
+                      variant="ghost"
+                      onClick={() => handleDownloadPdf(result.pdf_filename || 'GVIC_Report_Latest.pdf')}
                       className="text-blue-400 hover:text-blue-300 hover:bg-blue-500/20 p-0 h-auto flex items-center gap-1 mt-1"
                       data-testid="download-pdf-button"
                     >
                       <FileDown className="h-4 w-4" />
                       다운로드
-                    </a>
+                    </Button>
                   </CardContent>
                 </Card>
               </div>
