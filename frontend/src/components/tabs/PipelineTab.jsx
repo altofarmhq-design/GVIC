@@ -228,6 +228,67 @@ const PipelineTab = () => {
     ratio: (f.ratio * 100).toFixed(1)
   })) || [];
 
+  // 검색 필터링된 리포트 목록
+  const filteredReports = useMemo(() => {
+    if (!searchQuery.trim()) return reports;
+    return reports.filter(report => 
+      report.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [reports, searchQuery]);
+
+  // 페이지네이션 계산
+  const totalPages = Math.ceil(filteredReports.length / ITEMS_PER_PAGE);
+  const paginatedReports = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredReports.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredReports, currentPage]);
+
+  // 검색어 변경 시 페이지 초기화
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
+  // 리포트 클릭 시 해당 분석 결과 불러오기
+  const handleReportClick = async (report) => {
+    try {
+      // 파일명에서 세션 ID 추출 시도 (예: GVIC_Report_20260213_160029.pdf -> 20260213_160029)
+      const match = report.name.match(/(\d{8}_\d{6})/);
+      if (match) {
+        const timestamp = match[1];
+        // 세션 목록에서 해당 시간대의 세션 찾기
+        const matchingSession = sessions.find(s => {
+          const sessionTime = new Date(s.created_at).toISOString().replace(/[-:T]/g, '').slice(0, 15);
+          return sessionTime.includes(timestamp.replace('_', ''));
+        });
+        
+        if (matchingSession) {
+          const sessionDetail = await api.getSessionDetail(matchingSession.session_id).then(res => res.data);
+          setSelectedReportSession(sessionDetail);
+          // 분석 결과 형식으로 변환
+          setResult({
+            total_records: sessionDetail.total_records || 0,
+            sentiment_distribution: sessionDetail.sentiment_distribution || {},
+            positive_factors: sessionDetail.positive_factors || [],
+            negative_factors: sessionDetail.negative_factors || [],
+            gvic_results: sessionDetail.gvic_results || {},
+            insights: sessionDetail.insights || [],
+            recommendations: sessionDetail.recommendations || [],
+            product_name: sessionDetail.product_name,
+            site_type: sessionDetail.site_type,
+            url: sessionDetail.url,
+            pdf_filename: report.name
+          });
+          return;
+        }
+      }
+      // 매칭되는 세션이 없으면 PDF만 다운로드
+      handleDownloadPdf(report.name);
+    } catch (err) {
+      console.error('Failed to load session detail:', err);
+      handleDownloadPdf(report.name);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* 헤더 */}
