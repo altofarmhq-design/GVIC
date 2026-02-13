@@ -1866,5 +1866,24 @@
       "pareto_front_size": 13,
       "best_weighted_score": 0.8423529411764704
     }
+  },
+  {
+    "timestamp": "2026-02-13T15:45:00.868180",
+    "phase": "URL분석",
+    "action": "시작",
+    "data": {
+      "url": "https://www.phytotics.co.kr/goods/goods_view.php?goodsNo=1000000080#reviews",
+      "max_reviews": 1000
+    }
+  },
+  {
+    "timestamp": "2026-02-13T15:45:03.367444",
+    "phase": "URL분석",
+    "action": "완료",
+    "data": {
+      "url": "https://www.phytotics.co.kr/goods/goods_view.php?goodsNo=1000000080#reviews",
+      "records": 13,
+      "pdf": "/app/backend/data/reports/GVIC_Report_20260214_004500.pdf"
+    }
   }
 ]
