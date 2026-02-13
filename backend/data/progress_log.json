@@ -1671,5 +1671,30 @@
       "records": 1000,
       "pdf": "/app/backend/data/reports/GVIC_Report_20260213_052039.pdf"
     }
+  },
+  {
+    "timestamp": "2026-02-13T05:25:31.836035",
+    "phase": "알림",
+    "action": "헬스체크 실행",
+    "data": {}
+  },
+  {
+    "timestamp": "2026-02-13T05:25:31.942814",
+    "phase": "예측",
+    "action": "분석 완료",
+    "data": {
+      "confidence": 0.7379844419348325,
+      "adjustment_needed": true
+    }
+  },
+  {
+    "timestamp": "2026-02-13T05:25:31.998415",
+    "phase": "파레토",
+    "action": "최적화 실행",
+    "data": {
+      "solutions_count": 56,
+      "pareto_front_size": 9,
+      "best_weighted_score": 0.8423529411764704
+    }
   }
 ]
