@@ -689,7 +689,7 @@ const PipelineTab = () => {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => window.location.href = getDownloadUrl(report.name)}
+                            onClick={() => handleDownloadPdf(report.name)}
                             className="text-blue-400 hover:text-blue-300 hover:bg-blue-500/20 p-2"
                             data-testid={`download-report-${idx}`}
                             title="PDF 다운로드"
