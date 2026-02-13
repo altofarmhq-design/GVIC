@@ -1846,5 +1846,15 @@
       "value": 5.0,
       "success": true
     }
+  },
+  {
+    "timestamp": "2026-02-13T15:26:37.850309",
+    "phase": "파레토",
+    "action": "최적화 실행",
+    "data": {
+      "solutions_count": 56,
+      "pareto_front_size": 19,
+      "best_weighted_score": 0.8423529411764704
+    }
   }
 ]
