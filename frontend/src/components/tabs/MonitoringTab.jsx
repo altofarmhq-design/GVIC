@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -44,7 +44,7 @@ export const MonitoringTab = () => {
   }, [isLive, fetchData]);
 
   const current = monitoring?.current || {};
-  const history = monitoring?.history || [];
+  const history = useMemo(() => monitoring?.history || [], [monitoring?.history]);
   const efficiency = (current.efficiency || 0) * 100;
   const status = current.status || "unknown";
 
