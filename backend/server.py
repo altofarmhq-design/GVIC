@@ -2700,8 +2700,12 @@ async def list_pipeline_reports():
 
 @api_router.get("/pipeline/download/{filename}")
 async def direct_download_report(filename: str):
-    """PDF 리포트 직접 다운로드 - 가장 단순한 방식"""
+    """PDF 리포트 직접 다운로드 - fetch/blob 방식 지원"""
     file_path = f"/app/backend/data/reports/{filename}"
+    
+    # public 폴더에서도 확인
+    if not os.path.exists(file_path):
+        file_path = f"/app/frontend/public/{filename}"
     
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="Report not found")
@@ -2709,7 +2713,11 @@ async def direct_download_report(filename: str):
     return FileResponse(
         path=file_path,
         filename=filename,
-        media_type="application/pdf"
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Access-Control-Expose-Headers": "Content-Disposition"
+        }
     )
 
 
