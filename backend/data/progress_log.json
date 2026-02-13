@@ -1812,5 +1812,30 @@
       "records": 21800,
       "pdf": "/app/backend/data/reports/GVIC_Report_20260213_160029.pdf"
     }
+  },
+  {
+    "timestamp": "2026-02-13T09:42:26.385635",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 5.0,
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-13T09:42:44.290312",
+    "phase": "예측",
+    "action": "설정 변경",
+    "data": {
+      "auto_adjust": false
+    }
+  },
+  {
+    "timestamp": "2026-02-13T11:14:36.710250",
+    "phase": "리포트",
+    "action": "PDF 생성",
+    "data": {
+      "records": 20
+    }
   }
 ]
