@@ -206,17 +206,28 @@ class PDFReportAdapter(OutputAdapter):
         from reportlab.pdfbase import pdfmetrics
         from reportlab.pdfbase.ttfonts import TTFont
         
-        # 한글 폰트 등록 (나눔고딕)
+        # 한글 폰트 등록 (나눔고딕 또는 맑은 고딕)
+        korean_font = 'Helvetica'
+        korean_font_bold = 'Helvetica-Bold'
+        
         try:
-            pdfmetrics.registerFont(TTFont('NanumGothic', '/usr/share/fonts/truetype/nanum/NanumGothic.ttf'))
-            pdfmetrics.registerFont(TTFont('NanumGothicBold', '/usr/share/fonts/truetype/nanum/NanumGothicBold.ttf'))
-            korean_font = 'NanumGothic'
-            korean_font_bold = 'NanumGothicBold'
-            logger.info("한글 폰트 등록 성공: NanumGothic")
+            import platform
+            if platform.system() == 'Windows':
+                # Windows 맑은 고딕
+                pdfmetrics.registerFont(TTFont('KoreanFont', 'C:/Windows/Fonts/malgun.ttf'))
+                pdfmetrics.registerFont(TTFont('KoreanFontBold', 'C:/Windows/Fonts/malgunbd.ttf'))
+                korean_font = 'KoreanFont'
+                korean_font_bold = 'KoreanFontBold'
+                logger.info("한글 폰트 등록 성공: 맑은 고딕")
+            else:
+                # Linux 나눔고딕
+                pdfmetrics.registerFont(TTFont('KoreanFont', '/usr/share/fonts/truetype/nanum/NanumGothic.ttf'))
+                pdfmetrics.registerFont(TTFont('KoreanFontBold', '/usr/share/fonts/truetype/nanum/NanumGothicBold.ttf'))
+                korean_font = 'KoreanFont'
+                korean_font_bold = 'KoreanFontBold'
+                logger.info("한글 폰트 등록 성공: NanumGothic")
         except Exception as e:
             logger.warning(f"한글 폰트 등록 실패: {e}, 기본 폰트 사용")
-            korean_font = 'Helvetica'
-            korean_font_bold = 'Helvetica-Bold'
         
         # PDF 생성
         doc = SimpleDocTemplate(
