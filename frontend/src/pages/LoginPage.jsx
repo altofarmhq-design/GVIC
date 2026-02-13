@@ -213,15 +213,23 @@ export default function LoginPage() {
                   <div className="relative">
                     <Lock className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
                     <Input
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       placeholder="최소 6자 이상"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="pl-10 bg-slate-700 border-slate-600"
+                      className="pl-10 pr-10 bg-slate-700 border-slate-600"
                       required
                       minLength={6}
                       data-testid="register-password"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-3 text-slate-400 hover:text-slate-200 transition-colors"
+                      data-testid="register-toggle-password"
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -229,15 +237,23 @@ export default function LoginPage() {
                   <div className="relative">
                     <Lock className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
                     <Input
-                      type="password"
+                      type={showPasswordConfirm ? "text" : "password"}
                       placeholder="비밀번호를 다시 입력"
                       value={passwordConfirm}
                       onChange={(e) => setPasswordConfirm(e.target.value)}
-                      className="pl-10 bg-slate-700 border-slate-600"
+                      className="pl-10 pr-10 bg-slate-700 border-slate-600"
                       required
                       minLength={6}
                       data-testid="register-password-confirm"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
+                      className="absolute right-3 top-3 text-slate-400 hover:text-slate-200 transition-colors"
+                      data-testid="register-toggle-password-confirm"
+                    >
+                      {showPasswordConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
                   </div>
                   {password && passwordConfirm && password !== passwordConfirm && (
                     <p className="text-xs text-red-400">비밀번호가 일치하지 않습니다</p>
