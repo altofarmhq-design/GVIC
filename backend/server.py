@@ -2781,9 +2781,13 @@ class URLAnalysisRequest(BaseModel):
 async def analyze_url(request: URLAnalysisRequest):
     """URL에서 데이터를 수집하여 분석하고 PDF 리포트 생성 (모든 탭 연동)"""
     import uuid as uuid_module
+    from datetime import timedelta
     
     url = request.url
     max_reviews = min(request.max_reviews, 2000)  # 최대 2000건
+    
+    # 사용자 로컬 시간 계산 (타임존 오프셋 적용)
+    user_local_time = datetime.now(timezone.utc) - timedelta(minutes=request.timezone_offset)
     
     tracker.log("URL분석", "시작", {"url": url, "max_reviews": max_reviews})
     
