@@ -710,6 +710,62 @@ const PipelineTab = () => {
               </CardContent>
             </Card>
           )}
+          
+          {/* 생성된 리포트 목록 - 항상 표시 */}
+          <Card className="bg-slate-800 border-slate-700">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-slate-100">
+                <FileText className="h-5 w-5 text-blue-400" />
+                생성된 리포트
+              </CardTitle>
+              <CardDescription className="text-slate-400">이전에 생성된 PDF 리포트 목록</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {reports.length > 0 ? (
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  {reports.map((report, idx) => {
+                    const createdDate = new Date(report.created);
+                    const localTimeStr = createdDate.toLocaleString('ko-KR', {
+                      year: 'numeric',
+                      month: '2-digit',
+                      day: '2-digit',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit',
+                      hour12: false
+                    });
+                    
+                    return (
+                      <div key={report.name || idx} className="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg">
+                        <div>
+                          <div className="font-medium text-sm text-slate-200">{report.name}</div>
+                          <div className="text-xs text-slate-500">
+                            {localTimeStr} · {(report.size / 1024).toFixed(1)} KB
+                          </div>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDownloadPdf(report.name)}
+                          className="text-blue-400 hover:text-blue-300 hover:bg-blue-500/20 p-2"
+                          data-testid={`download-report-list-${idx}`}
+                          title="PDF 다운로드"
+                        >
+                          <FileDown className="h-5 w-5" />
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-slate-500">
+                  <FileText className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                  <p>아직 생성된 리포트가 없습니다</p>
+                  <p className="text-sm">URL을 입력하여 첫 분석을 시작하세요</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
