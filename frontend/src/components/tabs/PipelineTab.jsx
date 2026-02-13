@@ -638,26 +638,40 @@ const PipelineTab = () => {
               <CardContent>
                 {reports.length > 0 ? (
                   <div className="space-y-2">
-                    {reports.map((report, idx) => (
-                      <div key={idx} className="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg">
-                        <div>
-                          <div className="font-medium text-sm text-slate-200">{report.name}</div>
-                          <div className="text-xs text-slate-500">
-                            {new Date(report.created).toLocaleString('ko-KR')} · {(report.size / 1024).toFixed(1)} KB
+                    {reports.map((report, idx) => {
+                      // UTC 시간을 현지 시각으로 변환
+                      const createdDate = new Date(report.created);
+                      const localTimeStr = createdDate.toLocaleString('ko-KR', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: false
+                      });
+                      
+                      return (
+                        <div key={report.name || idx} className="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg">
+                          <div>
+                            <div className="font-medium text-sm text-slate-200">{report.name}</div>
+                            <div className="text-xs text-slate-500">
+                              {localTimeStr} · {(report.size / 1024).toFixed(1)} KB
+                            </div>
                           </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => window.location.href = getDownloadUrl(report.name)}
+                            className="text-blue-400 hover:text-blue-300 hover:bg-blue-500/20 p-2"
+                            data-testid={`download-report-${idx}`}
+                            title="PDF 다운로드"
+                          >
+                            <FileDown className="h-5 w-5" />
+                          </Button>
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => window.location.href = getDownloadUrl(report.name)}
-                          className="text-blue-400 hover:text-blue-300 hover:bg-blue-500/20 p-2"
-                          data-testid={`download-report-${idx}`}
-                          title="PDF 다운로드"
-                        >
-                          <FileDown className="h-5 w-5" />
-                        </Button>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 ) : (
                   <div className="text-center py-8 text-slate-500">
