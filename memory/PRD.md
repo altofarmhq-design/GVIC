@@ -26,6 +26,7 @@ Streamlit GVIC Engine 대시보드를 React/FastAPI 기반 풀스택 애플리�
 - [x] 나눔고딕 폰트 설치
 - [x] 로컬 설치용 프로젝트 패키징
 - [x] 탭 기능 상세 설명서 작성
+- [x] **DataHub 연동 확장**: ComparisonTab에 URL 분석 세션 비교 기능 추가
 
 ## 진행 중 이슈 (P0)
 1. PDF 다운로드 버튼 클릭 불가
@@ -33,7 +34,6 @@ Streamlit GVIC Engine 대시보드를 React/FastAPI 기반 풀스택 애플리�
 3. React 렌더링 오류 (에러 객체 처리)
 
 ## 백로그 (P2-P3)
-- DataHub 연동 확장
 - 비적합 데이터 판정 로직 수정
 - 입출력 어댑터 프레임워크 확장
 - 경영관리 모듈 구현
@@ -43,5 +43,7 @@ Streamlit GVIC Engine 대시보드를 React/FastAPI 기반 풀스택 애플리�
 
 ## 주요 파일
 - `/app/frontend/src/components/tabs/` - 14개 탭 컴포넌트
+- `/app/frontend/src/components/tabs/ComparisonTab.jsx` - DataHub 연동 비교 탭
 - `/app/backend/server.py` - 메인 API 서버
+- `/app/backend/core/data_hub.py` - DataHub 통합 데이터 관리
 - `/app/backend/adapters/output_adapter.py` - PDF 생성 로직
