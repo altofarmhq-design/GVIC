@@ -126,7 +126,34 @@ const PipelineTab = () => {
     }
   };
 
-  // PDF 다운로드 함수 - 간단한 링크 방식
+  // PDF 다운로드 함수 - fetch + blob 방식으로 강제 다운로드
+  const handleDownloadPdf = async (filename) => {
+    try {
+      const url = `${process.env.REACT_APP_BACKEND_URL}/api/pipeline/download/${filename}`;
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error('다운로드 실패');
+      }
+      
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error('PDF 다운로드 오류:', error);
+      alert('PDF 다운로드에 실패했습니다. 다시 시도해주세요.');
+    }
+  };
+
+  // URL 방식 (fallback)
   const getDownloadUrl = (filename) => {
     return `${process.env.REACT_APP_BACKEND_URL}/api/pipeline/download/${filename}`;
   };
