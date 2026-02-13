@@ -2942,7 +2942,7 @@ async def analyze_url(request: URLAnalysisRequest):
             "source": url,
             "product_name": product_name,
             "site_type": crawl_result.site_type.value,
-            "analysis_date": datetime.now().strftime("%Y-%m-%d %H:%M")
+            "analysis_date": user_local_time.strftime("%Y-%m-%d %H:%M")
         },
         sentiment_distribution=sentiment_distribution,
         positive_factors=positive_factors,
@@ -2952,7 +2952,8 @@ async def analyze_url(request: URLAnalysisRequest):
         recommendations=recommendations
     )
     
-    output_file = os.path.join(output_dir, f"GVIC_URL_Report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf")
+    # 사용자 로컬 시간 기준 파일명 생성
+    output_file = os.path.join(output_dir, f"GVIC_Report_{user_local_time.strftime('%Y%m%d_%H%M%S')}.pdf")
     output_adapter = OutputAdapterFactory.get_adapter(OutputType.PDF_REPORT)
     
     # 출력 옵션을 딕셔너리로 변환
