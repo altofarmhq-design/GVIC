@@ -245,17 +245,34 @@ const PipelineTab = () => {
                   </p>
                 </div>
 
-                {/* 최대 수집 건수 */}
+                {/* 최대 수집 건수 - 슬라이더 + 직접 입력 */}
                 <div className="space-y-2">
                   <Label className="text-slate-200">최대 수집 건수</Label>
-                  <Input
-                    type="number"
-                    min="100"
-                    max="2000"
-                    value={maxReviews}
-                    onChange={(e) => setMaxReviews(parseInt(e.target.value) || 1000)}
-                    className="bg-slate-700 border-slate-600 text-slate-100"
-                  />
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="range"
+                      min="100"
+                      max="2000"
+                      step="100"
+                      value={maxReviews}
+                      onChange={(e) => setMaxReviews(parseInt(e.target.value))}
+                      className="flex-1 h-2 bg-slate-600 rounded-lg appearance-none cursor-pointer accent-cyan-500"
+                    />
+                    <Input
+                      type="number"
+                      min="100"
+                      max="2000"
+                      step="100"
+                      value={maxReviews}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value) || 100;
+                        setMaxReviews(Math.min(2000, Math.max(100, val)));
+                      }}
+                      className="w-24 bg-slate-700 border-slate-600 text-slate-100 text-center"
+                    />
+                    <span className="text-slate-400 text-sm">건</span>
+                  </div>
+                  <p className="text-slate-500 text-xs">100 ~ 2000건 범위에서 설정 가능</p>
                 </div>
 
                 {/* 출력 옵션 섹션 */}
