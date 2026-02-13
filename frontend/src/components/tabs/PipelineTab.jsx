@@ -251,31 +251,74 @@ const PipelineTab = () => {
   // 리포트 클릭 시 해당 분석 결과 불러오기
   const handleReportClick = async (report) => {
     try {
-      // 파일명에서 세션 ID 추출 시도 (예: GVIC_Report_20260213_160029.pdf -> 20260213_160029)
+      // 파일명에서 타임스탬프 추출 (예: GVIC_Report_20260214_004500.pdf)
       const match = report.name.match(/(\d{8}_\d{6})/);
       if (match) {
-        const timestamp = match[1];
-        // 세션 목록에서 해당 시간대의 세션 찾기
-        const matchingSession = sessions.find(s => {
-          const sessionTime = new Date(s.created_at).toISOString().replace(/[-:T]/g, '').slice(0, 15);
-          return sessionTime.includes(timestamp.replace('_', ''));
+        const fileTimestamp = match[1]; // "20260214_004500"
+        
+        // 세션 목록에서 pdf_path가 일치하는 세션 찾기
+        let matchingSession = sessions.find(s => {
+          if (s.pdf_path) {
+            return s.pdf_path.includes(fileTimestamp);
+          }
+          return false;
         });
         
+        // pdf_path로 못 찾으면 시간으로 매칭
+        if (!matchingSession) {
+          matchingSession = sessions.find(s => {
+            const sessionDate = new Date(s.created_at);
+            const sessionTimestamp = sessionDate.toISOString()
+              .replace(/[-:T]/g, '')
+              .slice(0, 14); // "20260214004500" 형식
+            const fileTs = fileTimestamp.replace('_', ''); // "20260214004500"
+            return sessionTimestamp === fileTs;
+          });
+        }
+        
         if (matchingSession) {
+          // 세션 상세 정보 불러오기
           const sessionDetail = await api.getSessionDetail(matchingSession.session_id).then(res => res.data);
-          setSelectedReportSession(sessionDetail);
-          // 분석 결과 형식으로 변환
+          
+          // 분석 결과 형식으로 변환 (sentiment_distribution 구조 맞추기)
           setResult({
             total_records: sessionDetail.total_records || 0,
-            sentiment_distribution: sessionDetail.sentiment_distribution || {},
+            sentiment_distribution: {
+              positive: {
+                count: sessionDetail.sentiment_positive || 0,
+                ratio: sessionDetail.sentiment_positive_ratio || 0
+              },
+              neutral: {
+                count: sessionDetail.sentiment_neutral || 0,
+                ratio: sessionDetail.sentiment_neutral_ratio || 0
+              },
+              negative: {
+                count: sessionDetail.sentiment_negative || 0,
+                ratio: sessionDetail.sentiment_negative_ratio || 0
+              }
+            },
             positive_factors: sessionDetail.positive_factors || [],
             negative_factors: sessionDetail.negative_factors || [],
-            gvic_results: sessionDetail.gvic_results || {},
+            gvic_results: {
+              fairness_index: sessionDetail.fairness_index || 0,
+              convergence: {
+                status: sessionDetail.convergence_status,
+                balance_index: sessionDetail.convergence_balance_index
+              },
+              signal: {
+                conformance_rate: sessionDetail.signal_conformance_rate
+              },
+              distribution: {
+                public: sessionDetail.distribution_public,
+                productive: sessionDetail.distribution_productive,
+                individual: sessionDetail.distribution_individual
+              }
+            },
             insights: sessionDetail.insights || [],
             recommendations: sessionDetail.recommendations || [],
             product_name: sessionDetail.product_name,
-            site_type: sessionDetail.site_type,
-            url: sessionDetail.url,
+            site_type: sessionDetail.source_type,
+            url: sessionDetail.source_url,
             pdf_filename: report.name
           });
           return;
