@@ -743,51 +743,145 @@ const PipelineTab = () => {
             </Card>
           )}
           
-          {/* 생성된 리포트 목록 - 항상 표시 */}
+          {/* 생성된 리포트 목록 - 검색 및 페이지네이션 */}
           <Card className="bg-slate-800 border-slate-700">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-slate-100">
-                <FileText className="h-5 w-5 text-blue-400" />
-                생성된 리포트
-              </CardTitle>
-              <CardDescription className="text-slate-400">이전에 생성된 PDF 리포트 목록</CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2 text-slate-100">
+                    <FileText className="h-5 w-5 text-blue-400" />
+                    생성된 리포트
+                  </CardTitle>
+                  <CardDescription className="text-slate-400">
+                    총 {reports.length}개 · 클릭하면 분석 결과 확인
+                  </CardDescription>
+                </div>
+              </div>
+              {/* 검색창 */}
+              <div className="relative mt-3">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <Input
+                  type="text"
+                  placeholder="파일명으로 검색..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 bg-slate-700 border-slate-600 text-slate-100 placeholder:text-slate-500"
+                  data-testid="report-search-input"
+                />
+              </div>
             </CardHeader>
             <CardContent>
-              {reports.length > 0 ? (
-                <div className="space-y-2 max-h-64 overflow-y-auto">
-                  {reports.map((report, idx) => {
-                    const createdDate = new Date(report.created);
-                    const localTimeStr = createdDate.toLocaleString('ko-KR', {
-                      year: 'numeric',
-                      month: '2-digit',
-                      day: '2-digit',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      second: '2-digit',
-                      hour12: false
-                    });
-                    
-                    return (
-                      <div key={report.name || idx} className="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg">
-                        <div>
-                          <div className="font-medium text-sm text-slate-200">{report.name}</div>
-                          <div className="text-xs text-slate-500">
-                            {localTimeStr} · {(report.size / 1024).toFixed(1)} KB
-                          </div>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDownloadPdf(report.name)}
-                          className="text-blue-400 hover:text-blue-300 hover:bg-blue-500/20 p-2"
-                          data-testid={`download-report-list-${idx}`}
-                          title="PDF 다운로드"
+              {filteredReports.length > 0 ? (
+                <div className="space-y-4">
+                  {/* 리포트 목록 */}
+                  <div className="space-y-2">
+                    {paginatedReports.map((report, idx) => {
+                      const createdDate = new Date(report.created);
+                      const localTimeStr = createdDate.toLocaleString('ko-KR', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: false
+                      });
+                      
+                      return (
+                        <div 
+                          key={report.name || idx} 
+                          className="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg hover:bg-slate-700 cursor-pointer transition-colors"
+                          onClick={() => handleReportClick(report)}
+                          data-testid={`report-item-${idx}`}
                         >
-                          <FileDown className="h-5 w-5" />
-                        </Button>
+                          <div className="flex-1">
+                            <div className="font-medium text-sm text-slate-200">{report.name}</div>
+                            <div className="text-xs text-slate-500">
+                              {localTimeStr} · {(report.size / 1024).toFixed(1)} KB
+                            </div>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDownloadPdf(report.name);
+                            }}
+                            className="text-blue-400 hover:text-blue-300 hover:bg-blue-500/20 p-2"
+                            data-testid={`download-report-list-${idx}`}
+                            title="PDF 다운로드"
+                          >
+                            <FileDown className="h-5 w-5" />
+                          </Button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  
+                  {/* 페이지네이션 */}
+                  {totalPages > 1 && (
+                    <div className="flex items-center justify-center gap-2 pt-4 border-t border-slate-700">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                        disabled={currentPage === 1}
+                        className="border-slate-600 text-slate-300 disabled:opacity-50"
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </Button>
+                      
+                      <div className="flex items-center gap-1">
+                        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                          let pageNum;
+                          if (totalPages <= 5) {
+                            pageNum = i + 1;
+                          } else if (currentPage <= 3) {
+                            pageNum = i + 1;
+                          } else if (currentPage >= totalPages - 2) {
+                            pageNum = totalPages - 4 + i;
+                          } else {
+                            pageNum = currentPage - 2 + i;
+                          }
+                          
+                          return (
+                            <Button
+                              key={pageNum}
+                              variant={currentPage === pageNum ? "default" : "outline"}
+                              size="sm"
+                              onClick={() => setCurrentPage(pageNum)}
+                              className={`w-8 h-8 p-0 ${
+                                currentPage === pageNum 
+                                  ? 'bg-blue-600 text-white' 
+                                  : 'border-slate-600 text-slate-300'
+                              }`}
+                            >
+                              {pageNum}
+                            </Button>
+                          );
+                        })}
                       </div>
-                    );
-                  })}
+                      
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                        disabled={currentPage === totalPages}
+                        className="border-slate-600 text-slate-300 disabled:opacity-50"
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                      
+                      <span className="text-sm text-slate-500 ml-2">
+                        {currentPage} / {totalPages} 페이지
+                      </span>
+                    </div>
+                  )}
+                </div>
+              ) : searchQuery ? (
+                <div className="text-center py-8 text-slate-500">
+                  <Search className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                  <p>"{searchQuery}" 검색 결과가 없습니다</p>
                 </div>
               ) : (
                 <div className="text-center py-8 text-slate-500">
