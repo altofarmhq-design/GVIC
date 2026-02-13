@@ -141,26 +141,50 @@ const PipelineTab = () => {
   const handleDownloadPdf = async (filename) => {
     try {
       const url = `${process.env.REACT_APP_BACKEND_URL}/api/pipeline/download/${filename}`;
-      const response = await fetch(url);
+      console.log('Downloading PDF from:', url);
+      
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/pdf',
+        },
+      });
       
       if (!response.ok) {
-        throw new Error('다운로드 실패');
+        throw new Error(`다운로드 실패: ${response.status}`);
       }
       
       const blob = await response.blob();
+      console.log('Blob received:', blob.size, 'bytes, type:', blob.type);
+      
+      // Blob URL 생성
       const blobUrl = window.URL.createObjectURL(blob);
       
+      // 다운로드 링크 생성 및 클릭
       const link = document.createElement('a');
+      link.style.display = 'none';
       link.href = blobUrl;
       link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      link.setAttribute('download', filename);
       
-      window.URL.revokeObjectURL(blobUrl);
+      // body에 추가
+      document.body.appendChild(link);
+      
+      // 클릭 이벤트 발생
+      link.click();
+      
+      // 정리 (약간의 딜레이 후)
+      setTimeout(() => {
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(blobUrl);
+      }, 100);
+      
+      console.log('Download triggered for:', filename);
     } catch (error) {
       console.error('PDF 다운로드 오류:', error);
-      alert('PDF 다운로드에 실패했습니다. 다시 시도해주세요.');
+      // Fallback: 새 탭에서 열기
+      const fallbackUrl = `${process.env.REACT_APP_BACKEND_URL}/api/pipeline/download/${filename}`;
+      window.open(fallbackUrl, '_blank');
     }
   };
 
