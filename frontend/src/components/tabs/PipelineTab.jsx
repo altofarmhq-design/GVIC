@@ -41,6 +41,11 @@ const PipelineTab = () => {
   const [urlInput, setUrlInput] = useState('');
   const [maxReviews, setMaxReviews] = useState(1000);
   
+  // 검색 및 페이지네이션 상태
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedReportSession, setSelectedReportSession] = useState(null);
+  
   // 출력 옵션 상태
   const [outputOptions, setOutputOptions] = useState({
     reportTitle: '',
@@ -66,12 +71,14 @@ const PipelineTab = () => {
 
   const loadData = async () => {
     try {
-      const [filesRes, reportsRes] = await Promise.all([
+      const [filesRes, reportsRes, sessionsRes] = await Promise.all([
         getAnalysisFiles(),
-        getPipelineReports()
+        getPipelineReports(),
+        api.getAnalysisSessions(100).then(res => res.data)
       ]);
       setFiles(filesRes.files || []);
       setReports(reportsRes.reports || []);
+      setSessions(sessionsRes.sessions || []);
     } catch (err) {
       console.error('Failed to load data:', err);
     }
