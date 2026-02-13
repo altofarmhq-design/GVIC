@@ -2784,7 +2784,7 @@ async def analyze_url(request: URLAnalysisRequest):
     from datetime import timedelta
     
     url = request.url
-    max_reviews = min(request.max_reviews, 2000)  # 최대 2000건
+    max_reviews = request.max_reviews  # 사용자 입력값 그대로 사용
     
     # 사용자 로컬 시간 계산 (타임존 오프셋 적용)
     user_local_time = datetime.now(timezone.utc) - timedelta(minutes=request.timezone_offset)
