@@ -2113,5 +2113,25 @@
       "success": false,
       "value": null
     }
+  },
+  {
+    "timestamp": "2026-02-14T13:05:24.827233",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_a3ae82f3",
+      "success": true,
+      "value": 1.0
+    }
+  },
+  {
+    "timestamp": "2026-02-14T13:05:27.966690",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
   }
 ]
