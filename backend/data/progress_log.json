@@ -2193,5 +2193,15 @@
       "success": false,
       "value": null
     }
+  },
+  {
+    "timestamp": "2026-02-14T13:08:24.310419",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_1d6c4a15",
+      "success": false,
+      "value": null
+    }
   }
 ]
