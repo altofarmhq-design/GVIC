@@ -3484,10 +3484,10 @@ async def get_gvic_assets(
             query["classification"] = classification
         
         assets_cursor = db.gvic_assets.find(query, {"_id": 0}).sort("created_at", -1).limit(limit)
-        assets = list(assets_cursor)
+        assets = await assets_cursor.to_list(length=limit)
         
         # 통계 계산
-        total = db.gvic_assets.count_documents({})
+        total = await db.gvic_assets.count_documents({})
         positive = db.gvic_assets.count_documents({"classification": "긍정"})
         neutral = db.gvic_assets.count_documents({"classification": "중립"})
         negative = db.gvic_assets.count_documents({"classification": "부정"})
