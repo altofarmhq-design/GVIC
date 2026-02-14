@@ -3744,6 +3744,169 @@ async def get_gvic_assets(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"자산 조회 실패: {str(e)}")
 
+@api_router.get("/gvic-warehouse")
+async def get_gvic_warehouse(
+    current_user: dict = Depends(get_current_user)
+):
+    """자산화창고 - 공개 쇼케이스용 탑 10 유사 모듈"""
+    try:
+        # 공개(showcase) 자산만 조회
+        base_query = {"visibility": {"$in": ["showcase", None]}}  # None은 기존 데이터 호환
+        
+        # 시그널 유형별 그룹화 및 카운트 (탑 10)
+        pipeline = [
+            {"$match": base_query},
+            {"$group": {
+                "_id": "$signal_type_label",
+                "count": {"$sum": 1},
+                "sample_assets": {"$push": {
+                    "asset_id": "$asset_id",
+                    "summary": "$summary",
+                    "classification": "$classification",
+                    "key_themes": "$key_themes",
+                    "signal_count": "$signal_count",
+                    "overall_sentiment": "$overall_sentiment"
+                }}
+            }},
+            {"$sort": {"count": -1}},
+            {"$limit": 10},
+            {"$project": {
+                "signal_type": "$_id",
+                "count": 1,
+                "sample_assets": {"$slice": ["$sample_assets", 3]}  # 각 유형별 샘플 3개
+            }}
+        ]
+        
+        top_modules = []
+        async for doc in db.gvic_assets.aggregate(pipeline):
+            if doc.get("_id"):
+                top_modules.append({
+                    "signal_type": doc["signal_type"],
+                    "count": doc["count"],
+                    "samples": doc.get("sample_assets", [])
+                })
+        
+        # 전체 통계 (공개 자산만)
+        total_showcase = await db.gvic_assets.count_documents(base_query)
+        
+        # 감성별 통계
+        sentiment_stats = {
+            "positive": await db.gvic_assets.count_documents({**base_query, "classification": "긍정"}),
+            "negative": await db.gvic_assets.count_documents({**base_query, "classification": "부정"}),
+            "mixed": await db.gvic_assets.count_documents({**base_query, "classification": "혼합"}),
+            "neutral": await db.gvic_assets.count_documents({**base_query, "classification": "중립"})
+        }
+        
+        return {
+            "top_modules": top_modules,
+            "total_showcase": total_showcase,
+            "sentiment_stats": sentiment_stats,
+            "message": "궁금증을 자아내는 자산화창고입니다"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"자산화창고 조회 실패: {str(e)}")
+
+class NLSearchRequest(BaseModel):
+    query: str
+
+@api_router.post("/gvic-warehouse/search")
+async def search_warehouse_nl(
+    request: NLSearchRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """자산화창고 자연어 검색 - AI 기반"""
+    try:
+        from core.signal_detector import GVICSignalDetector
+        detector = GVICSignalDetector()
+        
+        # 자연어 쿼리를 AI로 분석하여 검색 키워드 추출
+        prompt = f"""사용자가 자산화창고에서 다음과 같이 검색했습니다:
+"{request.query}"
+
+이 자연어 검색 쿼리에서 핵심 검색 키워드들을 추출해주세요.
+응답은 JSON 형식으로:
+{{"keywords": ["키워드1", "키워드2", ...], "intent": "검색 의도 요약", "sentiment_filter": "positive/negative/mixed/neutral/all"}}
+"""
+        
+        # AI로 검색 의도 분석
+        search_analysis = await detector._call_llm(prompt)
+        
+        # 검색 실행 (공개 자산만)
+        base_query = {"visibility": {"$in": ["showcase", None]}}
+        
+        # 추출된 키워드로 검색
+        keywords = search_analysis.get("keywords", [request.query])
+        sentiment_filter = search_analysis.get("sentiment_filter", "all")
+        
+        search_conditions = []
+        for kw in keywords:
+            search_conditions.extend([
+                {"signal_type_label": {"$regex": kw, "$options": "i"}},
+                {"summary": {"$regex": kw, "$options": "i"}},
+                {"key_themes": {"$regex": kw, "$options": "i"}},
+                {"signal_texts": {"$regex": kw, "$options": "i"}},
+                {"hidden_meanings": {"$regex": kw, "$options": "i"}}
+            ])
+        
+        if search_conditions:
+            base_query["$or"] = search_conditions
+        
+        if sentiment_filter != "all":
+            sentiment_map = {"positive": "긍정", "negative": "부정", "mixed": "혼합", "neutral": "중립"}
+            if sentiment_filter in sentiment_map:
+                base_query["classification"] = sentiment_map[sentiment_filter]
+        
+        # 검색 결과
+        cursor = db.gvic_assets.find(base_query, {"_id": 0, "full_analysis": 0}).sort("created_at", -1).limit(10)
+        results = await cursor.to_list(length=10)
+        
+        return {
+            "query": request.query,
+            "analysis": {
+                "keywords": keywords,
+                "intent": search_analysis.get("intent", ""),
+                "sentiment_filter": sentiment_filter
+            },
+            "results": results,
+            "count": len(results)
+        }
+    except Exception as e:
+        # AI 분석 실패 시 단순 키워드 검색으로 폴백
+        base_query = {
+            "visibility": {"$in": ["showcase", None]},
+            "$or": [
+                {"summary": {"$regex": request.query, "$options": "i"}},
+                {"key_themes": {"$regex": request.query, "$options": "i"}},
+                {"signal_type_label": {"$regex": request.query, "$options": "i"}}
+            ]
+        }
+        cursor = db.gvic_assets.find(base_query, {"_id": 0, "full_analysis": 0}).sort("created_at", -1).limit(10)
+        results = await cursor.to_list(length=10)
+        
+        return {
+            "query": request.query,
+            "analysis": {"keywords": [request.query], "intent": "단순 검색", "sentiment_filter": "all"},
+            "results": results,
+            "count": len(results)
+        }
+
+@api_router.get("/gvic-assets/my")
+async def get_my_assets(
+    limit: int = 50,
+    current_user: dict = Depends(get_current_user)
+):
+    """내 자산 조회 (유료 요구자용) - 본인 자산만"""
+    try:
+        query = {"owner_id": current_user.get("user_id")}
+        cursor = db.gvic_assets.find(query, {"_id": 0}).sort("created_at", -1).limit(limit)
+        assets = await cursor.to_list(length=limit)
+        
+        total = await db.gvic_assets.count_documents(query)
+        
+        return {"assets": assets, "total": total}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"내 자산 조회 실패: {str(e)}")
+
 @api_router.get("/gvic-assets/{asset_id}")
 async def get_gvic_asset(
     asset_id: str,
