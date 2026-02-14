@@ -31,7 +31,8 @@ import {
   ParetoTab,
   ComparisonTab,
   DataSourcesTab,
-  PipelineTab
+  PipelineTab,
+  SignalTracerTab
 } from "@/components/tabs";
 import UsersTab from "@/components/tabs/UsersTab";
 import LoginPage from "@/pages/LoginPage";
