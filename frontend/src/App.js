@@ -232,6 +232,10 @@ function Dashboard() {
               <Zap className="w-4 h-4 mr-2" /> 시그널추적
             </TabsTrigger>
             
+            <TabsTrigger value="showcase" className="data-[state=active]:bg-slate-700 data-[state=active]:bg-amber-600">
+              <Sparkles className="w-4 h-4 mr-2" /> GVIC쇼케이스
+            </TabsTrigger>
+            
             <TabsTrigger value="data" className="data-[state=active]:bg-slate-700">
               <Database className="w-4 h-4 mr-2" /> 데이터
             </TabsTrigger>
