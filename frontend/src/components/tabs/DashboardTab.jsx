@@ -120,33 +120,46 @@ export const DashboardTab = ({ dashboard, systemStatus }) => {
         </Button>
       </div>
 
-      {/* Metrics Row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" data-testid="metrics-row">
+      {/* Metrics Row - 실제 데이터 */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4" data-testid="metrics-row">
         <MetricCard 
           icon={Activity} 
-          label="처리 건수" 
-          value={dashboard?.metrics?.total_processed || 0}
+          label="총 분석 건수" 
+          value={totalAnalyzed}
           variant="cyan"
+        />
+        <MetricCard 
+          icon={Database} 
+          label="자산화 건수" 
+          value={totalAssets}
+          variant="purple"
         />
         <MetricCard 
           icon={CheckCircle} 
           label="성공률" 
-          value={`${((dashboard?.metrics?.success_rate || 0) * 100).toFixed(1)}%`}
+          value={`${(successRate * 100).toFixed(1)}%`}
           variant="teal"
         />
         <MetricCard 
-          icon={AlertTriangle} 
-          label="비적합 감지" 
-          value={moduleStats?.nonconform?.nonconform_count || 0}
-          subValue={`비율: ${((moduleStats?.nonconform?.nonconform_rate || 0) * 100).toFixed(1)}%`}
+          icon={Clock} 
+          label="최근 1시간" 
+          value={lastHourCount}
+          subValue="처리량"
           variant="amber"
         />
-        <MetricCard 
-          icon={Zap} 
-          label="시스템" 
-          value={dashboard?.metrics?.system_status || "active"}
-          variant="purple"
-        />
+        <Card className="bg-slate-800/50 border-slate-700">
+          <CardContent className="py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Zap className="w-5 h-5 text-slate-400" />
+                <span className="text-slate-400 text-sm">상태</span>
+              </div>
+              <Badge className={`${statusColors[status]} text-white`}>
+                {statusLabels[status]}
+              </Badge>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Charts Row */}
