@@ -293,10 +293,6 @@ function Dashboard() {
             <PipelineTab />
           </TabsContent>
 
-          <TabsContent value="tracer">
-            <SignalTracerTab />
-          </TabsContent>
-
           <TabsContent value="showcase">
             <GVICShowcaseTab />
           </TabsContent>
