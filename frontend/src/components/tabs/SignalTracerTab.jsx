@@ -66,12 +66,18 @@ export const SignalTracerTab = () => {
     setError(null);
     
     try {
-      const response = await api.post("/api/signal-tracer/analyze", {
+      const token = localStorage.getItem('token');
+      const response = await axios.post(`${API_URL}/api/signal-tracer/analyze`, {
         content: content,
         rating: rating,
         sigma: sigma,
         omega_min: omegaMin,
         omega_max: omegaMax
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       });
       setResult(response.data);
     } catch (err) {
