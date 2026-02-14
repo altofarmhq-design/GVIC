@@ -693,4 +693,37 @@ const AssetStorageView = ({ assets, stats, searchQuery, setSearchQuery, onRefres
   );
 };
 
+// 자산 카드 컴포넌트
+const AssetCard = ({ asset }) => (
+  <div className="bg-slate-900/50 rounded-lg p-3 border border-slate-700">
+    <div className="flex items-start justify-between mb-2">
+      <div className="flex items-center gap-2">
+        <Badge className={`text-xs ${
+          asset.overall_sentiment === 'positive' ? 'bg-green-600' :
+          asset.overall_sentiment === 'negative' ? 'bg-red-600' :
+          asset.overall_sentiment === 'mixed' ? 'bg-purple-600' :
+          'bg-yellow-600'
+        }`}>
+          {asset.classification || asset.overall_sentiment || '미분류'}
+        </Badge>
+        <Badge variant="outline" className="text-xs text-blue-400 border-blue-600">
+          {asset.signal_type_label || '알 수 없음'}
+        </Badge>
+      </div>
+      <span className="text-slate-600 text-xs">{asset.signal_count || 0}개 시그널</span>
+    </div>
+    <p className="text-slate-200 text-sm mb-2">{asset.summary || '요약 없음'}</p>
+    {asset.key_themes?.length > 0 && (
+      <div className="flex flex-wrap gap-1">
+        {asset.key_themes.map((theme, i) => (
+          <Badge key={i} variant="outline" className="text-xs text-amber-400 border-amber-600">
+            <Tag className="w-3 h-3 mr-1" />
+            {theme}
+          </Badge>
+        ))}
+      </div>
+    )}
+  </div>
+);
+
 export default GVICShowcaseTab;
