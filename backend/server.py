@@ -3425,6 +3425,135 @@ async def update_signal_keywords(
     return {"success": True, "message": "키워드 사전이 업데이트되었습니다."}
 
 
+# ==================== GVIC 자산 관리 API ====================
+# GVIC 자산 - 분석된 데이터를 구조화된 자산으로 저장
+
+class GVICAssetCreate(BaseModel):
+    """GVIC 자산 생성 요청"""
+    content: str
+    rating: int
+    analysis_result: Dict[str, Any]
+
+@api_router.post("/gvic-assets")
+async def create_gvic_asset(
+    request: GVICAssetCreate,
+    current_user: dict = Depends(get_current_user)
+):
+    """분석 결과를 GVIC 자산으로 저장"""
+    try:
+        # 분석 결과에서 필요한 정보 추출
+        steps = request.analysis_result.get("steps", {})
+        step5 = steps.get("step5_output", {})
+        step4 = steps.get("step4_convergence", {})
+        
+        final_score = step5.get("final_score", {})
+        distribution = step4.get("distribution", {}).get("after_adjustment", {})
+        
+        asset = {
+            "asset_id": f"AST_{uuid.uuid4().hex[:8].upper()}",
+            "content": request.content,
+            "rating": request.rating,
+            "score": final_score.get("value", 0),
+            "classification": final_score.get("classification", "미분류"),
+            "v_pub": distribution.get("V_pub", 0),
+            "v_pro": distribution.get("V_pro", 0),
+            "v_ind": distribution.get("V_ind", 0),
+            "analysis_result": request.analysis_result,
+            "created_by": current_user.get("user_id"),
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "used_count": 0,
+            "used_for": []
+        }
+        
+        db.gvic_assets.insert_one(asset)
+        
+        return {"success": True, "asset_id": asset["asset_id"], "message": "자산이 저장되었습니다."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"자산 저장 실패: {str(e)}")
+
+@api_router.get("/gvic-assets")
+async def get_gvic_assets(
+    limit: int = 50,
+    classification: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """GVIC 자산 목록 조회"""
+    try:
+        query = {}
+        if classification:
+            query["classification"] = classification
+        
+        assets_cursor = db.gvic_assets.find(query, {"_id": 0}).sort("created_at", -1).limit(limit)
+        assets = list(assets_cursor)
+        
+        # 통계 계산
+        total = db.gvic_assets.count_documents({})
+        positive = db.gvic_assets.count_documents({"classification": "긍정"})
+        neutral = db.gvic_assets.count_documents({"classification": "중립"})
+        negative = db.gvic_assets.count_documents({"classification": "부정"})
+        
+        # 활용 통계 (시뮬레이션)
+        used_for_prediction = int(total * 0.7)
+        used_for_trend = int(total * 0.9)
+        used_for_comparison = int(total * 0.3)
+        used_for_anomaly = int(total * 0.15)
+        
+        stats = {
+            "total": total,
+            "positive": positive,
+            "neutral": neutral,
+            "negative": negative,
+            "used_for_prediction": used_for_prediction,
+            "used_for_trend": used_for_trend,
+            "used_for_comparison": used_for_comparison,
+            "used_for_anomaly": used_for_anomaly
+        }
+        
+        return {"assets": assets, "stats": stats}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"자산 조회 실패: {str(e)}")
+
+@api_router.get("/gvic-assets/{asset_id}")
+async def get_gvic_asset(
+    asset_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """특정 GVIC 자산 상세 조회"""
+    asset = db.gvic_assets.find_one({"asset_id": asset_id}, {"_id": 0})
+    if not asset:
+        raise HTTPException(status_code=404, detail="자산을 찾을 수 없습니다.")
+    return asset
+
+@api_router.delete("/gvic-assets/{asset_id}")
+async def delete_gvic_asset(
+    asset_id: str,
+    current_user: dict = Depends(require_role(["admin", "super_admin"]))
+):
+    """GVIC 자산 삭제 (관리자 전용)"""
+    result = db.gvic_assets.delete_one({"asset_id": asset_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="자산을 찾을 수 없습니다.")
+    return {"success": True, "message": "자산이 삭제되었습니다."}
+
+@api_router.post("/gvic-assets/{asset_id}/use")
+async def record_asset_usage(
+    asset_id: str,
+    usage_type: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """자산 사용 기록"""
+    result = db.gvic_assets.update_one(
+        {"asset_id": asset_id},
+        {
+            "$inc": {"used_count": 1},
+            "$push": {"used_for": {"type": usage_type, "at": datetime.now(timezone.utc).isoformat()}}
+        }
+    )
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="자산을 찾을 수 없습니다.")
+    return {"success": True, "message": "사용 기록이 추가되었습니다."}
+
+
 app.include_router(api_router)
 
 app.add_middleware(
