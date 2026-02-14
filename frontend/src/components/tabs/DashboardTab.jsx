@@ -1,33 +1,84 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { 
   PieChart, Pie, Cell, ResponsiveContainer, 
-  RadialBarChart, RadialBar, Tooltip as RechartsTooltip
+  RadialBarChart, RadialBar, Tooltip as RechartsTooltip,
+  AreaChart, Area, XAxis, YAxis, CartesianGrid
 } from 'recharts';
 import { 
   Activity, CheckCircle, AlertTriangle, Zap, 
   Shield, BarChart3, TrendingUp, PieChart as PieChartIcon,
-  FileDown, RefreshCw
+  FileDown, RefreshCw, Database, Clock
 } from 'lucide-react';
 import { MetricCard } from "@/components/MetricCard";
 import { api } from "@/lib/api";
+import axios from "axios";
+
+const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export const DashboardTab = ({ dashboard, systemStatus }) => {
   const [generating, setGenerating] = useState(false);
+  const [realStats, setRealStats] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const pieData = dashboard?.charts?.distribution?.data || [
-    { name: '공공', value: 33, color: '#3b82f6' },
-    { name: '생산', value: 34, color: '#10b981' },
-    { name: '개인', value: 33, color: '#f59e0b' }
-  ];
+  // 실제 통계 로드
+  const loadRealStats = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${API_URL}/api/dashboard/realstats`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      setRealStats(response.data);
+    } catch (error) {
+      console.error("Failed to load real stats:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadRealStats();
+    // 10초마다 업데이트
+    const interval = setInterval(loadRealStats, 10000);
+    return () => clearInterval(interval);
+  }, [loadRealStats]);
+
+  // 실제 데이터 또는 기본값
+  const totalAnalyzed = realStats?.realtime?.total_analyzed || 0;
+  const totalAssets = realStats?.assets?.total || 0;
+  const successRate = realStats?.realtime?.success_rate || 0;
+  const lastHourCount = realStats?.realtime?.last_hour_count || 0;
+  const status = realStats?.realtime?.status || "idle";
+
+  // 감성 분포 (실제 데이터)
+  const sentimentData = realStats?.by_sentiment || {};
+  const pieData = [
+    { name: '긍정', value: sentimentData.positive || 0, color: '#10b981' },
+    { name: '혼합', value: sentimentData.mixed || 0, color: '#8b5cf6' },
+    { name: '중립', value: sentimentData.neutral || 0, color: '#3b82f6' },
+    { name: '부정', value: sentimentData.negative || 0, color: '#ef4444' }
+  ].filter(d => d.value > 0);
+
+  // 차트 데이터
+  const chartData = realStats?.chart_data || [];
 
   const balanceScore = dashboard?.balance_score || 0.85;
   const gaugeData = [{ name: '균형', value: balanceScore * 100, fill: '#10b981' }];
-  const sigma = dashboard?.sigma || [0.33, 0.34, 0.33];
 
-  // 모듈 상태
-  const moduleStats = systemStatus?.modules || {};
+  // 상태 색상
+  const statusColors = {
+    active: 'bg-emerald-500',
+    normal: 'bg-blue-500',
+    low: 'bg-yellow-500',
+    idle: 'bg-slate-500'
+  };
+
+  const statusLabels = {
+    active: '활발',
+    normal: '정상',
+    low: '저조',
+    idle: '대기'
+  };
 
   // PDF 리포트 다운로드
   const handleDownloadReport = async () => {
