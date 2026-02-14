@@ -292,6 +292,10 @@ function Dashboard() {
             <PipelineTab />
           </TabsContent>
 
+          <TabsContent value="tracer">
+            <SignalTracerTab />
+          </TabsContent>
+
           <TabsContent value="data">
             <DataTab logs={logs} onLogsRefresh={fetchData} />
           </TabsContent>
