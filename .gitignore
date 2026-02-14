@@ -121,3 +121,5 @@ frontend/node_modules/.cache/default-development/10.pack
 # Environment files
 *.env
 *.env.*
+gvic_local_package/frontend/node_modules/.cache/default-development/6.pack
+gvic_local_package/frontend/node_modules/.cache/default-development/0.pack
