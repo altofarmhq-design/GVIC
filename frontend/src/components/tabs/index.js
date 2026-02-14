@@ -12,5 +12,4 @@ export { ComparisonTab } from './ComparisonTab';
 export { default as DataSourcesTab } from './DataSourcesTab';
 export { default as UsersTab } from './UsersTab';
 export { default as PipelineTab } from './PipelineTab';
-export { default as SignalTracerTab } from './SignalTracerTab';
 export { default as GVICShowcaseTab } from './GVICShowcaseTab';
