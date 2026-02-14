@@ -1,35 +1,5 @@
 [
   {
-    "timestamp": "2026-02-14T14:02:28.206948",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T14:02:29.299758",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T14:02:30.374312",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
     "timestamp": "2026-02-14T14:02:31.459423",
     "phase": "데이터소스",
     "action": "데이터 수집",
@@ -9988,6 +9958,34 @@
       "source_id": "ds_787c194e",
       "success": false,
       "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:18:22.227146",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 5.0,
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:18:31.843364",
+    "phase": "예측",
+    "action": "분석 완료",
+    "data": {
+      "confidence": 0.7476679622550585,
+      "adjustment_needed": true
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:18:40.574612",
+    "phase": "파레토",
+    "action": "최적화 실행",
+    "data": {
+      "solutions_count": 56,
+      "pareto_front_size": 15,
+      "best_weighted_score": 0.8423529411764704
     }
   }
 ]
