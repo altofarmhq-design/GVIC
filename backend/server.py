@@ -3114,6 +3114,8 @@ SIGNAL_KEYWORDS = {
 
 # AI 기반 시그널 감지기 초기화
 from core.signal_detector import GVICSignalDetector
+from core.gvic_models import Signal, SignalModule, SignalInput, GVICAsset, generate_id
+
 signal_detector = None
 
 def get_signal_detector():
@@ -3133,23 +3135,6 @@ class AISignalAnalysisInput(BaseModel):
     include_perspective_mapping: bool = Field(default=True, description="3관점 매핑 포함 여부")
 
 
-class AISignalAnalysisResponse(BaseModel):
-    """AI 기반 시그널 분석 응답"""
-    success: bool
-    trace_id: str
-    signal_type: str
-    signal_type_label: str
-    signal_type_confidence: float
-    signal_type_reason: str
-    discovered_signals: List[Dict[str, Any]]
-    overall_sentiment: str
-    key_themes: List[str]
-    summary: str
-    applicable_perspectives: Dict[str, bool]
-    perspective_relevance: str
-    raw_response: Optional[str] = None
-
-
 @api_router.post("/signal-tracer/ai-analyze")
 async def ai_analyze_signal(
     request: AISignalAnalysisInput,
@@ -3158,11 +3143,16 @@ async def ai_analyze_signal(
     """
     AI 기반 시그널 분석 - 시그널 유형 자동 감지 및 특징 추출
     
-    1. 시그널 유형 감지: 이 텍스트가 무엇인지 파악
-    2. 시그널 특징 추출: 텍스트에서 발견되는 모든 의미있는 시그널을 추출
-    3. 감성 및 맥락 분석: 각 시그널의 감성과 숨겨진 의미 파악
+    ID 체계:
+    - input_id: 입력 고유 ID
+    - module_id: 모듈 고유 ID  
+    - signal_id: 개별 시그널 고유 ID
+    - requester_id: 요구자 ID
     """
-    trace_id = str(uuid.uuid4())[:8]
+    # ID 생성
+    requester_id = current_user.get("user_id")
+    input_id = generate_id("INP")
+    module_id = generate_id("MOD")
     
     detector = get_signal_detector()
     if detector is None:
@@ -3171,7 +3161,7 @@ async def ai_analyze_signal(
     try:
         result = await detector.detect_and_extract(
             text=request.content,
-            session_id=f"gvic_{trace_id}"
+            session_id=f"gvic_{input_id}"
         )
         
         if not result.get("success", False):
@@ -3194,23 +3184,56 @@ async def ai_analyze_signal(
             "unknown": "분류불가"
         }
         
+        # 개별 시그널에 ID 부여
+        discovered_signals = result.get("discovered_signals", [])
+        signals_with_id = []
+        for sig in discovered_signals:
+            signal_id = generate_id("SIG")
+            sig_with_id = {
+                "signal_id": signal_id,
+                "module_id": module_id,
+                "input_id": input_id,
+                **sig
+            }
+            signals_with_id.append(sig_with_id)
+        
         return {
             "success": True,
-            "trace_id": trace_id,
+            
+            # ID 체계
+            "input_id": input_id,
+            "module_id": module_id,
+            "requester_id": requester_id,
+            
+            # 입력 정보
+            "raw_content": request.content,
+            "content_length": len(request.content),
+            
+            # 모듈 정보
             "signal_type": signal_type,
             "signal_type_label": signal_type_labels.get(signal_type, "알 수 없음"),
             "signal_type_confidence": result.get("signal_type_confidence", 0),
             "signal_type_reason": result.get("signal_type_reason", ""),
-            "discovered_signals": result.get("discovered_signals", []),
+            
+            # 시그널들 (각각 signal_id 포함)
+            "discovered_signals": signals_with_id,
+            "signal_count": len(signals_with_id),
+            
+            # 분석 결과
             "overall_sentiment": result.get("overall_sentiment", "neutral"),
             "key_themes": result.get("key_themes", []),
             "summary": result.get("summary", ""),
+            
+            # 3관점 적용 여부
             "applicable_perspectives": result.get("applicable_perspectives", {
                 "society": False,
                 "production": False,
                 "consumer": False
             }),
-            "perspective_relevance": result.get("perspective_relevance", "")
+            "perspective_relevance": result.get("perspective_relevance", ""),
+            
+            # 메타데이터
+            "created_at": datetime.now(timezone.utc).isoformat()
         }
         
     except HTTPException:
