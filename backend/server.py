@@ -3488,9 +3488,9 @@ async def get_gvic_assets(
         
         # 통계 계산
         total = await db.gvic_assets.count_documents({})
-        positive = db.gvic_assets.count_documents({"classification": "긍정"})
-        neutral = db.gvic_assets.count_documents({"classification": "중립"})
-        negative = db.gvic_assets.count_documents({"classification": "부정"})
+        positive = await db.gvic_assets.count_documents({"classification": "긍정"})
+        neutral = await db.gvic_assets.count_documents({"classification": "중립"})
+        negative = await db.gvic_assets.count_documents({"classification": "부정"})
         
         # 활용 통계 (시뮬레이션)
         used_for_prediction = int(total * 0.7)
