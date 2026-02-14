@@ -1,15 +1,5 @@
 [
   {
-    "timestamp": "2026-02-14T14:02:31.459423",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
     "timestamp": "2026-02-14T14:02:32.543985",
     "phase": "데이터소스",
     "action": "데이터 수집",
@@ -9986,6 +9976,14 @@
       "solutions_count": 56,
       "pareto_front_size": 15,
       "best_weighted_score": 0.8423529411764704
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:18:47.216604",
+    "phase": "비교",
+    "action": "분석 완료",
+    "data": {
+      "records_count": 10
     }
   }
 ]
