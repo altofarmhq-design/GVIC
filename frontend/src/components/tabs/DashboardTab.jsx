@@ -321,4 +321,3 @@ export const DashboardTab = ({ dashboard, systemStatus }) => {
   );
 };
 
-export { DashboardTab };
