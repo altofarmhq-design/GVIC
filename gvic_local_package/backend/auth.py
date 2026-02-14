@@ -1,5 +1,5 @@
 """
-GVIC Engine Authentication Module
+GVIC Engine Authentication Module (로컬 환경용)
 - JWT-based custom authentication (email/password)
 - Google OAuth via Emergent Auth
 - Role-based access control (RBAC)
@@ -20,55 +20,17 @@ JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "gvic-engine-secret-key-change
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRY_DAYS = 7
 
-# Roles - 내부/외부 구분
+# Roles
 ROLES = {
-    # 내부 시스템 역할
-    "super_admin": {
-        "level": 4, 
-        "type": "internal",
-        "label": "최고관리자",
-        "permissions": ["*", "system_config"]
-    },
-    "admin": {
-        "level": 3, 
-        "type": "internal",
-        "label": "관리자",
-        "permissions": ["*"]
-    },
-    "operator": {
-        "level": 2, 
-        "type": "internal",
-        "label": "오퍼레이터",
-        "permissions": ["read", "write", "process", "report"]
-    },
-    "visitor": {
-        "level": 1, 
-        "type": "internal",
-        "label": "방문객",
-        "permissions": ["read"]
-    },
-    # 외부 시스템 역할 (모두 visitor와 동일한 권한)
-    "ext_admin": {
-        "level": 1, 
-        "type": "external",
-        "label": "외부관리자",
-        "permissions": ["read"]
-    },
-    "ext_operator": {
-        "level": 1, 
-        "type": "external",
-        "label": "외부오퍼레이터",
-        "permissions": ["read"]
-    },
-    "ext_visitor": {
-        "level": 1, 
-        "type": "external",
-        "label": "외부방문객",
-        "permissions": ["read"]
-    }
+    "super_admin": {"level": 4, "type": "internal", "label": "최고관리자", "permissions": ["*", "system_config"]},
+    "admin": {"level": 3, "type": "internal", "label": "관리자", "permissions": ["*"]},
+    "operator": {"level": 2, "type": "internal", "label": "오퍼레이터", "permissions": ["read", "write", "process", "report"]},
+    "visitor": {"level": 1, "type": "internal", "label": "방문객", "permissions": ["read"]},
+    "ext_admin": {"level": 1, "type": "external", "label": "외부관리자", "permissions": ["read"]},
+    "ext_operator": {"level": 1, "type": "external", "label": "외부오퍼레이터", "permissions": ["read"]},
+    "ext_visitor": {"level": 1, "type": "external", "label": "외부방문객", "permissions": ["read"]}
 }
 
-# 내부 관리자 역할 목록
 INTERNAL_ADMIN_ROLES = ["super_admin", "admin"]
 
 # ==================== Models ====================
@@ -121,12 +83,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 def create_jwt_token(user_id: str, email: str, role: str) -> str:
     expire = datetime.now(timezone.utc) + timedelta(days=JWT_EXPIRY_DAYS)
-    payload = {
-        "sub": user_id,
-        "email": email,
-        "role": role,
-        "exp": expire
-    }
+    payload = {"sub": user_id, "email": email, "role": role, "exp": expire}
     return jwt.encode(payload, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
 
 def decode_jwt_token(token: str) -> dict:
@@ -141,14 +98,8 @@ def create_auth_router(db):
     
     router = APIRouter(prefix="/auth", tags=["Authentication"])
     
-    # ==================== Auth Middleware ====================
-    
     async def get_current_user(request: Request) -> dict:
-        """Get current user from session token (cookie) or JWT (header)"""
-        # Check cookie first
         session_token = request.cookies.get("session_token")
-        
-        # Check Authorization header as fallback
         if not session_token:
             auth_header = request.headers.get("Authorization")
             if auth_header and auth_header.startswith("Bearer "):
@@ -157,14 +108,9 @@ def create_auth_router(db):
         if not session_token:
             raise HTTPException(status_code=401, detail="Not authenticated")
         
-        # Try session token (Google OAuth)
-        session = await db.user_sessions.find_one(
-            {"session_token": session_token},
-            {"_id": 0}
-        )
+        session = await db.user_sessions.find_one({"session_token": session_token}, {"_id": 0})
         
         if session:
-            # Check expiry
             expires_at = session.get("expires_at")
             if isinstance(expires_at, str):
                 expires_at = datetime.fromisoformat(expires_at)
@@ -174,30 +120,21 @@ def create_auth_router(db):
             if expires_at < datetime.now(timezone.utc):
                 raise HTTPException(status_code=401, detail="Session expired")
             
-            user = await db.users.find_one(
-                {"user_id": session["user_id"]},
-                {"_id": 0}
-            )
+            user = await db.users.find_one({"user_id": session["user_id"]}, {"_id": 0})
             if user:
                 return user
         
-        # Try JWT token
         payload = decode_jwt_token(session_token)
         if payload:
-            user = await db.users.find_one(
-                {"user_id": payload["sub"]},
-                {"_id": 0}
-            )
+            user = await db.users.find_one({"user_id": payload["sub"]}, {"_id": 0})
             if user:
                 return user
         
         raise HTTPException(status_code=401, detail="Invalid session")
     
     def require_role(allowed_roles: List[str]):
-        """Dependency to check user role"""
         async def role_checker(user: dict = Depends(get_current_user)):
             user_role = user["role"]
-            # super_admin과 admin은 모든 내부 권한 접근 가능
             if user_role in INTERNAL_ADMIN_ROLES:
                 return user
             if user_role not in allowed_roles:
@@ -205,21 +142,15 @@ def create_auth_router(db):
             return user
         return role_checker
     
-    # ==================== Auth Endpoints ====================
-    
     @router.post("/register")
     async def register(data: UserRegister, response: Response):
-        """Register new user with email/password (requires admin approval)"""
-        # Validate password confirmation
         if data.password != data.password_confirm:
             raise HTTPException(status_code=400, detail="비밀번호가 일치하지 않습니다")
         
-        # Check if email exists
         existing = await db.users.find_one({"email": data.email}, {"_id": 0})
         if existing:
             raise HTTPException(status_code=400, detail="이미 등록된 이메일입니다")
         
-        # Create user with pending status
         user_id = f"user_{uuid.uuid4().hex[:12]}"
         user = {
             "user_id": user_id,
@@ -227,9 +158,9 @@ def create_auth_router(db):
             "name": data.name,
             "password_hash": hash_password(data.password),
             "picture": None,
-            "role": "visitor",  # Default role for new users
+            "role": "visitor",
             "auth_provider": "local",
-            "status": "pending",  # 승인 대기 상태
+            "status": "pending",
             "created_at": datetime.now(timezone.utc).isoformat()
         }
         await db.users.insert_one(user)
@@ -237,31 +168,22 @@ def create_auth_router(db):
         return {
             "success": True,
             "message": "회원가입 신청이 완료되었습니다. 관리자 승인 후 로그인할 수 있습니다.",
-            "user": {
-                "user_id": user_id,
-                "email": data.email,
-                "name": data.name,
-                "status": "pending"
-            }
+            "user": {"user_id": user_id, "email": data.email, "name": data.name, "status": "pending"}
         }
     
     @router.post("/login")
     async def login(data: UserLogin, response: Response):
-        """Login with email/password"""
         user = await db.users.find_one({"email": data.email}, {"_id": 0})
         
         if not user:
             raise HTTPException(status_code=401, detail="이메일 또는 비밀번호가 올바르지 않습니다")
         
-        # Check if user is pending approval
         if user.get("status") == "pending":
-            raise HTTPException(status_code=403, detail="관리자 승인 대기 중입니다. 승인 후 로그인할 수 있습니다.")
+            raise HTTPException(status_code=403, detail="관리자 승인 대기 중입니다.")
         
-        # Check if user is rejected
         if user.get("status") == "rejected":
-            raise HTTPException(status_code=403, detail="가입이 거부되었습니다. 관리자에게 문의하세요.")
+            raise HTTPException(status_code=403, detail="가입이 거부되었습니다.")
         
-        # Check password (for local auth users)
         if user.get("auth_provider") == "local":
             if not user.get("password_hash"):
                 raise HTTPException(status_code=401, detail="이메일 또는 비밀번호가 올바르지 않습니다")
@@ -270,39 +192,21 @@ def create_auth_router(db):
         else:
             raise HTTPException(status_code=400, detail="Google 로그인을 사용해주세요")
         
-        # Create JWT token
         token = create_jwt_token(user["user_id"], user["email"], user["role"])
         
-        # Set cookie
         response.set_cookie(
-            key="session_token",
-            value=token,
-            httponly=True,
-            secure=True,
-            samesite="none",
-            path="/",
-            max_age=JWT_EXPIRY_DAYS * 24 * 60 * 60
+            key="session_token", value=token, httponly=True, secure=True,
+            samesite="none", path="/", max_age=JWT_EXPIRY_DAYS * 24 * 60 * 60
         )
         
         return {
             "success": True,
-            "user": {
-                "user_id": user["user_id"],
-                "email": user["email"],
-                "name": user["name"],
-                "picture": user.get("picture"),
-                "role": user["role"]
-            },
+            "user": {"user_id": user["user_id"], "email": user["email"], "name": user["name"], "picture": user.get("picture"), "role": user["role"]},
             "token": token
         }
     
     @router.post("/google/session")
     async def google_session(data: GoogleSessionRequest, response: Response):
-        """
-        Exchange Google OAuth session_id for user session
-        REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
-        """
-        # Call Emergent Auth API to get user data
         try:
             async with httpx.AsyncClient() as client:
                 auth_response = await client.get(
@@ -310,258 +214,140 @@ def create_auth_router(db):
                     headers={"X-Session-ID": data.session_id},
                     timeout=10.0
                 )
-                
                 if auth_response.status_code != 200:
                     raise HTTPException(status_code=401, detail="Invalid session ID")
-                
                 auth_data = auth_response.json()
         except httpx.RequestError as e:
             raise HTTPException(status_code=500, detail=f"Auth service error: {str(e)}")
         
-        # Check if user exists
         user = await db.users.find_one({"email": auth_data["email"]}, {"_id": 0})
         
         if user:
-            # Update existing user
             await db.users.update_one(
                 {"email": auth_data["email"]},
-                {"$set": {
-                    "name": auth_data["name"],
-                    "picture": auth_data.get("picture"),
-                    "last_login": datetime.now(timezone.utc).isoformat()
-                }}
+                {"$set": {"name": auth_data["name"], "picture": auth_data.get("picture"), "last_login": datetime.now(timezone.utc).isoformat()}}
             )
             user_id = user["user_id"]
             role = user["role"]
         else:
-            # Create new user (외부 사용자로 기본 설정)
             user_id = f"user_{uuid.uuid4().hex[:12]}"
-            role = "ext_visitor"  # 외부 방문객으로 기본 설정
-            
+            role = "ext_visitor"
             new_user = {
-                "user_id": user_id,
-                "email": auth_data["email"],
-                "name": auth_data["name"],
-                "picture": auth_data.get("picture"),
-                "role": role,
-                "auth_provider": "google",
+                "user_id": user_id, "email": auth_data["email"], "name": auth_data["name"],
+                "picture": auth_data.get("picture"), "role": role, "auth_provider": "google",
                 "created_at": datetime.now(timezone.utc).isoformat()
             }
             await db.users.insert_one(new_user)
         
-        # Store session
         session_token = auth_data.get("session_token", f"session_{uuid.uuid4().hex}")
         expires_at = datetime.now(timezone.utc) + timedelta(days=7)
         
         await db.user_sessions.insert_one({
-            "user_id": user_id,
-            "session_token": session_token,
-            "expires_at": expires_at,
-            "created_at": datetime.now(timezone.utc)
+            "user_id": user_id, "session_token": session_token,
+            "expires_at": expires_at, "created_at": datetime.now(timezone.utc)
         })
         
-        # Set cookie
         response.set_cookie(
-            key="session_token",
-            value=session_token,
-            httponly=True,
-            secure=True,
-            samesite="none",
-            path="/",
-            max_age=7 * 24 * 60 * 60
+            key="session_token", value=session_token, httponly=True, secure=True,
+            samesite="none", path="/", max_age=7 * 24 * 60 * 60
         )
         
-        return {
-            "success": True,
-            "user": {
-                "user_id": user_id,
-                "email": auth_data["email"],
-                "name": auth_data["name"],
-                "picture": auth_data.get("picture"),
-                "role": role
-            }
-        }
+        return {"success": True, "user": {"user_id": user_id, "email": auth_data["email"], "name": auth_data["name"], "picture": auth_data.get("picture"), "role": role}}
     
     @router.get("/me")
     async def get_me(user: dict = Depends(get_current_user)):
-        """Get current authenticated user"""
-        return {
-            "user_id": user["user_id"],
-            "email": user["email"],
-            "name": user["name"],
-            "picture": user.get("picture"),
-            "role": user["role"],
-            "created_at": user.get("created_at")
-        }
+        return {"user_id": user["user_id"], "email": user["email"], "name": user["name"], "picture": user.get("picture"), "role": user["role"], "created_at": user.get("created_at")}
     
     @router.post("/logout")
     async def logout(request: Request, response: Response):
-        """Logout user and clear session"""
         session_token = request.cookies.get("session_token")
-        
         if session_token:
-            # Delete session from database
             await db.user_sessions.delete_many({"session_token": session_token})
-        
-        # Clear cookie
         response.delete_cookie(key="session_token", path="/")
-        
         return {"success": True, "message": "Logged out successfully"}
     
     @router.put("/password")
     async def change_password(data: PasswordChange, user: dict = Depends(get_current_user)):
-        """Change password for local auth users"""
         if user.get("auth_provider") != "local":
             raise HTTPException(status_code=400, detail="Cannot change password for Google accounts")
-        
-        # Get full user with password
         full_user = await db.users.find_one({"user_id": user["user_id"]}, {"_id": 0})
-        
         if not verify_password(data.current_password, full_user.get("password_hash", "")):
             raise HTTPException(status_code=401, detail="Current password is incorrect")
-        
-        # Update password
-        await db.users.update_one(
-            {"user_id": user["user_id"]},
-            {"$set": {"password_hash": hash_password(data.new_password)}}
-        )
-        
+        await db.users.update_one({"user_id": user["user_id"]}, {"$set": {"password_hash": hash_password(data.new_password)}})
         return {"success": True, "message": "Password changed successfully"}
-    
-    # ==================== User Management (Admin Only) ====================
     
     @router.get("/users")
     async def list_users(user: dict = Depends(require_role(INTERNAL_ADMIN_ROLES))):
-        """List all users (Admin only)"""
-        users = await db.users.find(
-            {},
-            {"_id": 0, "password_hash": 0}
-        ).to_list(1000)
-        
+        users = await db.users.find({}, {"_id": 0, "password_hash": 0}).to_list(1000)
         return {"users": users, "total": len(users)}
     
     @router.get("/users/{user_id}")
     async def get_user(user_id: str, user: dict = Depends(require_role(INTERNAL_ADMIN_ROLES))):
-        """Get specific user (Admin only)"""
-        target_user = await db.users.find_one(
-            {"user_id": user_id},
-            {"_id": 0, "password_hash": 0}
-        )
-        
+        target_user = await db.users.find_one({"user_id": user_id}, {"_id": 0, "password_hash": 0})
         if not target_user:
             raise HTTPException(status_code=404, detail="User not found")
-        
         return target_user
     
     @router.put("/users/{user_id}")
     async def update_user(user_id: str, data: UserUpdate, user: dict = Depends(require_role(INTERNAL_ADMIN_ROLES))):
-        """Update user role or name (Admin only)"""
         target_user = await db.users.find_one({"user_id": user_id}, {"_id": 0})
-        
         if not target_user:
             raise HTTPException(status_code=404, detail="User not found")
-        
         update_data = {}
         if data.name:
             update_data["name"] = data.name
         if data.role:
             if data.role not in ROLES:
-                raise HTTPException(status_code=400, detail=f"Invalid role. Choose from: {list(ROLES.keys())}")
-            # super_admin 역할 변경은 super_admin만 가능
+                raise HTTPException(status_code=400, detail=f"Invalid role")
             if data.role == "super_admin" and user["role"] != "super_admin":
                 raise HTTPException(status_code=403, detail="Only super_admin can assign super_admin role")
             update_data["role"] = data.role
-        
         if update_data:
-            await db.users.update_one(
-                {"user_id": user_id},
-                {"$set": update_data}
-            )
-        
+            await db.users.update_one({"user_id": user_id}, {"$set": update_data})
         return {"success": True, "updated": update_data}
     
     @router.delete("/users/{user_id}")
     async def delete_user(user_id: str, user: dict = Depends(require_role(INTERNAL_ADMIN_ROLES))):
-        """Delete user (Admin only)"""
         if user_id == user["user_id"]:
             raise HTTPException(status_code=400, detail="Cannot delete yourself")
-        
         target_user = await db.users.find_one({"user_id": user_id}, {"_id": 0})
         if target_user and target_user["role"] == "super_admin":
             raise HTTPException(status_code=403, detail="Cannot delete super_admin")
-        
         result = await db.users.delete_one({"user_id": user_id})
-        
         if result.deleted_count == 0:
             raise HTTPException(status_code=404, detail="User not found")
-        
-        # Delete user sessions
         await db.user_sessions.delete_many({"user_id": user_id})
-        
         return {"success": True, "deleted_user_id": user_id}
     
     @router.get("/roles")
     async def list_roles():
-        """List available roles"""
         return {"roles": ROLES}
-    
-    # ==================== User Approval (Admin Only) ====================
     
     @router.get("/pending")
     async def list_pending_users(user: dict = Depends(require_role(INTERNAL_ADMIN_ROLES))):
-        """List users pending approval (Admin only)"""
-        users = await db.users.find(
-            {"status": "pending"},
-            {"_id": 0, "password_hash": 0}
-        ).to_list(100)
-        
+        users = await db.users.find({"status": "pending"}, {"_id": 0, "password_hash": 0}).to_list(100)
         return {"users": users, "total": len(users)}
     
     @router.post("/users/{user_id}/approve")
     async def approve_user(user_id: str, user: dict = Depends(require_role(INTERNAL_ADMIN_ROLES))):
-        """Approve pending user (Admin only)"""
         target_user = await db.users.find_one({"user_id": user_id}, {"_id": 0})
-        
         if not target_user:
             raise HTTPException(status_code=404, detail="사용자를 찾을 수 없습니다")
-        
         if target_user.get("status") != "pending":
             raise HTTPException(status_code=400, detail="승인 대기 중인 사용자가 아닙니다")
-        
-        await db.users.update_one(
-            {"user_id": user_id},
-            {"$set": {
-                "status": "approved",
-                "approved_by": user["user_id"],
-                "approved_at": datetime.now(timezone.utc).isoformat()
-            }}
-        )
-        
+        await db.users.update_one({"user_id": user_id}, {"$set": {"status": "approved", "approved_by": user["user_id"], "approved_at": datetime.now(timezone.utc).isoformat()}})
         return {"success": True, "message": f"{target_user['name']}님의 가입이 승인되었습니다"}
     
     @router.post("/users/{user_id}/reject")
     async def reject_user(user_id: str, user: dict = Depends(require_role(INTERNAL_ADMIN_ROLES))):
-        """Reject pending user (Admin only)"""
         target_user = await db.users.find_one({"user_id": user_id}, {"_id": 0})
-        
         if not target_user:
             raise HTTPException(status_code=404, detail="사용자를 찾을 수 없습니다")
-        
         if target_user.get("status") != "pending":
             raise HTTPException(status_code=400, detail="승인 대기 중인 사용자가 아닙니다")
-        
-        await db.users.update_one(
-            {"user_id": user_id},
-            {"$set": {
-                "status": "rejected",
-                "rejected_by": user["user_id"],
-                "rejected_at": datetime.now(timezone.utc).isoformat()
-            }}
-        )
-        
+        await db.users.update_one({"user_id": user_id}, {"$set": {"status": "rejected", "rejected_by": user["user_id"], "rejected_at": datetime.now(timezone.utc).isoformat()}})
         return {"success": True, "message": f"{target_user['name']}님의 가입이 거부되었습니다"}
     
-    # Export dependencies for use in other routers
     router.get_current_user = get_current_user
     router.require_role = require_role
     
