@@ -145,37 +145,192 @@ export const MonitoringTab = () => {
         </Card>
       </div>
 
-      {/* Charts Row */}
+      {/* Charts Row - 실제 데이터 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Consumption Chart */}
+        {/* 실시간 시그널 추이 */}
         <Card className="bg-slate-800/50 border-slate-700">
           <CardHeader>
             <CardTitle className="text-slate-100 flex items-center gap-2">
-              <Activity className="w-5 h-5" /> 실시간 소비량
+              <TrendingUp className="w-5 h-5" /> 실시간 시그널 추이
             </CardTitle>
             <CardDescription className="text-slate-400">
-              특허6: ConsumptionMonitor 데이터
+              분석된 시그널 수 변화
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="h-64" data-testid="consumption-chart">
-              {history.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%" key={`chart-${history.length}`}>
-                  <AreaChart data={history}>
+            <div className="h-64" data-testid="signal-chart">
+              {chartData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={chartData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
                     <XAxis dataKey="time" stroke="#94a3b8" fontSize={10} />
                     <YAxis stroke="#94a3b8" fontSize={10} />
                     <RechartsTooltip 
                       contentStyle={{ background: '#1e293b', border: '1px solid #475569', borderRadius: '8px' }}
                     />
-                    <Area type="monotone" dataKey="public" stackId="1" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.6} name="공공" />
-                    <Area type="monotone" dataKey="productive" stackId="1" stroke="#10b981" fill="#10b981" fillOpacity={0.6} name="생산" />
-                    <Area type="monotone" dataKey="individual" stackId="1" stroke="#f59e0b" fill="#f59e0b" fillOpacity={0.6} name="개인" />
+                    <Area type="monotone" dataKey="signals" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.3} name="시그널 수" />
                   </AreaChart>
                 </ResponsiveContainer>
               ) : (
                 <div className="h-full flex items-center justify-center text-slate-500">
-                  데이터 로딩 중...
+                  <div className="text-center">
+                    <Activity className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                    <p>분석 데이터가 없습니다</p>
+                    <p className="text-sm">시그널분석 탭에서 분석을 시작하세요</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* 감성 분포 */}
+        <Card className="bg-slate-800/50 border-slate-700">
+          <CardHeader>
+            <CardTitle className="text-slate-100 flex items-center gap-2">
+              <Activity className="w-5 h-5" /> 감성 분포
+            </CardTitle>
+            <CardDescription className="text-slate-400">
+              분석된 시그널의 감성 현황
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-64" data-testid="sentiment-chart">
+              {sentimentChartData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={sentimentChartData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={50}
+                      outerRadius={80}
+                      paddingAngle={2}
+                      dataKey="value"
+                    >
+                      {sentimentChartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <RechartsTooltip 
+                      contentStyle={{ background: '#1e293b', border: '1px solid #475569', borderRadius: '8px' }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-full flex items-center justify-center text-slate-500">
+                  <div className="text-center">
+                    <Radio className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                    <p>감성 데이터가 없습니다</p>
+                  </div>
+                </div>
+              )}
+            </div>
+            {sentimentChartData.length > 0 && (
+              <div className="flex justify-center gap-4 mt-2">
+                {sentimentChartData.map((item, idx) => (
+                  <div key={idx} className="flex items-center gap-1">
+                    <div className="w-3 h-3 rounded-full" style={{ background: item.color }} />
+                    <span className="text-slate-400 text-xs">{item.name}: {item.value}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* 시그널 유형별 통계 */}
+      {Object.keys(bySignalType).length > 0 && (
+        <Card className="bg-slate-800/50 border-slate-700">
+          <CardHeader>
+            <CardTitle className="text-slate-100 flex items-center gap-2">
+              <Zap className="w-5 h-5" /> 시그널 유형별 분포
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+              {Object.entries(bySignalType).map(([type, count]) => (
+                <div key={type} className="bg-slate-900/50 rounded-lg p-3 text-center">
+                  <p className="text-xl font-bold text-violet-400">{count}</p>
+                  <p className="text-slate-400 text-xs truncate">{type}</p>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* 최근 처리 이력 */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* 최근 분석 */}
+        <Card className="bg-slate-800/50 border-slate-700">
+          <CardHeader>
+            <CardTitle className="text-slate-100 flex items-center gap-2">
+              <Clock className="w-5 h-5" /> 최근 분석 이력
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {recentSignals.length > 0 ? (
+              <div className="space-y-2 max-h-64 overflow-y-auto">
+                {recentSignals.map((signal, idx) => (
+                  <div key={idx} className="flex items-center justify-between bg-slate-900/50 rounded p-2 text-sm">
+                    <div className="flex items-center gap-2">
+                      <span className="text-slate-500 text-xs">{signal.time_display}</span>
+                      <Badge variant="outline" className="text-xs">{signal.signal_type_label}</Badge>
+                    </div>
+                    <Badge className={`text-xs ${
+                      signal.overall_sentiment === 'positive' ? 'bg-green-600' :
+                      signal.overall_sentiment === 'negative' ? 'bg-red-600' :
+                      signal.overall_sentiment === 'mixed' ? 'bg-purple-600' :
+                      'bg-slate-600'
+                    }`}>
+                      {signal.overall_sentiment}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-slate-500">
+                <Clock className="w-10 h-10 mx-auto mb-2 opacity-50" />
+                <p>분석 이력이 없습니다</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* 최근 자산화 */}
+        <Card className="bg-slate-800/50 border-slate-700">
+          <CardHeader>
+            <CardTitle className="text-slate-100 flex items-center gap-2">
+              <Database className="w-5 h-5" /> 최근 자산화 이력
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {recentAssets.length > 0 ? (
+              <div className="space-y-2 max-h-64 overflow-y-auto">
+                {recentAssets.map((asset, idx) => (
+                  <div key={idx} className="flex items-center justify-between bg-slate-900/50 rounded p-2 text-sm">
+                    <div className="flex items-center gap-2">
+                      <span className="text-slate-500 text-xs">{asset.time_display}</span>
+                      <span className="text-slate-400 text-xs font-mono">{asset.asset_id}</span>
+                    </div>
+                    <Badge variant="outline" className="text-xs">{asset.signal_type}</Badge>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-slate-500">
+                <Database className="w-10 h-10 mx-auto mb-2 opacity-50" />
+                <p>자산화 이력이 없습니다</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+};
                 </div>
               )}
             </div>
