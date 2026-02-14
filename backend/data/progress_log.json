@@ -1,15 +1,5 @@
 [
   {
-    "timestamp": "2026-02-14T13:51:45.340019",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
     "timestamp": "2026-02-14T13:51:46.402328",
     "phase": "데이터소스",
     "action": "데이터 수집",
@@ -9995,6 +9985,14 @@
     "action": "폴링 중지",
     "data": {
       "source_id": "ds_787c194e"
+    }
+  },
+  {
+    "timestamp": "2026-02-14T14:10:08.449019",
+    "phase": "데이터소스",
+    "action": "폴링 중지",
+    "data": {
+      "source_id": "ds_0a6c69cb"
     }
   }
 ]
