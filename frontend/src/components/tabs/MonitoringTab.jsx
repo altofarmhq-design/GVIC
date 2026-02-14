@@ -5,27 +5,28 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { 
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, 
-  CartesianGrid, Tooltip as RechartsTooltip, AreaChart, Area
+  CartesianGrid, Tooltip as RechartsTooltip, AreaChart, Area, PieChart, Pie, Cell
 } from 'recharts';
-import { Activity, Radio, AlertTriangle, CheckCircle, RefreshCw, Pause, Play } from 'lucide-react';
+import { Activity, Radio, AlertTriangle, CheckCircle, RefreshCw, Zap, Database, Clock, TrendingUp } from 'lucide-react';
 import { MetricCard } from "@/components/MetricCard";
 import { api } from "@/lib/api";
+import axios from "axios";
+
+const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export const MonitoringTab = () => {
-  const [monitoring, setMonitoring] = useState(null);
-  const [distribution, setDistribution] = useState(null);
+  const [signalStats, setSignalStats] = useState(null);
   const [isLive, setIsLive] = useState(true);
   const [loading, setLoading] = useState(false);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [monRes, distRes] = await Promise.all([
-        api.getRealtimeMonitoring(),
-        api.getDistributionMonitor()
-      ]);
-      setMonitoring(monRes.data);
-      setDistribution(distRes.data);
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${API_URL}/api/monitor/signals`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      setSignalStats(response.data);
     } catch (error) {
       console.error("Monitoring fetch error:", error);
     }
@@ -36,17 +37,41 @@ export const MonitoringTab = () => {
     fetchData();
   }, [fetchData]);
 
-  // 실시간 폴링
+  // 실시간 폴링 (3초)
   useEffect(() => {
     if (!isLive) return;
-    const interval = setInterval(fetchData, 2000); // 2초마다 업데이트
+    const interval = setInterval(fetchData, 3000);
     return () => clearInterval(interval);
   }, [isLive, fetchData]);
 
-  const current = monitoring?.current || {};
-  const history = useMemo(() => monitoring?.history || [], [monitoring?.history]);
-  const efficiency = (current.efficiency || 0) * 100;
-  const status = current.status || "unknown";
+  // 실제 데이터
+  const totalAnalyzed = signalStats?.total_analyzed || 0;
+  const totalAssets = signalStats?.total_assets || 0;
+  const successRate = (signalStats?.success_rate || 0) * 100;
+  const lastHourCount = signalStats?.last_hour_count || 0;
+  const status = signalStats?.status || "idle";
+  const chartData = signalStats?.chart_data || [];
+  const recentSignals = signalStats?.recent_signals || [];
+  const recentAssets = signalStats?.recent_assets || [];
+  const bySignalType = signalStats?.by_signal_type || {};
+  const bySentiment = signalStats?.by_sentiment || {};
+
+  // 감성 차트 데이터
+  const sentimentChartData = [
+    { name: '긍정', value: bySentiment.positive || 0, color: '#10b981' },
+    { name: '혼합', value: bySentiment.mixed || 0, color: '#8b5cf6' },
+    { name: '중립', value: bySentiment.neutral || 0, color: '#3b82f6' },
+    { name: '부정', value: bySentiment.negative || 0, color: '#ef4444' }
+  ].filter(d => d.value > 0);
+
+  // 상태 표시
+  const statusConfig = {
+    active: { label: '활발', color: 'bg-emerald-500', icon: CheckCircle },
+    normal: { label: '정상', color: 'bg-blue-500', icon: Activity },
+    low: { label: '저조', color: 'bg-yellow-500', icon: AlertTriangle },
+    idle: { label: '대기', color: 'bg-slate-500', icon: Radio }
+  };
+  const currentStatus = statusConfig[status] || statusConfig.idle;
 
   return (
     <div className="space-y-6">
