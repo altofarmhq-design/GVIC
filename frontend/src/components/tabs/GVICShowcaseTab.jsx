@@ -442,19 +442,44 @@ export const GVICShowcaseTab = () => {
 
 // ==================== 자산 저장소 뷰 ====================
 const AssetStorageView = ({ assets, stats, searchQuery, setSearchQuery, onRefresh }) => {
-  const filteredAssets = assets.filter(a => 
-    a.content?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const [selectedAsset, setSelectedAsset] = useState(null);
+  
+  // 서버 사이드 검색을 위해 debounce 적용 가능하지만, 
+  // 현재는 로드된 데이터에서 클라이언트 검색
+  // 모듈화된 데이터 검색 (원시 content가 아닌 모듈 데이터)
+  const filteredAssets = assets.filter(a => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    
+    // 모듈화된 데이터에서 검색
+    return (
+      // 시그널 유형
+      a.signal_type_label?.toLowerCase().includes(q) ||
+      // 요약
+      a.summary?.toLowerCase().includes(q) ||
+      // 주요 테마
+      a.key_themes?.some(theme => theme.toLowerCase().includes(q)) ||
+      // 시그널 텍스트들
+      a.signal_texts?.some(text => text.toLowerCase().includes(q)) ||
+      // 시그널 유형들
+      a.signal_types?.some(type => type.toLowerCase().includes(q)) ||
+      // 숨겨진 의미
+      a.hidden_meanings?.some(hm => hm.toLowerCase().includes(q)) ||
+      // 모듈/자산 ID
+      a.module_id?.toLowerCase().includes(q) ||
+      a.asset_id?.toLowerCase().includes(q)
+    );
+  });
 
   return (
     <div className="flex-1 flex flex-col gap-4">
       {/* 통계 */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-5 gap-4">
         <Card className="bg-slate-800/50 border-slate-700">
           <CardContent className="py-4 text-center">
             <Database className="w-8 h-8 text-violet-400 mx-auto mb-2" />
             <p className="text-2xl font-bold text-white">{stats?.total || 0}</p>
-            <p className="text-slate-400 text-sm">총 자산</p>
+            <p className="text-slate-400 text-sm">총 모듈</p>
           </CardContent>
         </Card>
         <Card className="bg-slate-800/50 border-slate-700">
@@ -462,6 +487,13 @@ const AssetStorageView = ({ assets, stats, searchQuery, setSearchQuery, onRefres
             <CheckCircle2 className="w-8 h-8 text-green-400 mx-auto mb-2" />
             <p className="text-2xl font-bold text-green-400">{stats?.positive || 0}</p>
             <p className="text-slate-400 text-sm">긍정</p>
+          </CardContent>
+        </Card>
+        <Card className="bg-slate-800/50 border-slate-700">
+          <CardContent className="py-4 text-center">
+            <Layers className="w-8 h-8 text-purple-400 mx-auto mb-2" />
+            <p className="text-2xl font-bold text-purple-400">{stats?.mixed || 0}</p>
+            <p className="text-slate-400 text-sm">혼합</p>
           </CardContent>
         </Card>
         <Card className="bg-slate-800/50 border-slate-700">
@@ -480,21 +512,37 @@ const AssetStorageView = ({ assets, stats, searchQuery, setSearchQuery, onRefres
         </Card>
       </div>
 
+      {/* 시그널 유형별 통계 */}
+      {stats?.by_signal_type && Object.keys(stats.by_signal_type).length > 0 && (
+        <Card className="bg-slate-800/50 border-slate-700">
+          <CardContent className="py-3">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-slate-400 text-sm">시그널 유형:</span>
+              {Object.entries(stats.by_signal_type).map(([type, count]) => (
+                <Badge key={type} variant="outline" className="text-xs text-slate-300 border-slate-600">
+                  {type}: {count}
+                </Badge>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* 검색 및 목록 */}
       <Card className="flex-1 bg-slate-800/50 border-slate-700">
         <CardHeader className="pb-3 flex flex-row items-center justify-between">
           <CardTitle className="text-slate-100 text-lg flex items-center gap-2">
             <Database className="w-5 h-5 text-violet-400" />
-            자산 목록
+            자산화된 모듈 목록
           </CardTitle>
           <div className="flex gap-2">
             <div className="relative">
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <Input
-                placeholder="검색..."
+                placeholder="시그널, 테마, 요약 검색..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 w-64 bg-slate-900 border-slate-600"
+                className="pl-9 w-72 bg-slate-900 border-slate-600"
               />
             </div>
             <Button variant="outline" onClick={onRefresh} size="sm">
@@ -507,31 +555,118 @@ const AssetStorageView = ({ assets, stats, searchQuery, setSearchQuery, onRefres
             {filteredAssets.length === 0 ? (
               <div className="text-center py-12 text-slate-500">
                 <Database className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p>저장된 자산이 없습니다</p>
+                <p>저장된 모듈이 없습니다</p>
                 <p className="text-sm">시그널 분석 후 "자산 저장" 버튼을 클릭하세요</p>
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {filteredAssets.map((asset, idx) => (
-                  <div key={asset.asset_id || idx} className="bg-slate-900/50 rounded-lg p-3 flex items-center gap-4">
-                    <div className={`
-                      w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold
-                      ${asset.classification === '긍정' ? 'bg-green-900/50 text-green-400' :
-                        asset.classification === '부정' ? 'bg-red-900/50 text-red-400' :
-                        'bg-yellow-900/50 text-yellow-400'}
-                    `}>
-                      {asset.score || '-'}
+                  <div 
+                    key={asset.asset_id || idx} 
+                    className="bg-slate-900/50 rounded-lg p-4 border border-slate-700 hover:border-violet-500/50 cursor-pointer transition-colors"
+                    onClick={() => setSelectedAsset(selectedAsset?.asset_id === asset.asset_id ? null : asset)}
+                  >
+                    {/* 헤더 */}
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <Badge className={`text-xs ${
+                          asset.overall_sentiment === 'positive' ? 'bg-green-600' :
+                          asset.overall_sentiment === 'negative' ? 'bg-red-600' :
+                          asset.overall_sentiment === 'mixed' ? 'bg-purple-600' :
+                          'bg-yellow-600'
+                        }`}>
+                          {asset.classification || asset.overall_sentiment || '미분류'}
+                        </Badge>
+                        <Badge variant="outline" className="text-xs text-blue-400 border-blue-600">
+                          {asset.signal_type_label || '알 수 없음'}
+                        </Badge>
+                        <span className="text-slate-500 text-xs">
+                          {asset.signal_count || 0}개 시그널
+                        </span>
+                      </div>
+                      <span className="text-slate-600 text-xs font-mono">{asset.asset_id}</span>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-slate-200 text-sm truncate">{asset.content}</p>
-                      <p className="text-slate-500 text-xs font-mono">{asset.asset_id}</p>
-                    </div>
-                    <Badge className={
-                      asset.classification === '긍정' ? 'bg-green-600' :
-                      asset.classification === '부정' ? 'bg-red-600' : 'bg-yellow-600'
-                    }>
-                      {asset.classification || '미분류'}
-                    </Badge>
+
+                    {/* 요약 */}
+                    <p className="text-slate-200 text-sm mb-2">{asset.summary || '요약 없음'}</p>
+
+                    {/* 주요 테마 */}
+                    {asset.key_themes?.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mb-2">
+                        {asset.key_themes.map((theme, i) => (
+                          <Badge key={i} variant="outline" className="text-xs text-amber-400 border-amber-600">
+                            <Tag className="w-3 h-3 mr-1" />
+                            {theme}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* 확장 상세 정보 */}
+                    {selectedAsset?.asset_id === asset.asset_id && (
+                      <div className="mt-3 pt-3 border-t border-slate-700 space-y-3">
+                        {/* 발견된 시그널들 */}
+                        {asset.discovered_signals?.length > 0 && (
+                          <div>
+                            <p className="text-slate-400 text-xs mb-2 flex items-center gap-1">
+                              <Zap className="w-3 h-3" /> 발견된 시그널
+                            </p>
+                            <div className="space-y-2">
+                              {asset.discovered_signals.map((sig, sidx) => (
+                                <div key={sidx} className="bg-slate-800 rounded p-2 text-xs">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <Badge variant="outline" className={`text-xs ${
+                                      sig.sentiment === 'positive' ? 'text-green-400 border-green-600' :
+                                      sig.sentiment === 'negative' ? 'text-red-400 border-red-600' :
+                                      'text-slate-400 border-slate-600'
+                                    }`}>
+                                      {sig.sentiment}
+                                    </Badge>
+                                    <span className="text-slate-500">{sig.type}</span>
+                                    <span className="text-slate-600">강도: {(sig.intensity * 100).toFixed(0)}%</span>
+                                  </div>
+                                  <p className="text-slate-300">"{sig.text}"</p>
+                                  {sig.hidden_meaning && (
+                                    <p className="text-violet-400 mt-1 flex items-start gap-1">
+                                      <Lightbulb className="w-3 h-3 mt-0.5 flex-shrink-0" />
+                                      {sig.hidden_meaning}
+                                    </p>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* 3관점 분석 */}
+                        {asset.applicable_perspectives && (
+                          <div>
+                            <p className="text-slate-400 text-xs mb-1">3관점 적용</p>
+                            <div className="flex gap-2">
+                              <Badge variant="outline" className={asset.applicable_perspectives?.society ? 'text-blue-400 border-blue-600' : 'text-slate-600 border-slate-700'}>
+                                🏛️ 사회
+                              </Badge>
+                              <Badge variant="outline" className={asset.applicable_perspectives?.production ? 'text-emerald-400 border-emerald-600' : 'text-slate-600 border-slate-700'}>
+                                🏭 생산
+                              </Badge>
+                              <Badge variant="outline" className={asset.applicable_perspectives?.consumer ? 'text-amber-400 border-amber-600' : 'text-slate-600 border-slate-700'}>
+                                👤 소비자
+                              </Badge>
+                            </div>
+                            {asset.perspective_relevance && (
+                              <p className="text-slate-500 text-xs mt-1">{asset.perspective_relevance}</p>
+                            )}
+                          </div>
+                        )}
+
+                        {/* 메타데이터 */}
+                        <div className="flex gap-4 text-xs text-slate-500">
+                          <span>모듈: {asset.module_id}</span>
+                          <span>입력: {asset.input_id}</span>
+                          <span>생성: {asset.created_at?.slice(0, 10)}</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
