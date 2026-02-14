@@ -2319,5 +2319,32 @@
     "phase": "알림",
     "action": "헬스체크 실행",
     "data": {}
+  },
+  {
+    "timestamp": "2026-02-14T13:31:55.514051",
+    "phase": "데이터소스",
+    "action": "소스 등록",
+    "data": {
+      "source_id": "ds_787c194e",
+      "name": "올리브영"
+    }
+  },
+  {
+    "timestamp": "2026-02-14T13:32:07.566426",
+    "phase": "데이터소스",
+    "action": "폴링 시작",
+    "data": {
+      "source_id": "ds_787c194e"
+    }
+  },
+  {
+    "timestamp": "2026-02-14T13:32:07.890433",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
   }
 ]
