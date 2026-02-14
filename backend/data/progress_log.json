@@ -1960,5 +1960,14 @@
       "records": 1000,
       "pdf": "/app/backend/data/reports/GVIC_Report_20260214_104928.pdf"
     }
+  },
+  {
+    "timestamp": "2026-02-14T11:27:57.103751",
+    "phase": "예측",
+    "action": "분석 완료",
+    "data": {
+      "confidence": 0.7249828950751247,
+      "adjustment_needed": true
+    }
   }
 ]
