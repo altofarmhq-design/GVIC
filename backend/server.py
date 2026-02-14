@@ -823,6 +823,79 @@ async def get_realtime_monitoring():
         "last_update": monitoring_data["last_update"]
     }
 
+@api_router.get("/monitor/signals")
+async def get_signal_monitoring():
+    """실시간 시그널 모니터링 - 실제 데이터"""
+    return get_realtime_signal_stats()
+
+@api_router.get("/dashboard/realstats")
+async def get_real_dashboard_stats():
+    """대시보드 실제 통계"""
+    # 실제 시그널 통계
+    signal_stats = get_realtime_signal_stats()
+    
+    # MongoDB에서 실제 자산 통계
+    try:
+        total_assets = await db.gvic_assets.count_documents({})
+        positive_assets = await db.gvic_assets.count_documents({"classification": "긍정"})
+        negative_assets = await db.gvic_assets.count_documents({"classification": "부정"})
+        mixed_assets = await db.gvic_assets.count_documents({"classification": "혼합"})
+        neutral_assets = await db.gvic_assets.count_documents({"classification": "중립"})
+        
+        # 시그널 유형별 통계
+        signal_type_pipeline = [
+            {"$group": {"_id": "$signal_type_label", "count": {"$sum": 1}}},
+            {"$sort": {"count": -1}},
+            {"$limit": 10}
+        ]
+        signal_types = {}
+        async for doc in db.gvic_assets.aggregate(signal_type_pipeline):
+            if doc["_id"]:
+                signal_types[doc["_id"]] = doc["count"]
+        
+        # 최근 처리 이력
+        recent_cursor = db.gvic_assets.find({}, {"_id": 0, "asset_id": 1, "signal_type_label": 1, "classification": 1, "created_at": 1}).sort("created_at", -1).limit(10)
+        recent_assets = await recent_cursor.to_list(length=10)
+        
+    except Exception as e:
+        total_assets = 0
+        positive_assets = 0
+        negative_assets = 0
+        mixed_assets = 0
+        neutral_assets = 0
+        signal_types = {}
+        recent_assets = []
+    
+    return {
+        # 실시간 분석 현황
+        "realtime": {
+            "total_analyzed": signal_stats["total_analyzed"],
+            "last_hour_count": signal_stats["last_hour_count"],
+            "success_rate": signal_stats["success_rate"],
+            "status": signal_stats["status"]
+        },
+        # 자산 현황
+        "assets": {
+            "total": total_assets,
+            "positive": positive_assets,
+            "negative": negative_assets,
+            "mixed": mixed_assets,
+            "neutral": neutral_assets
+        },
+        # 시그널 유형별
+        "by_signal_type": signal_types,
+        # 감성별
+        "by_sentiment": signal_stats["by_sentiment"],
+        # 최근 처리
+        "recent_assets": recent_assets,
+        # 차트 데이터
+        "chart_data": signal_stats["chart_data"],
+        # 최근 시그널
+        "recent_signals": signal_stats["recent_signals"],
+        # 업데이트 시간
+        "last_update": signal_stats["last_update"] or datetime.now(timezone.utc).isoformat()
+    }
+
 @api_router.get("/monitor/distribution")
 async def get_distribution_monitor():
     """분배 상태 모니터링"""
