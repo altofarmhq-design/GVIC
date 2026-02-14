@@ -158,7 +158,7 @@ export const GVICShowcaseTab = () => {
             onClick={() => setActiveView("assets")}
             className="gap-2"
           >
-            <Database className="w-4 h-4" /> 자산 저장소
+            <Database className="w-4 h-4" /> 자산화창고
           </Button>
         </div>
       </div>
