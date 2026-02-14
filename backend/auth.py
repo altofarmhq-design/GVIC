@@ -9,14 +9,11 @@ from fastapi import APIRouter, HTTPException, Depends, Request, Response
 from pydantic import BaseModel, EmailStr, Field
 from typing import Optional, List
 from datetime import datetime, timezone, timedelta
-from passlib.context import CryptContext
+import bcrypt
 from jose import JWTError, jwt
 import uuid
 import httpx
 import os
-
-# Password hashing
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # JWT settings
 JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "gvic-engine-secret-key-change-in-production")
