@@ -2010,5 +2010,108 @@
       "V_ind_max": 0.5,
       "sum_constraint": 1.0
     }
+  },
+  {
+    "timestamp": "2026-02-14T13:03:05.698684",
+    "phase": "데이터소스",
+    "action": "소스 등록",
+    "data": {
+      "source_id": "ds_1d6c4a15",
+      "name": "https://www.amazon.com/-/ko/"
+    }
+  },
+  {
+    "timestamp": "2026-02-14T13:03:20.272882",
+    "phase": "데이터소스",
+    "action": "폴링 시작",
+    "data": {
+      "source_id": "ds_1d6c4a15"
+    }
+  },
+  {
+    "timestamp": "2026-02-14T13:03:20.765333",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_1d6c4a15",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T13:03:22.002703",
+    "phase": "데이터소스",
+    "action": "폴링 시작",
+    "data": {
+      "source_id": "ds_0a6c69cb"
+    }
+  },
+  {
+    "timestamp": "2026-02-14T13:03:23.702783",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T13:03:24.592510",
+    "phase": "데이터소스",
+    "action": "폴링 시작",
+    "data": {
+      "source_id": "ds_a3ae82f3"
+    }
+  },
+  {
+    "timestamp": "2026-02-14T13:03:24.662838",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_a3ae82f3",
+      "success": true,
+      "value": 1.0
+    }
+  },
+  {
+    "timestamp": "2026-02-14T13:04:21.271335",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_1d6c4a15",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T13:04:24.758153",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_a3ae82f3",
+      "success": true,
+      "value": 1.0
+    }
+  },
+  {
+    "timestamp": "2026-02-14T13:04:25.850010",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_0a6c69cb",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T13:05:21.825488",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_1d6c4a15",
+      "success": false,
+      "value": null
+    }
   }
 ]
