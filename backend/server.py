@@ -3564,6 +3564,12 @@ class GVICAssetCreate(BaseModel):
     rating: int
     analysis_result: Dict[str, Any]
 
+class GVICAssetCreateV2(BaseModel):
+    content: str
+    rating: int = 5
+    analysis_result: dict
+    visibility: str = "showcase"  # "showcase" (공개) or "private" (유료요구자 전용)
+
 @api_router.post("/gvic-assets")
 async def create_gvic_asset(
     request: GVICAssetCreate,
@@ -3573,14 +3579,20 @@ async def create_gvic_asset(
     try:
         result = request.analysis_result
         
+        # 유료 요구자 여부 확인 (role 기반 또는 별도 필드로 관리)
+        # 유료 요구자: ext_admin, ext_operator 등 외부 역할 또는 별도 표시
+        user_role = current_user.get("role", "visitor")
+        is_paid_requester = user_role in ["ext_admin", "ext_operator"] or current_user.get("is_paid", False)
+        
+        # 기본 visibility 결정: 유료 요구자는 private, 그 외는 showcase
+        visibility = "private" if is_paid_requester else "showcase"
+        
         # AI 분석 결과인지 기존 키워드 분석 결과인지 확인
         is_ai_result = "signal_type" in result and "discovered_signals" in result
         
         if is_ai_result:
-            # AI 분석 결과에서 모듈화된 데이터 추출
             discovered_signals = result.get("discovered_signals", [])
             
-            # 감성 분류 결정
             overall_sentiment = result.get("overall_sentiment", "neutral")
             if overall_sentiment == "positive":
                 classification = "긍정"
@@ -3591,44 +3603,39 @@ async def create_gvic_asset(
             else:
                 classification = "중립"
             
-            # 시그널 텍스트 추출 (검색용)
             signal_texts = [sig.get("text", "") for sig in discovered_signals]
             signal_types = list(set([sig.get("type", "") for sig in discovered_signals]))
             hidden_meanings = [sig.get("hidden_meaning", "") for sig in discovered_signals if sig.get("hidden_meaning")]
             
             asset = {
                 "asset_id": f"AST_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}_{uuid.uuid4().hex[:6].upper()}",
-                # 원시 데이터
                 "raw_content": request.content,
                 "content_length": len(request.content),
-                # 모듈화된 핵심 데이터 (검색 대상)
                 "module_id": result.get("module_id"),
                 "input_id": result.get("input_id"),
                 "signal_type": result.get("signal_type"),
                 "signal_type_label": result.get("signal_type_label"),
                 "signal_count": result.get("signal_count", 0),
                 "discovered_signals": discovered_signals,
-                "signal_texts": signal_texts,  # 검색용 시그널 텍스트 배열
-                "signal_types": signal_types,  # 검색용 시그널 유형 배열
-                "hidden_meanings": hidden_meanings,  # 검색용 숨겨진 의미 배열
-                # 분석 요약
+                "signal_texts": signal_texts,
+                "signal_types": signal_types,
+                "hidden_meanings": hidden_meanings,
                 "summary": result.get("summary", ""),
                 "key_themes": result.get("key_themes", []),
                 "overall_sentiment": overall_sentiment,
                 "classification": classification,
-                # 3관점 분석
                 "applicable_perspectives": result.get("applicable_perspectives", {}),
                 "perspective_relevance": result.get("perspective_relevance", ""),
-                # 메타데이터
                 "created_by": current_user.get("user_id"),
                 "created_at": datetime.now(timezone.utc).isoformat(),
                 "used_count": 0,
                 "used_for": [],
-                # 전체 분석 결과 보관
-                "full_analysis": result
+                "full_analysis": result,
+                # 접근 제어
+                "visibility": visibility,
+                "owner_id": current_user.get("user_id")
             }
         else:
-            # 기존 키워드 분석 결과 호환 (레거시)
             steps = result.get("steps", {})
             step5 = steps.get("step5_output", {})
             step4 = steps.get("step4_convergence", {})
@@ -3654,7 +3661,9 @@ async def create_gvic_asset(
                 "created_by": current_user.get("user_id"),
                 "created_at": datetime.now(timezone.utc).isoformat(),
                 "used_count": 0,
-                "used_for": []
+                "used_for": [],
+                "visibility": visibility,
+                "owner_id": current_user.get("user_id")
             }
         
         await db.gvic_assets.insert_one(asset)
