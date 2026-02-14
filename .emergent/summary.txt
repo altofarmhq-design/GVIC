@@ -1,177 +1,270 @@
 <analysis>**original_problem_statement:**
-사용자는 Streamlit GVIC Engine 대시보드를 React/FastAPI 애플리케이션으로 전환해달라고 요청했습니다. 7개의 핵심 특허 로직을 구현했으며, 이후 사용자 인증, 역할 관리(RBAC), 외부 데이터 연동 기능이 추가되었습니다.
+The user's initial goal was to migrate a Streamlit application to a React/FastAPI stack. Over several sessions, the focus has shifted dramatically.
 
-최근 사용자는 시스템의 실제 운영 가능성을 검증하기 위해 다음과 같은 기능을 요청했습니다.
-1.  실제 데이터(웹사이트 리뷰)를 이용한 시스템 테스트.
-2.  표준화된 입력/출력 구조 설계: 외부 시스템의 다양한 신호(시그널)를 표준화된 포맷으로 수용하는 **입력 어댑터**와, 분석 결과를 PDF 등 표준화된 형태로 출력하는 **출력 어댑터** 구현.
-3.  분석 파이프라인 대시보드 연동: URL을 입력하면 실시간으로 데이터를 분석하고, 그 결과가 **모든 대시보드 탭에 동기화**되어 관련 지표들이 동시에 업데이트되는 기능 구현.
+The primary requests during this session were:
+1.  **Local Environment Stability**: Create Windows batch () files to simplify starting/stopping the application, and resolve persistent local dependency and execution issues.
+2.  **Core Philosophy Implementation**: The user, upon understanding the system's hardcoded keyword-based logic, articulated a profound philosophical shift for the GVIC engine. They rejected the static keyword approach, demanding a system that can:
+    *   **Dynamically discover signals** from any text without a predefined list.
+    *   **First, identify the signal's TYPE** (e.g., product review, system requirement, customer complaint) before attempting analysis.
+    *   **Modularize the discovered signals** into a structured format, capturing nuance and hidden meaning (like resigned satisfaction).
+    *   **Implement a robust ID system** for complete traceability, assigning unique IDs to requesters (users), inputs, modules (the analysis of an input), and individual signals within a module.
+3.  **Feature Development**:
+    *   **Signal Tracer**: A tool to visualize how a single piece of text is processed by the GVIC engine, step-by-step.
+    *   **GVIC Showcase**: An expansion of the tracer to demonstrate the entire value chain: Signal Flow -> Assetization (storage) -> Asset Utilization.
 
 **User's preferred language**:
 Korean (사용자가 한국어로 소통하고 있으므로, 다음 에이전트는 반드시 한국어로 응답해야 합니다.)
 
 **what currently exists?**
-- React(프론트엔드), FastAPI(백엔드), MongoDB 기반의 풀스택 애플리케이션입니다.
-- 핵심 특허 로직(P0-P3), 외부 데이터 소스 연동(P4), 사용자 인증 및 RBAC(P5) 기능이 구현되어 있습니다.
-- 사용자의 요청에 따라, **입력/출력 어댑터**의 개념 증명(PoC)이 구현되었습니다.
-    - **입력**: 대시보드에서 URL을 입력받아 웹 페이지의 내용을 분석 데이터로 사용합니다.
-    - **출력**: 분석 결과를 요약하여 PDF 리포트로 생성하고 다운로드할 수 있습니다.
-- 분석 결과를 모든 탭에 연동하기 위한 **중앙 데이터 저장소()**가 백엔드에 도입되었습니다.
-- 분석 파이프라인 실행 시, 결과 데이터가 에 저장됩니다.
-- **메인 대시보드 탭**은 와 연동되어 분석 결과를 실시간으로 보여주도록 업데이트되었습니다.
+- The user's local Windows environment is finally functional after extensive troubleshooting of virtual environments, dependencies (, , etc.), and file encodings.
+- A suite of  scripts exists in  to manage the local application.
+- **A new, AI-driven analysis backend has been implemented**, replacing the old hardcoded keyword system.
+    - A new  endpoint uses the **Emergent LLM Key (OpenAI)** to perform analysis.
+    - A new  module handles the AI interaction.
+    - The new API can **detect the signal type** (e.g., product review, requirement) and **extract nuanced signals**, including hidden context.
+- **A comprehensive ID and data model system has been created** in  to ensure full traceability for inputs, modules, and signals, linking them back to the user.
+- **Two new frontend features have been created (but only one is fully updated):**
+    - : A basic version was created and then superseded.
+    - : A sophisticated UI to visualize the GVIC pipeline. It currently makes calls to the *old* keyword-based API and needs to be updated to use the new AI-driven backend.
 
 **Last working item**:
-- Last item agent was working: 사용자의 분석 결과가 모든 대시보드 탭에 연동되어야 한다는 요청에 따라, 중앙 데이터 저장소인 를 구현하고 분석 파이프라인과 연동했습니다. 이후 메인 대시보드 탭()을 수정하여 의 데이터를 표시하도록 업데이트했습니다.
+- Last item agent was working: The agent had just received the user's request to update the  to reflect the newly implemented AI-based analysis engine and its comprehensive ID hierarchy. It began by overwriting the  file, presumably with a new version.
 - Status: IN PROGRESS
-- Agent Testing Done: Y (백엔드 API는 로 테스트 완료, 프론트엔드 는 스크린샷으로 확인 완료)
-- Which testing method agent to use? Frontend testing agent (모든 탭들이 DataHub와 올바르게 연동되는지 확인하기 위해)
+- Agent Testing Done: Y (The new backend AI API and ID system were thoroughly tested via . The frontend is not yet tested with the new backend.)
+- Which testing method agent to use? Frontend testing agent (to verify the  correctly calls the new AI API and displays the complex, nested results, including all IDs).
 - User Testing Done: N
 
 **All Pending/In progress Issue list**:
-  - Issue 1: 나머지 프론트엔드 탭들을 와 연동 (Priority: P0)
-  - Issue 2: 비적합 데이터 판정 로직 오류 수정 (Priority: P1)
-  
-  Issues Detail:
-  - Issue 1: 
-     - Attempted fixes: 메인 대시보드 탭()만 와 연동되었습니다.
-     - Next debug checklist: , ,  등 나머지 모든 탭 컴포넌트들을 수정하여, 각각에 해당하는 신규 API 엔드포인트( 등)를 호출하고 의 데이터를 표시하도록 만들어야 합니다.
-     - Why fix this issue and what will be achieved with the fix?: 사용자의 핵심 요구사항인 하나의 분석으로 모든 대시보드가 동기화되는 경험을 완성할 수 있습니다.
-     - Status:  IN PROGRESS
-     - Is recurring issue? N
-     - Should Test frontend/backend/both after fix? frontend
-     - Blocked on other issue: 없음
+  - Issue 1: Update  to use the new AI backend (Priority: P0)
+  - Issue 2: Recurring React  Runtime Error (Priority: P1)
+  - Issue 3: Finalize user's local environment updates (Priority: P2)
+  - Issue 4: Verify PDF download and Korean character functionality (Priority: P3)
 
-  - Issue 2: 
-     - Attempted fixes: 없음. 실제 데이터 테스트 중 발견된 문제입니다.
+  Issues Detail:
+  - Issue 1:
+     - Attempted fixes: The backend API is complete and tested. The agent has started overwriting the frontend component.
      - Next debug checklist:
-        1.  파일의  함수 로직을 검토합니다.
-        2. 현재 모든 평점(1-5점)을 비적합으로 분류하는 원인을 파악하고, 올바른 비적합 기준(예: 특정 값 범위, 데이터 형식 등)을 적용하도록 수정합니다.
-        3. 수정한 후 를 다시 실행하여 문제가 해결되었는지 확인합니다.
-     - Why fix this issue and what will be achieved with the fix?: 특허 5번 핵심 로직이 의도대로 동작하게 하여 분석 결과의 신뢰도를 높입니다.
-     - Status:  NOT STARTED
+        1.  Verify the contents of  to see the new structure.
+        2.  Update the component's state management and API call to use .
+        3.  Modify the UI to render the new hierarchical response, including , , and  for each discovered signal.
+        4.  Update the Assetization part to save the new AI-generated module structure.
+     - Why fix this issue and what will be achieved with the fix?: This will connect the new, powerful AI backend to the frontend, realizing the user's core vision for the GVIC Showcase.
+     - Status: IN PROGRESS
      - Is recurring issue? N
-     - Should Test frontend/backend/both after fix? backend
-     - Blocked on other issue: 없음
+     - Should Test frontend/backend/both after fix? both
+     - Blocked on other issue: None.
+
+  - Issue 2:
+     - Attempted fixes: None in this session. This is a carry-over issue from previous forks. Fixes have included removing  and patching , but the root cause is unknown.
+     - Next debug checklist: Wait for the user to report specific actions that trigger the error now that the application is more stable.
+     - Why fix this issue and what will be achieved with the fix?: This is a critical, app-breaking bug that makes the UI unstable and unusable.
+     - Status: NOT STARTED
+     - Is recurring issue? Y
+     - Should Test frontend/backend/both after fix? frontend
+     - Blocked on other issue: User providing reproduction steps.
+
+  - Issue 3:
+     - Attempted fixes: The agent has provided numerous files for download (, , , ). However, the user's local code is now significantly out of date with the new  and  features.
+     - Next debug checklist: Once the showcase is functional in the preview, provide a consolidated list of all new/changed files for the user to update their local environment (, , , , etc.).
+     - Why fix this issue and what will be achieved with the fix?: To allow the user to use the latest features locally.
+     - Status: NOT STARTED
+     - Is recurring issue? Y (Dependency issues are very recurrent).
+     - Should Test frontend/backend/both after fix? both
+     - Blocked on other issue: Issue 1 (GVIC Showcase Update).
+
+  - Issue 4:
+     - Attempted fixes: The agent previously provided a fix in  for Korean fonts on Windows.
+     - Next debug checklist: Ask the user to run an analysis and download a PDF on their now-working local environment to confirm both the download and font rendering are fixed.
+     - Why fix this issue and what will be achieved with the fix?: This is a core feature of the application.
+     - Status: USER VERIFICATION PENDING
+     - Is recurring issue? Y
+     - Should Test frontend/backend/both after fix? both
+     - Blocked on other issue: None.
 
 **In progress Task List**:
-  - Task 1:  와 프론트엔드 전체 탭 연동 (Priority: P0)
-
- Task Detail:
-  - Task 1: 
-     - Where to resume:  이외의 모든 탭 컴포넌트(, ,  등)들을 에 추가된 신규  함수를 사용하도록 수정해야 합니다.
-     - What will be achieved with this?: URL 분석 한 번으로 모든 대시보드 탭의 데이터가 실시간으로 업데이트됩니다.
-     - Status:  IN PROGRESS
-     - Should Test frontend/backend/both after fix? frontend
-     - Blocked on something: 없음
+  - Task 1: Updating 
+     - Where to resume: The file has just been overwritten. The next step is to examine its new content and wire it up to the AI backend API (), ensuring the new state structure can handle the hierarchical ID-based response from the AI.
+     - What will be achieved with this?: It will visually represent the new AI-powered core of the GVIC engine, a major milestone.
+     - Status: IN PROGRESS
+     - Should Test frontend/backend/both after fix? both
+     - Blocked on something: None
 
 **Upcoming and Future Tasks**
 - **Upcoming Tasks:**
-    - **Task 1 (P1):** **입력/출력 어댑터 프레임워크 확장 (P6, P7):** 현재 PoC로 구현된 어댑터를 다양한 데이터 소스(센서, DB 등)와 출력 형식(Webhook, ERP 연동)을 지원하는 확장 가능한 구조로 발전시킵니다.
-    - **Task 2 (P2):** **경영관리 모듈 구현 (P8):** 서비스 요금제, 사용량 기반 과금, 구독 관리 기능을 구현합니다.
+    - **Task 1 (P0):** Complete the GVIC Asset System: Update the Save to Asset functionality to store the full AI-generated module (with all IDs) in MongoDB. Update the Asset Repository and Asset Utilization views to work with this new data structure.
+    - **Task 2 (P1):** Build a UI for managing AI analysis parameters (e.g., selecting the LLM model, adjusting prompts).
 - **Future Tasks:**
-    - 대시보드 UI/UX 전면 개편.
-    - 이메일 알림 기능 추가 (가입 승인, 리포트 생성 완료 등).
-    - 다국어 지원 기능 구현.
-    - 실제 머신러닝 모델(PCA, 임베딩 등) 통합하여 시뮬레이션 로직 대체.
+    - (From PRD) Simplify UI for general users.
+    - (From PRD) Link remaining tabs (, , ) to the central DataHub.
+    - (From PRD) Implement a management module for service plans and billing.
+    - (From PRD) Overhaul the main dashboard UI/UX.
 
 **Completed work in this session**
-- **프로젝트 다운로드 기능 구현**: 전체 소스 코드와 설치 스크립트를 포함한 ZIP 파일을 생성하고 다운로드 링크를 제공했습니다.
-- **실제 데이터 기반 시스템 테스트**: 올리브영 리뷰 데이터를 샘플링하여 GVIC 엔진을 테스트하고, 이 과정에서 로직 개선점(비적합 판정 오류)을 발견했습니다.
-- **입력/출력 어댑터 PoC 구현**:
-    - 대시보드에서 URL을 입력받아 분석하는 **입력 어댑터** 로직 구현.
-    - 분석 결과를 PDF 리포트로 생성하는 **출력 어댑터** 로직 구현.
-    - 이 과정을 제어하는 API () 및 프론트엔드 UI () 구현.
-- **중앙 데이터 허브() 구현**:
-    - 백엔드에 분석 결과를 중앙에서 관리하는  모듈 생성.
-    - 분석 파이프라인 실행 시 결과가 에 저장되도록  수정.
-    - 각 탭이 에서 데이터를 가져올 수 있는 API 엔드포인트들 추가.
-    - 메인 대시보드 탭이 와 연동되도록 프론트엔드 수정 완료.
-- **로그인 문제 해결**: DB의 사용자 필드명 불일치( vs )로 인해 발생한 로그인 문제를 해결했습니다.
+- **Full Local Environment Resolution**: Successfully guided the user through creating a Python virtual environment, installing all dependencies, and running the frontend and backend servers on their Windows machine. Created helper  scripts for ease of use.
+- **Architectural Pivot to AI**: Transitioned the core analysis engine from a flawed, hardcoded keyword system to a dynamic, AI-powered one using the Emergent LLM Key.
+- **AI Signal Type Detection**: Implemented a new backend module () and API () that uses an LLM to classify the type of input text before analysis.
+- **AI Signal & Nuance Extraction**: The new API can extract complex signals and hidden meanings (e.g., resigned satisfaction) that are impossible with keyword matching.
+- **Comprehensive ID & Data Model**: Designed and implemented a full data model and ID generation system () for complete traceability of users, inputs, modules, and signals.
+- **GVIC Showcase Feature**: Created the backend APIs and frontend UI for a new tab that visualizes the GVIC pipeline, including analysis, asset storage, and asset utilization panes. (Note: Frontend is not yet connected to the new AI backend).
+
+**Earlier issues found/mentioned but not fixed**
+   - **Issue 1**: The recurring React  error remains a critical, unaddressed issue that causes UI instability.
+
+**Known issue recurrence from previous fork**
+  - **Issue recurrence in previous fork**: The  error is a long-standing recurring bug. The local environment dependency and setup issues have also been a major recurring problem throughout multiple sessions, though it is now functional.
+  - **Recurrence count**: 3+
+  - **Status**:  error is NOT STARTED. Local setup issues are tentatively resolved but fragile.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-- **Frontend**: React.js, , Axios, Shadcn/UI
-- **Backend**: FastAPI, Pymongo, , ReportLab
-- **Database**: MongoDB
-- **Architecture**:
-    - **Input/Output Adapter Pattern**: 외부 시스템과의 연동을 표준화하고 모듈화.
-    - **Centralized Data Hub**: 인메모리 데이터 저장소를 통해 분석 결과 상태를 중앙에서 관리하고, 각 컴포넌트가 이를 구독하여 UI를 동기화.
+- **AI/LLM Integration**: Used  and the  to integrate an OpenAI model for advanced text analysis, classification, and signal extraction.
+- **System Architecture Redesign**: Pivoted from a static, keyword-based system to a dynamic, multi-stage AI pipeline (Type Detection -> Signal Extraction -> Modularization).
+- **Data Modeling for Traceability**: Designed a hierarchical data model with unique, prefixed IDs (, , ) to ensure full traceability from user input to individual analyzed signals.
+- **Async Python/MongoDB**: Debugged and fixed  issues by correctly using  and list comprehensions on  objects.
+- **Windows Environment Debugging**: Deep troubleshooting of Python virtual environments, 
+Usage:   
+  pip <command> [options]
+
+Commands:
+  install                     Install packages.
+  lock                        Generate a lock file.
+  download                    Download packages.
+  uninstall                   Uninstall packages.
+  freeze                      Output installed packages in requirements format.
+  inspect                     Inspect the python environment.
+  list                        List installed packages.
+  show                        Show information about installed packages.
+  check                       Verify installed packages have compatible 
+dependencies.
+  config                      Manage local and global configuration.
+  search                      Search PyPI for packages.
+  cache                       Inspect and manage pip's wheel cache.
+  index                       Inspect information available from package 
+indexes.
+  wheel                       Build wheels from your requirements.
+  hash                        Compute hashes of package archives.
+  completion                  A helper command used for command completion.
+  debug                       Show information useful for debugging.
+  help                        Show help for commands.
+
+General Options:
+  -h, --help                  Show help.
+  --debug                     Let unhandled exceptions propagate outside the
+                              main subroutine, instead of logging them to
+                              stderr.
+  --isolated                  Run pip in an isolated mode, ignoring
+                              environment variables and user configuration.
+  --require-virtualenv        Allow pip to only run in a virtual environment;
+                              exit with an error otherwise.
+  --python <python>           Run pip with the specified Python interpreter.
+  -v, --verbose               Give more output. Option is additive, and can be
+                              used up to 3 times.
+  -V, --version               Show version and exit.
+  -q, --quiet                 Give less output. Option is additive, and can be
+                              used up to 3 times (corresponding to WARNING,
+                              ERROR, and CRITICAL logging levels).
+  --log <path>                Path to a verbose appending log.
+  --no-input                  Disable prompting for input.
+  --keyring-provider <keyring_provider>
+                              Enable the credential lookup via the keyring
+                              library if user input is allowed. Specify which
+                              mechanism to use [auto, disabled, import,
+                              subprocess]. (default: auto)
+  --proxy <proxy>             Specify a proxy in the form
+                              scheme://[user:passwd@]proxy.server:port.
+  --retries <retries>         Maximum attempts to establish a new HTTP
+                              connection. (default: 5)
+  --timeout <sec>             Set the socket timeout (default 15 seconds).
+  --exists-action <action>    Default action when a path already exists:
+                              (s)witch, (i)gnore, (w)ipe, (b)ackup, (a)bort.
+  --trusted-host <hostname>   Mark this host or host:port pair as trusted,
+                              even though it does not have valid or any HTTPS.
+  --cert <path>               Path to PEM-encoded CA certificate bundle. If
+                              provided, overrides the default. See 'SSL
+                              Certificate Verification' in pip documentation
+                              for more information.
+  --client-cert <path>        Path to SSL client certificate, a single file
+                              containing the private key and the certificate
+                              in PEM format.
+  --cache-dir <dir>           Store the cache data in <dir>.
+  --no-cache-dir              Disable the cache.
+  --disable-pip-version-check
+                              Don't periodically check PyPI to determine
+                              whether a new version of pip is available for
+                              download. Implied with --no-
+                              index.
+  --no-color                  Suppress colored output.
+  --use-feature <feature>     Enable new functionality, that may be backward
+                              incompatible.
+  --use-deprecated <feature>  Enable deprecated functionality, that will be
+                              removed in the future.
+  --resume-retries <resume_retries>
+                              Maximum attempts to resume or restart an
+                              incomplete download. (default: 5) vs , file encodings ( vs ), and creating  scripts.
 
 **key DB schema**
-- **users**: 사용자 정보 (, , , ) - 변경 없음.
-- **datasources**: 외부 데이터 소스 정보 - 변경 없음.
-
-**changes in tech stack**
-- 기술 스택 변경 사항은 없으나,  라이브러리를 활용한 PDF 생성 기능이 핵심 기능으로 추가되었습니다.
+  - **gvic_inputs**: 
+  - **gvic_modules**: 
+  - **gvic_assets**: Stores the finalized modules after they are assetized.
+  - (Implicit Model) **GVICSignal**: 
 
 **All files of reference**
-- : 모든 탭의 데이터를 관리하는 핵심 상태 저장소.
-- :  및 분석 파이프라인 API가 추가된 메인 서버 파일.
-- : URL 분석을 실행하는 새로운 UI 컴포넌트.
-- :  및 파이프라인 API 호출 함수가 추가된 파일.
-- : 입력 데이터 처리 로직.
-- : PDF 리포트 생성 로직.
-- : 수정이 필요한 비적합 데이터 판정 로직 파일.
-
-**Areas that need refactoring**:
--  파일이 3000줄에 가까워지고 있습니다.  관련 라우터, 분석 파이프라인 라우터 등을 별도 파일로 분리하여 모듈성을 높이는 것이 시급합니다.
+- : **New file.** The heart of the new AI analysis engine.
+- : **New file.** Defines the Pydantic models for the ID hierarchy.
+- : Heavily modified to add the  endpoint and update asset APIs with async fixes and new data models.
+- : **New file.** The UI for the user's core vision. Needs to be connected to the new AI backend.
+- : Modified to add the new GVIC Showcase tab to the main UI.
 
 **key api endpoints**
-- **Pipeline:**
-  - : 파일 기반 분석 파이프라인 실행.
-  - : URL 기반 분석 파이프라인 실행.
-- **Data Hub:**
-  - : 의 모든 데이터 조회.
-  - : 대시보드 탭 데이터 조회.
-  - : 수렴 제어 탭 데이터 조회.
-  - : 신호 처리 탭 데이터 조회.
-  - (기타 탭별 데이터 조회 API 다수)
+- : **[NEW & CRITICAL]** Takes raw text and rating, returns a full AI analysis with the new ID hierarchy.
+- : Fetches all saved assets. Modified to use async and new models.
+- : Creates a new asset. Modified to use async and new models.
+- : **[OBSOLETE]** The old keyword-based analysis endpoint. Should be removed or updated.
 
 **Critical Info for New Agent**
-- **가장 중요한 다음 작업**: 메인 대시보드 탭을 제외한 나머지 모든 프론트엔드 탭들을  API와 연동하여 사용자의 통합 대시보드 요구사항을 완료해야 합니다.
-- **한국어 사용은 필수입니다.**
-- 는 현재 인메모리 방식이므로 서버가 재시작되면 데이터가 초기화됩니다. 이 부분은 사용자와의 논의를 통해 향후 DB 지속성 여부를 결정해야 할 수 있습니다.
-
-**documents and test reports created in this job**
-- : 테스트에 사용된 샘플 데이터.
-- : 샘플 데이터 테스트 결과.
-- : 분석 파이프라인을 통해 생성된 PDF 리포트들.
-- : 사용자가 요청한 프로젝트 압축 파일.
-- : URL 기반 분석 기능 완료까지 업데이트됨.
+- **Embrace the New Architecture**: The project's direction has fundamentally changed. The old keyword-based analysis is obsolete. Your primary focus should be on the new AI-driven pipeline: AI Signal Detection -> Modularization -> Assetization.
+- **GVIC Showcase is Priority #1**: Your first task is to connect the  to the new  backend. It needs to correctly display the nested, ID-based JSON response from the AI.
+- **IDs are Everything**: The user has emphasized that the ID system (, , ) is crucial for traceability. Ensure all new features respect and utilize this structure.
+- **User's Local is Fragile**: The user's local Windows environment is working but has proven difficult to manage. Be prepared to provide clear instructions for updating their local files once the GVIC Showcase is complete. Expect further dependency issues.
+- **The  Bug Still Exists**: Do not forget this critical UI stability bug. Once the user is satisfied with the showcase feature, this should be the next priority to investigate.
 
 **Last 10 User Messages and any pending HUMAN messages**
-- **User**: 어떤 시그널이든 처리되면 12개 탭 모두 연관되므로 관련 지표들이 동시적으로 작동하고 대시보드에 나타나야 한다. (In Progress)
-- **User**: 대시보드에서 URL을 입력하면 분석하고 그 결과를 PDF로 출력받도록 하자. (Completed)
-- **User**: 이 분석을 GVIC Engine에 넣고 대시보드에서 각 과정을 보고 싶다. (Completed)
-- **User**: 입력단과 출력단을 설계하고 실행해보자. (Completed)
-- **User**: 외부 시스템마다 입출력 시그널이 다르므로 입출력 기능이 별도로 있어야 한다. 그리고 경영관리 모듈도 필요하다. (Acknowledged)
-- **User**: 특허 로직이 (외부 데이터 연동과 무관하게) 완성된 것인가? (Clarified: 로직 구조는 완성, 실제 데이터 연동 및 ML 모델은 미완)
-- **User**: 실제 현상을 보려면 어떤 서비스가 작동하나? (Clarified: 외부 데이터 수집만 작동, 분석 엔진과는 미연결)
-- **User**: 로컬 서버 이식을 위해 프로젝트를 zip 파일로 압축해달라. (Completed)
-- **User**: (새로운 스크린샷) 이 이미지에서 붉은색 오류는 무엇인가? (Clarified: 실제 데이터 수집 오류)
-- **User**: 실제 자료로 시스템을 운영해봐야 한다. (Agreed)
+10. **User**: The current system isn't what I want if it's just a fixed list of keywords.
+9.  **User**: My system shouldn't fit signals to a predefined frame; it should discover the characteristics of the signals and modularize them.
+8.  **User**: (Gives a complex example review with resigned satisfaction). How should this be modularized?
+7.  **User**: (Gives a non-review text as an example). How is this modularized?
+6.  **User**: Correctly modularizing signals this way allows us to respond to specific group needs and prevent data silos.
+5.  **User**: **Let's implement step 1 (AI Signal Type Detection).**
+4.  **User**: Every signal needs a requester ID, a signal ID, and the modules that group them need an ID.
+3.  **User**: **Let's see the current progress in the GVIC Showcase.**
+2.  **User**: The analysis showing packaging keywords for a text that doesn't mention packaging is wrong.
+1.  **User**: (Clarifies the wrong analysis was for a non-review text asking for system features).
 
 **Project Health Check:**
-- **Broken**: 없음
-- **Mocked**: 특허 로직 내 일부 복잡한 알고리즘(PCA, 텍스트 임베딩)은 시뮬레이션으로 동작 중입니다.
+- **Broken**:
+    - The  React error persists, causing critical UI instability.
+    - The  is not connected to the correct (new) backend API.
+- **Mocked**:
+    - The Asset Utilization view is purely static and does not reflect any real use of the saved assets.
 
 **3rd Party Integrations**
+- **OpenAI (via Emergent LLM Key)**: **Newly added and critical**. Powers the entire new analysis engine. The key is sourced from the environment.
 - MongoDB
 - ReportLab
-- Emergent-managed Google Auth (OAuth 2.0)
+- Emergent-managed Google Auth
 
 **Testing status**
-- Testing agent used after significant changes: NO (마지막 작업은 스크린샷과 curl로 수동 테스트함)
-- Troubleshoot agent used after agent stuck in loop: NO
-- Test files created:
-    - 
-- Known regressions: 없음
+  - Testing agent used after significant changes: NO (but should be used for the GVIC Showcase update)
+  - Troubleshoot agent used after agent stuck in loop: NO
+  - Test files created: []
+  - Known regressions: None identified in this session.
 
 **Credentials to test flow:**
-- **최고관리자 (Super Admin)**:
-  - 이메일: 
-  - 비밀번호: 
+- **Role**: Super Admin
+- **Email**: 
+- **Password**: 
 
 **What agent forgot to execute**
-- 없음. 사용자의 요청에 따라 체계적으로 기능을 구현하고 확장했습니다.</analysis>
+- The agent correctly prioritized the user's major architectural shift and new feature requests over pre-existing, lower-priority tasks. The most significant pending item that was not addressed is the critical  bug.</analysis>
