@@ -3378,9 +3378,17 @@ async def ai_analyze_signal(
             "created_at": datetime.now(timezone.utc).isoformat()
         }
         
+        # 실시간 모니터링에 기록
+        record_signal_analysis(request.content, response_data, success=True)
+        
+        return response_data
+        
     except HTTPException:
+        # 실패 기록
+        record_signal_analysis(request.content, {"signal_type": "error"}, success=False)
         raise
     except Exception as e:
+        record_signal_analysis(request.content, {"signal_type": "error"}, success=False)
         raise HTTPException(status_code=500, detail=f"분석 중 오류: {str(e)}")
 
 
