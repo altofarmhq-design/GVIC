@@ -1969,5 +1969,46 @@
       "confidence": 0.7249828950751247,
       "adjustment_needed": true
     }
+  },
+  {
+    "timestamp": "2026-02-14T11:28:36.086495",
+    "phase": "예측",
+    "action": "설정 변경",
+    "data": {
+      "auto_adjust": false
+    }
+  },
+  {
+    "timestamp": "2026-02-14T11:28:46.423310",
+    "phase": "파레토",
+    "action": "최적화 실행",
+    "data": {
+      "solutions_count": 56,
+      "pareto_front_size": 14,
+      "best_weighted_score": 0.8423529411764704
+    }
+  },
+  {
+    "timestamp": "2026-02-14T11:30:32.586164",
+    "phase": "자동조정",
+    "action": "설정 변경",
+    "data": {
+      "enabled": false,
+      "threshold": 0.11
+    }
+  },
+  {
+    "timestamp": "2026-02-14T11:30:36.337196",
+    "phase": "설정",
+    "action": "Ω 업데이트",
+    "data": {
+      "V_pub_min": 0.2,
+      "V_pub_max": 0.5,
+      "V_pro_min": 0.2,
+      "V_pro_max": 0.5,
+      "V_ind_min": 0.1,
+      "V_ind_max": 0.5,
+      "sum_constraint": 1.0
+    }
   }
 ]
