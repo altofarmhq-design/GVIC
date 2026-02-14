@@ -1,25 +1,5 @@
 [
   {
-    "timestamp": "2026-02-14T14:02:32.543985",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T14:02:33.654120",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
     "timestamp": "2026-02-14T14:02:34.749406",
     "phase": "데이터소스",
     "action": "데이터 수집",
@@ -9985,5 +9965,20 @@
     "data": {
       "records_count": 10
     }
+  },
+  {
+    "timestamp": "2026-02-14T17:19:08.624778",
+    "phase": "통합",
+    "action": "데이터 교환",
+    "data": {
+      "source": "erp",
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:19:37.708353",
+    "phase": "알림",
+    "action": "헬스체크 실행",
+    "data": {}
   }
 ]
