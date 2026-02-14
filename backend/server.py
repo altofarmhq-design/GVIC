@@ -3339,7 +3339,7 @@ async def ai_analyze_signal(
             }
             signals_with_id.append(sig_with_id)
         
-        return {
+        response_data = {
             "success": True,
             
             # ID 체계
