@@ -2313,5 +2313,11 @@
       "success": false,
       "value": null
     }
+  },
+  {
+    "timestamp": "2026-02-14T13:22:58.221780",
+    "phase": "알림",
+    "action": "헬스체크 실행",
+    "data": {}
   }
 ]
