@@ -1923,5 +1923,33 @@
       "records": 56,
       "pdf": "/app/backend/data/reports/GVIC_Report_20260214_164301.pdf"
     }
+  },
+  {
+    "timestamp": "2026-02-14T09:58:18.586511",
+    "phase": "처리",
+    "action": "엔진 실행",
+    "data": {
+      "value": 5.0,
+      "success": true
+    }
+  },
+  {
+    "timestamp": "2026-02-14T10:01:26.400727",
+    "phase": "예측",
+    "action": "분석 완료",
+    "data": {
+      "confidence": 0.7249828950751247,
+      "adjustment_needed": true
+    }
+  },
+  {
+    "timestamp": "2026-02-14T10:01:41.110448",
+    "phase": "파레토",
+    "action": "최적화 실행",
+    "data": {
+      "solutions_count": 56,
+      "pareto_front_size": 20,
+      "best_weighted_score": 0.8423529411764704
+    }
   }
 ]
