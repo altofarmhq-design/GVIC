@@ -24,7 +24,8 @@ import {
   CheckCircle2,
   Info
 } from 'lucide-react';
-import { api } from "@/lib/api";
+
+const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export const SignalTracerTab = () => {
   // 입력 상태
