@@ -301,6 +301,10 @@ function Dashboard() {
             <SignalTracerTab />
           </TabsContent>
 
+          <TabsContent value="showcase">
+            <GVICShowcaseTab />
+          </TabsContent>
+
           <TabsContent value="data">
             <DataTab logs={logs} onLogsRefresh={fetchData} />
           </TabsContent>
