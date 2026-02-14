@@ -3667,13 +3667,40 @@ async def create_gvic_asset(
 async def get_gvic_assets(
     limit: int = 50,
     classification: Optional[str] = None,
+    search: Optional[str] = None,
+    signal_type: Optional[str] = None,
     current_user: dict = Depends(get_current_user)
 ):
-    """GVIC 자산 목록 조회"""
+    """GVIC 자산(모듈) 목록 조회 - 모듈화된 데이터 검색"""
     try:
         query = {}
         if classification:
             query["classification"] = classification
+        if signal_type:
+            query["signal_type"] = signal_type
+        
+        # 모듈화된 데이터 검색 (원시 content가 아닌 모듈 데이터 검색)
+        if search:
+            search_lower = search.lower()
+            query["$or"] = [
+                # 시그널 유형 레이블
+                {"signal_type_label": {"$regex": search, "$options": "i"}},
+                # 시그널 텍스트들
+                {"signal_texts": {"$regex": search, "$options": "i"}},
+                # 요약
+                {"summary": {"$regex": search, "$options": "i"}},
+                # 주요 테마
+                {"key_themes": {"$regex": search, "$options": "i"}},
+                # 숨겨진 의미
+                {"hidden_meanings": {"$regex": search, "$options": "i"}},
+                # 시그널 유형들
+                {"signal_types": {"$regex": search, "$options": "i"}},
+                # 관점 관련성
+                {"perspective_relevance": {"$regex": search, "$options": "i"}},
+                # 모듈 ID로도 검색 가능
+                {"module_id": {"$regex": search, "$options": "i"}},
+                {"asset_id": {"$regex": search, "$options": "i"}}
+            ]
         
         assets_cursor = db.gvic_assets.find(query, {"_id": 0}).sort("created_at", -1).limit(limit)
         assets = await assets_cursor.to_list(length=limit)
@@ -3683,22 +3710,25 @@ async def get_gvic_assets(
         positive = await db.gvic_assets.count_documents({"classification": "긍정"})
         neutral = await db.gvic_assets.count_documents({"classification": "중립"})
         negative = await db.gvic_assets.count_documents({"classification": "부정"})
+        mixed = await db.gvic_assets.count_documents({"classification": "혼합"})
         
-        # 활용 통계 (시뮬레이션)
-        used_for_prediction = int(total * 0.7)
-        used_for_trend = int(total * 0.9)
-        used_for_comparison = int(total * 0.3)
-        used_for_anomaly = int(total * 0.15)
+        # 시그널 유형별 통계
+        signal_type_stats = {}
+        pipeline = [
+            {"$group": {"_id": "$signal_type_label", "count": {"$sum": 1}}},
+            {"$sort": {"count": -1}}
+        ]
+        async for doc in db.gvic_assets.aggregate(pipeline):
+            if doc["_id"]:
+                signal_type_stats[doc["_id"]] = doc["count"]
         
         stats = {
             "total": total,
             "positive": positive,
             "neutral": neutral,
             "negative": negative,
-            "used_for_prediction": used_for_prediction,
-            "used_for_trend": used_for_trend,
-            "used_for_comparison": used_for_comparison,
-            "used_for_anomaly": used_for_anomaly
+            "mixed": mixed,
+            "by_signal_type": signal_type_stats
         }
         
         return {"assets": assets, "stats": stats}
