@@ -3075,6 +3075,356 @@ async def load_data_sources():
 api_router.include_router(auth_router)
 
 # Include the router in the main app
+
+# ==================== Signal Tracer API ====================
+# 시그널 추적기 - 단일 후기의 처리 과정을 단계별로 시각화
+
+class SignalTracerInput(BaseModel):
+    """시그널 추적기 입력"""
+    content: str = Field(..., description="후기 내용")
+    rating: int = Field(default=5, ge=1, le=5, description="평점 (1-5)")
+    # 튜닝 가능한 파라미터
+    sigma: Optional[List[float]] = Field(default=None, description="시그마 가중치 [V_pub, V_pro, V_ind]")
+    omega_min: Optional[List[float]] = Field(default=None, description="오메가 최소값")
+    omega_max: Optional[List[float]] = Field(default=None, description="오메가 최대값")
+    # 키워드 가중치
+    keyword_weights: Optional[Dict[str, float]] = Field(default=None, description="키워드별 가중치")
+
+class SignalTracerResponse(BaseModel):
+    """시그널 추적기 응답 - 5단계 결과"""
+    success: bool
+    trace_id: str
+    steps: Dict[str, Any]
+
+# 키워드 사전 (시그널 분류용)
+SIGNAL_KEYWORDS = {
+    "society": {  # 사회/규제 관점
+        "positive": ["안전", "인증", "친환경", "무첨가", "자연", "유기농", "검증"],
+        "negative": ["위험", "부작용", "알러지", "환경오염", "플라스틱", "화학"]
+    },
+    "production": {  # 생산/기업 관점
+        "positive": ["품질", "포장", "배송", "꼼꼼", "신속", "정품", "유통기한"],
+        "negative": ["불량", "파손", "지연", "오배송", "누락", "하자"]
+    },
+    "consumer": {  # 소비자 관점
+        "positive": ["효과", "만족", "추천", "재구매", "좋아요", "최고", "가성비"],
+        "negative": ["실망", "비싸", "효과없", "후회", "비추", "가격"]
+    }
+}
+
+def analyze_keywords(content: str, custom_weights: Optional[Dict[str, float]] = None) -> Dict[str, Any]:
+    """키워드 기반 시그널 분석"""
+    results = {
+        "society": {"positive": [], "negative": [], "score": 0},
+        "production": {"positive": [], "negative": [], "score": 0},
+        "consumer": {"positive": [], "negative": [], "score": 0}
+    }
+    
+    content_lower = content.lower()
+    
+    for domain, keywords in SIGNAL_KEYWORDS.items():
+        pos_count = 0
+        neg_count = 0
+        
+        for kw in keywords["positive"]:
+            if kw in content_lower:
+                results[domain]["positive"].append(kw)
+                weight = custom_weights.get(kw, 1.0) if custom_weights else 1.0
+                pos_count += weight
+                
+        for kw in keywords["negative"]:
+            if kw in content_lower:
+                results[domain]["negative"].append(kw)
+                weight = custom_weights.get(kw, 1.0) if custom_weights else 1.0
+                neg_count += weight
+        
+        # 점수 계산 (0-100)
+        total = pos_count + neg_count
+        if total > 0:
+            results[domain]["score"] = int((pos_count / (pos_count + neg_count + 0.5)) * 100)
+        else:
+            results[domain]["score"] = 50  # 중립
+    
+    return results
+
+@api_router.post("/signal-tracer/analyze", response_model=SignalTracerResponse)
+async def analyze_single_review(request: SignalTracerInput, current_user: dict = Depends(get_current_user)):
+    """
+    시그널 추적기 - 단일 후기를 5단계로 분석
+    회원 전용 기능
+    """
+    trace_id = str(uuid.uuid4())[:8]
+    
+    # 기본 파라미터 설정
+    sigma = request.sigma or [0.33, 0.34, 0.33]
+    omega_min = request.omega_min or [0.2, 0.2, 0.1]
+    omega_max = request.omega_max or [0.5, 0.5, 0.5]
+    
+    # ==================== STEP 1: 입력 ====================
+    step1_input = {
+        "step": 1,
+        "name": "입력 (Input)",
+        "description": "원본 후기 데이터",
+        "data": {
+            "content": request.content,
+            "rating": request.rating,
+            "char_count": len(request.content),
+            "word_count": len(request.content.split())
+        }
+    }
+    
+    # ==================== STEP 2: 표준화 ====================
+    # 평점을 0-100 스케일로 변환
+    normalized_value = (request.rating / 5.0) * 100
+    
+    # 감성 힌트 결정
+    if request.rating >= 4:
+        sentiment_hint = "positive"
+    elif request.rating == 3:
+        sentiment_hint = "neutral"
+    else:
+        sentiment_hint = "negative"
+    
+    step2_standardize = {
+        "step": 2,
+        "name": "표준화 (Standardization)",
+        "description": "GVIC 표준 입력 포맷으로 변환",
+        "transformation": {
+            "rating_scale": "1-5 → 0-100",
+            "formula": f"({request.rating} / 5) × 100 = {normalized_value}"
+        },
+        "data": {
+            "primary_value": normalized_value,
+            "sentiment_hint": sentiment_hint,
+            "source_type": "direct_input",
+            "domain": "product_review"
+        }
+    }
+    
+    # ==================== STEP 3: 시그널 분석 ====================
+    keyword_analysis = analyze_keywords(request.content, request.keyword_weights)
+    
+    # 각 영역별 원시 점수
+    raw_scores = {
+        "V_pub": keyword_analysis["society"]["score"],
+        "V_pro": keyword_analysis["production"]["score"],
+        "V_ind": keyword_analysis["consumer"]["score"]
+    }
+    
+    # 평점 기반 보정
+    rating_factor = normalized_value / 100
+    for key in raw_scores:
+        raw_scores[key] = int(raw_scores[key] * 0.6 + rating_factor * 100 * 0.4)
+    
+    step3_signal = {
+        "step": 3,
+        "name": "시그널 분석 (Signal Analysis)",
+        "description": "3가지 관점에서 시그널 추출",
+        "keyword_analysis": {
+            "society": {
+                "label": "🏛️ 사회·규제 관점",
+                "found_positive": keyword_analysis["society"]["positive"],
+                "found_negative": keyword_analysis["society"]["negative"],
+                "raw_score": keyword_analysis["society"]["score"]
+            },
+            "production": {
+                "label": "🏭 기업·생산 관점",
+                "found_positive": keyword_analysis["production"]["positive"],
+                "found_negative": keyword_analysis["production"]["negative"],
+                "raw_score": keyword_analysis["production"]["score"]
+            },
+            "consumer": {
+                "label": "👤 소비자·고객 관점",
+                "found_positive": keyword_analysis["consumer"]["positive"],
+                "found_negative": keyword_analysis["consumer"]["negative"],
+                "raw_score": keyword_analysis["consumer"]["score"]
+            }
+        },
+        "raw_scores": raw_scores,
+        "rating_adjustment": f"평점({request.rating}점) 기반 40% 보정 적용"
+    }
+    
+    # ==================== STEP 4: 수렴 연산 ====================
+    import numpy as np
+    
+    # 시그마 가중치 적용
+    sigma_arr = np.array(sigma)
+    scores_arr = np.array([raw_scores["V_pub"], raw_scores["V_pro"], raw_scores["V_ind"]])
+    
+    # 가중 평균 계산
+    weighted_scores = scores_arr * sigma_arr
+    
+    # 정규화 (합이 100이 되도록)
+    total = np.sum(weighted_scores)
+    if total > 0:
+        normalized_distribution = (weighted_scores / total) * 100
+    else:
+        normalized_distribution = np.array([33.33, 33.34, 33.33])
+    
+    # 오메가 경계 조건 검증
+    omega_min_arr = np.array(omega_min) * 100
+    omega_max_arr = np.array(omega_max) * 100
+    
+    boundary_violations = []
+    adjusted_distribution = normalized_distribution.copy()
+    
+    for i, (val, min_v, max_v, name) in enumerate(zip(
+        normalized_distribution, 
+        omega_min_arr, 
+        omega_max_arr,
+        ["V_pub", "V_pro", "V_ind"]
+    )):
+        if val < min_v:
+            boundary_violations.append(f"{name}: {val:.1f}% < 최소 {min_v:.1f}%")
+            adjusted_distribution[i] = min_v
+        elif val > max_v:
+            boundary_violations.append(f"{name}: {val:.1f}% > 최대 {max_v:.1f}%")
+            adjusted_distribution[i] = max_v
+    
+    # 재정규화
+    if boundary_violations:
+        adjusted_distribution = (adjusted_distribution / np.sum(adjusted_distribution)) * 100
+    
+    step4_convergence = {
+        "step": 4,
+        "name": "수렴 연산 (Convergence)",
+        "description": "Σ 시그마 가중치 적용 및 Ω 오메가 경계 검증",
+        "sigma_applied": {
+            "weights": {"V_pub": sigma[0], "V_pro": sigma[1], "V_ind": sigma[2]},
+            "formula": "weighted_score = raw_score × sigma",
+            "weighted_scores": {
+                "V_pub": round(weighted_scores[0], 2),
+                "V_pro": round(weighted_scores[1], 2),
+                "V_ind": round(weighted_scores[2], 2)
+            }
+        },
+        "omega_validation": {
+            "boundaries": {
+                "V_pub": f"{omega_min[0]*100:.0f}% ~ {omega_max[0]*100:.0f}%",
+                "V_pro": f"{omega_min[1]*100:.0f}% ~ {omega_max[1]*100:.0f}%",
+                "V_ind": f"{omega_min[2]*100:.0f}% ~ {omega_max[2]*100:.0f}%"
+            },
+            "violations": boundary_violations if boundary_violations else ["없음 - 경계 조건 충족"],
+            "is_valid": len(boundary_violations) == 0
+        },
+        "distribution": {
+            "before_adjustment": {
+                "V_pub": round(normalized_distribution[0], 2),
+                "V_pro": round(normalized_distribution[1], 2),
+                "V_ind": round(normalized_distribution[2], 2)
+            },
+            "after_adjustment": {
+                "V_pub": round(adjusted_distribution[0], 2),
+                "V_pro": round(adjusted_distribution[1], 2),
+                "V_ind": round(adjusted_distribution[2], 2)
+            }
+        }
+    }
+    
+    # ==================== STEP 5: 최종 출력 ====================
+    # 종합 점수 계산
+    final_score = int(np.sum(scores_arr * sigma_arr))
+    
+    # 인사이트 생성
+    insights = []
+    
+    # 긍정 키워드 기반 인사이트
+    all_positive = (
+        keyword_analysis["society"]["positive"] + 
+        keyword_analysis["production"]["positive"] + 
+        keyword_analysis["consumer"]["positive"]
+    )
+    all_negative = (
+        keyword_analysis["society"]["negative"] + 
+        keyword_analysis["production"]["negative"] + 
+        keyword_analysis["consumer"]["negative"]
+    )
+    
+    if all_positive:
+        insights.append({"type": "positive", "text": f"긍정 요소: {', '.join(all_positive)}"})
+    if all_negative:
+        insights.append({"type": "negative", "text": f"개선 필요: {', '.join(all_negative)}"})
+    
+    # 영역별 인사이트
+    max_domain = max(["V_pub", "V_pro", "V_ind"], key=lambda x: adjusted_distribution[["V_pub", "V_pro", "V_ind"].index(x)])
+    domain_labels = {"V_pub": "사회·규제", "V_pro": "기업·생산", "V_ind": "소비자·고객"}
+    insights.append({
+        "type": "info", 
+        "text": f"주요 관점: {domain_labels[max_domain]} ({adjusted_distribution[['V_pub', 'V_pro', 'V_ind'].index(max_domain)]:.1f}%)"
+    })
+    
+    # 분류 결정
+    if final_score >= 70:
+        classification = "긍정"
+        classification_color = "green"
+    elif final_score >= 40:
+        classification = "중립"
+        classification_color = "yellow"
+    else:
+        classification = "부정"
+        classification_color = "red"
+    
+    step5_output = {
+        "step": 5,
+        "name": "최종 출력 (Output)",
+        "description": "분석 결과 및 인사이트",
+        "final_score": {
+            "value": final_score,
+            "max": 100,
+            "classification": classification,
+            "color": classification_color
+        },
+        "distribution_chart": {
+            "V_pub": {"label": "🏛️ 사회·규제", "value": round(adjusted_distribution[0], 1)},
+            "V_pro": {"label": "🏭 기업·생산", "value": round(adjusted_distribution[1], 1)},
+            "V_ind": {"label": "👤 소비자·고객", "value": round(adjusted_distribution[2], 1)}
+        },
+        "insights": insights,
+        "recommendations": [
+            "이 후기는 제품 품질에 대한 피드백을 포함합니다." if keyword_analysis["production"]["positive"] or keyword_analysis["production"]["negative"] else None,
+            "소비자 만족도 관련 의견이 포함되어 있습니다." if keyword_analysis["consumer"]["positive"] or keyword_analysis["consumer"]["negative"] else None,
+            "사회적/규제적 관점의 언급이 있습니다." if keyword_analysis["society"]["positive"] or keyword_analysis["society"]["negative"] else None
+        ]
+    }
+    # None 제거
+    step5_output["recommendations"] = [r for r in step5_output["recommendations"] if r]
+    
+    # 전체 응답 조립
+    return SignalTracerResponse(
+        success=True,
+        trace_id=trace_id,
+        steps={
+            "step1_input": step1_input,
+            "step2_standardize": step2_standardize,
+            "step3_signal": step3_signal,
+            "step4_convergence": step4_convergence,
+            "step5_output": step5_output
+        }
+    )
+
+@api_router.get("/signal-tracer/keywords")
+async def get_signal_keywords(current_user: dict = Depends(get_current_user)):
+    """시그널 분석에 사용되는 키워드 사전 조회"""
+    return {
+        "keywords": SIGNAL_KEYWORDS,
+        "description": {
+            "society": "사회·규제 관점 (환경, 안전, 인증 등)",
+            "production": "기업·생산 관점 (품질, 포장, 배송 등)",
+            "consumer": "소비자·고객 관점 (효과, 만족, 가성비 등)"
+        }
+    }
+
+@api_router.put("/signal-tracer/keywords")
+async def update_signal_keywords(
+    keywords: Dict[str, Dict[str, List[str]]],
+    current_user: dict = Depends(require_role(["admin", "super_admin"]))
+):
+    """시그널 키워드 사전 업데이트 (관리자 전용)"""
+    global SIGNAL_KEYWORDS
+    SIGNAL_KEYWORDS = keywords
+    return {"success": True, "message": "키워드 사전이 업데이트되었습니다."}
+
+
 app.include_router(api_router)
 
 app.add_middleware(
