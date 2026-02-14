@@ -3519,7 +3519,7 @@ async def get_gvic_asset(
     current_user: dict = Depends(get_current_user)
 ):
     """특정 GVIC 자산 상세 조회"""
-    asset = db.gvic_assets.find_one({"asset_id": asset_id}, {"_id": 0})
+    asset = await db.gvic_assets.find_one({"asset_id": asset_id}, {"_id": 0})
     if not asset:
         raise HTTPException(status_code=404, detail="자산을 찾을 수 없습니다.")
     return asset
@@ -3530,7 +3530,7 @@ async def delete_gvic_asset(
     current_user: dict = Depends(require_role(["admin", "super_admin"]))
 ):
     """GVIC 자산 삭제 (관리자 전용)"""
-    result = db.gvic_assets.delete_one({"asset_id": asset_id})
+    result = await db.gvic_assets.delete_one({"asset_id": asset_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="자산을 찾을 수 없습니다.")
     return {"success": True, "message": "자산이 삭제되었습니다."}
@@ -3542,7 +3542,7 @@ async def record_asset_usage(
     current_user: dict = Depends(get_current_user)
 ):
     """자산 사용 기록"""
-    result = db.gvic_assets.update_one(
+    result = await db.gvic_assets.update_one(
         {"asset_id": asset_id},
         {
             "$inc": {"used_count": 1},
