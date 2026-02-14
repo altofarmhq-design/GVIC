@@ -317,47 +317,11 @@ export const DashboardTab = ({ dashboard, systemStatus }) => {
           </CardContent>
         </Card>
       )}
-                <RadialBarChart 
-                  cx="50%" 
-                  cy="50%" 
-                  innerRadius="60%" 
-                  outerRadius="100%" 
-                  data={gaugeData}
-                  startAngle={180}
-                  endAngle={0}
-                >
-                  <RadialBar
-                    background={{ fill: '#334155' }}
-                    dataKey="value"
-                    cornerRadius={10}
-                  />
-                </RadialBarChart>
-              </ResponsiveContainer>
-              <div className="text-center -mt-20">
-                <span className="text-4xl font-bold text-slate-100">{(balanceScore * 100).toFixed(1)}%</span>
-              </div>
-            </div>
-            <div className="mt-8 space-y-2 px-4">
-              <p className="text-slate-400 text-sm">
-                Σ 기준: [{sigma[0]?.toFixed(2)}, {sigma[1]?.toFixed(2)}, {sigma[2]?.toFixed(2)}]
-              </p>
-              <p className="text-slate-400 text-sm">
-                수렴 상태: <span className="text-emerald-400 font-medium">active</span>
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+    </div>
+  );
+};
 
-      {/* Module Stats Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Convergence Stats */}
-        <Card className="bg-slate-800/50 border-slate-700">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-slate-100 text-sm flex items-center gap-2">
-              <Shield className="w-4 h-4 text-emerald-400" /> 수렴 제어 (특허1)
-            </CardTitle>
-          </CardHeader>
+export { DashboardTab };
           <CardContent className="space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-slate-400">총 처리</span>
