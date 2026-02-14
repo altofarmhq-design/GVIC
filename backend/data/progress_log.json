@@ -1,3355 +1,5 @@
 [
   {
-    "timestamp": "2026-02-14T13:51:46.402328",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:51:47.496257",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:51:48.574248",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:51:50.047222",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:51:51.129127",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:51:52.234930",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:51:53.344113",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:51:54.422450",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:51:55.496682",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:51:56.612729",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:51:57.689454",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:51:58.782401",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:51:59.862973",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:52:00.929671",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:52:02.059259",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:52:03.137570",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:52:04.237243",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:52:05.325660",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:52:06.403066",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:52:07.471317",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:52:08.541000",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:52:09.648599",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:52:10.739615",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:52:11.821038",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:52:12.884153",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:52:13.971397",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:52:34.777591",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:52:35.895458",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:52:37.242853",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:52:38.326080",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:52:39.423830",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:52:40.509746",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:52:41.870751",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:52:42.949786",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:52:44.038228",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:52:45.404183",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:52:45.718308",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_0a6c69cb",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:52:46.506072",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:52:47.625806",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:52:48.990434",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:52:50.074854",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:52:51.158647",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:52:52.245652",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:52:53.590948",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:52:54.922702",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:52:55.981886",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:52:57.189676",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:52:58.289435",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:52:59.379572",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:00.466625",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:01.569864",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:02.671776",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:03.768852",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:04.875586",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:05.954842",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:07.032905",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:08.121316",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:09.192139",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:10.295933",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:11.385191",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:12.459192",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:13.532552",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:14.605693",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:15.750765",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:16.816373",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:17.911928",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:19.002896",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:20.090775",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:21.206604",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:22.300533",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:23.392660",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:24.481849",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:25.557146",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:26.657740",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:27.744398",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:28.820662",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:29.910335",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:30.983620",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:32.075973",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:33.147762",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:34.228790",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:35.301465",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:36.411606",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:37.512153",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:38.588695",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:39.665974",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:40.744630",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:41.835708",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:42.943045",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:44.035313",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:45.124446",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:46.207150",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:47.287801",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:47.880321",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_0a6c69cb",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:48.381090",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:49.470535",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:50.559986",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:51.641531",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:52.722147",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:53.820848",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:54.894026",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:55.976290",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:57.052191",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:58.129259",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:53:59.221718",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:00.304935",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:01.378849",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:02.461026",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:03.528709",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:04.688340",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:05.768011",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:07.059099",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:08.126054",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:09.205638",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:10.318546",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:11.413830",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:12.491962",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:13.589819",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:14.706392",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:15.796780",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:16.881148",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:17.968120",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:19.044730",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:20.125826",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:21.246389",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:22.335566",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:23.428330",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:24.505475",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:25.585772",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:26.687489",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:27.770031",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:28.859900",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:29.956375",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:31.095254",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:32.194345",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:33.277637",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:34.357735",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:35.434200",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:36.525665",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:37.998937",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:39.092958",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:40.204949",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:41.301016",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:42.373695",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:43.493863",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:44.555961",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:45.626441",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:46.704437",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:47.802864",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:48.933830",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:50.013729",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:50.388018",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_0a6c69cb",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:51.120581",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:52.200159",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:53.276895",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:54.384376",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:55.466422",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:56.552589",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:57.657232",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:58.736947",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:54:59.833479",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:00.904966",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:02.026111",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:03.148466",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:04.237928",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:05.360090",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:06.432722",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:07.523347",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:08.619092",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:09.726374",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:11.099265",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:12.254038",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:13.325021",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:14.428574",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:15.516262",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:16.706368",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:17.813888",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:18.920317",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:20.011349",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:21.104946",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:22.221667",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:23.327695",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:24.397240",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:25.466333",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:26.537520",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:27.621843",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:28.693664",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:29.761745",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:30.840105",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:31.924092",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:33.014763",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:34.094314",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:35.151231",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:36.239894",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:37.343336",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:38.439913",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:39.734508",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:40.815813",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:41.891564",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:42.968050",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:44.046231",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:45.126244",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:46.223802",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:47.310355",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:48.395781",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:49.474888",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:50.532832",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:51.617486",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:52.723256",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:52.902302",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_0a6c69cb",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:53.833916",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:54.939250",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:56.030379",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:57.117358",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:58.201714",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:55:59.286466",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:00.397126",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:01.491240",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:02.574939",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:03.656674",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:04.716517",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:05.819041",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:06.906123",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:07.983224",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:09.087433",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:10.434244",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:11.530726",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:12.591852",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:13.671972",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:14.751949",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:15.842818",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:16.938806",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:18.015779",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:19.125651",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:20.207625",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:21.290116",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:22.397957",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:23.475277",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:24.566548",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:25.655137",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:26.732297",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:27.804810",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:28.888395",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:29.965045",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:31.050608",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:32.158505",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:33.256358",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:34.331723",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:35.442159",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:36.528486",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:37.604889",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:38.709711",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:39.784950",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:40.878263",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:41.964894",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:43.063922",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:44.172101",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:45.283298",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:46.412157",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:47.509605",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:48.606303",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:49.709088",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:50.791750",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:51.878489",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:52.967930",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:54.047387",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:55.010944",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_0a6c69cb",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:55.156321",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:56.296599",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:57.373677",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:58.458887",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:56:59.534586",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:00.634142",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:01.723817",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:02.827823",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:03.913530",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:05.004529",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:06.086550",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:07.162509",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:08.257204",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:09.375319",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:10.548078",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:11.868330",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:12.948281",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:14.025161",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:15.110837",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:16.193417",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:17.301004",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:18.400257",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:19.484855",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:20.558656",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:21.644034",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:22.757704",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:23.838603",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:24.921698",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:26.040411",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:27.150019",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:28.228550",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:29.305233",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:30.378840",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:31.458052",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:32.596883",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:33.703935",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:34.785886",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:35.880156",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:36.958939",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:38.039428",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:39.132725",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:40.228642",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:41.358611",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:42.601141",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:43.677003",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:44.778504",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:45.863708",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:46.950362",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:48.008805",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:49.090893",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:50.186322",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:51.262772",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:52.346157",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:53.421123",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:54.480941",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:55.552399",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:56.630919",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:57.465827",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_0a6c69cb",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:57.719713",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:58.806080",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:57:59.888235",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:58:00.994871",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:58:02.073663",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:58:03.141603",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:58:04.228898",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:58:05.309082",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:58:06.437705",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T13:58:07.513926",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
     "timestamp": "2026-02-14T13:58:08.592061",
     "phase": "데이터소스",
     "action": "데이터 수집",
@@ -9993,6 +6643,3351 @@
     "action": "폴링 중지",
     "data": {
       "source_id": "ds_0a6c69cb"
+    }
+  },
+  {
+    "timestamp": "2026-02-14T16:59:56.277982",
+    "phase": "데이터소스",
+    "action": "폴링 시작",
+    "data": {
+      "source_id": "ds_787c194e"
+    }
+  },
+  {
+    "timestamp": "2026-02-14T16:59:56.421549",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T16:59:57.507649",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T16:59:58.581692",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T16:59:59.679036",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:00.769298",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:01.961147",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:03.086917",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:04.183493",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:05.308905",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:06.415385",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:07.525432",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:08.614766",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:09.699366",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:10.799590",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:11.885331",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:13.004595",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:14.112948",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:15.220646",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:16.316245",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:17.413367",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:18.536896",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:19.636248",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:20.740062",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:21.854105",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:22.947781",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:24.067322",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:25.283407",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:26.373655",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:27.691624",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:28.829407",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:30.117594",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:31.261162",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:32.365575",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:33.453685",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:34.564166",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:35.648301",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:36.829420",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:37.953219",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:39.047097",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:40.159691",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:41.236826",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:42.346021",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:43.460585",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:44.526890",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:45.083641",
+    "phase": "데이터소스",
+    "action": "소스 등록",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "name": "BING"
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:45.610530",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:46.776281",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:47.865656",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:48.963869",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:50.071087",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:51.164031",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:52.271721",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:53.330470",
+    "phase": "데이터소스",
+    "action": "폴링 시작",
+    "data": {
+      "source_id": "ds_62e8656a"
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:53.379481",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:53.460008",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:54.492619",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:55.580046",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:56.663776",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:58.002264",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:00:59.197078",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:00.305868",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:01.428544",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:02.576645",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:03.759486",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:04.862299",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:05.981777",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:07.082978",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:08.176936",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:09.395820",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:10.468328",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:11.570850",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:12.723425",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:13.818273",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:14.908657",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:15.994930",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:17.091434",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:18.299142",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:19.403129",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:20.525353",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:21.678588",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:22.759321",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:23.862580",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:24.937036",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:26.025420",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:27.091609",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:28.196358",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:29.334281",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:30.453713",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:31.595224",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:32.686604",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:33.785942",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:34.896268",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:35.997633",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:37.105263",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:38.196011",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:39.297955",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:40.406087",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:41.497730",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:42.605144",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:43.715410",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:44.809853",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:45.902803",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:47.002314",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:48.126117",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:49.265354",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:50.355655",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:51.499611",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:52.603659",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:53.598099",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:53.720645",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:54.703028",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:54.818310",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:55.832735",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:55.928308",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:56.935465",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:57.033132",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:58.057595",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:58.181844",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:59.171356",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:01:59.561039",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:00.264207",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:00.651735",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:01.455368",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:01.783348",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:02.553727",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:02.899865",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:03.691107",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:03.991329",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:04.822724",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:05.091866",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:05.955316",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:06.219892",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:07.078590",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:07.307848",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:08.172292",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:08.413506",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:09.335075",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:09.506203",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:10.486020",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:10.642580",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:11.590667",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:11.771915",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:12.679166",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:12.854250",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:13.826409",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:13.941160",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:14.910105",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:15.058810",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:16.045717",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:16.174455",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:17.162218",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:17.272713",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:18.311251",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:18.378047",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:19.403808",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:19.464462",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:20.507607",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:20.564198",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:21.619076",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:21.695388",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:22.703493",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:22.783901",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:23.812314",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:23.885854",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:24.903108",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:24.979258",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:25.993412",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:26.065659",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:27.133473",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:27.172201",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:28.244050",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:28.266031",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:29.359498",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:29.449413",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:30.513486",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:30.711343",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:31.608520",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:31.874869",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:32.726826",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:33.025931",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:33.826689",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:34.190217",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:34.919751",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:35.405885",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:36.040240",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:36.557680",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:37.154355",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:37.712734",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:38.250596",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:38.866655",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:39.370360",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:40.076163",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:40.466264",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:41.225472",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:41.559723",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:42.374580",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:42.631846",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:43.508555",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:43.749429",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:44.704534",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:44.835549",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:45.903303",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:45.977782",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:46.989690",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:47.141953",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:48.093941",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:48.311024",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:49.208674",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:49.539420",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:50.287149",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:50.722217",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:51.366380",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:51.899910",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:52.486508",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:53.114330",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:53.587685",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:54.267286",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:54.736356",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:55.412792",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:55.836238",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:56.569151",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:56.931968",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:57.729737",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:58.044852",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:58.874435",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:02:59.246408",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:00.069402",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:00.368334",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:01.224731",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:01.641940",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:02.385400",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:02.745039",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:03.550886",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:03.839843",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:04.720204",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:04.982036",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:05.891757",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:06.107642",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:07.052734",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:07.207462",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:08.254269",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:08.313825",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:09.404143",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:09.411028",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:10.492577",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:10.513003",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:11.612300",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:11.631113",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:12.717121",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:12.751607",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:13.823019",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:13.851698",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:14.902079",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:14.942959",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:16.017551",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:16.036276",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:17.127019",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:17.144978",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:18.221339",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:18.285383",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:19.293698",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:19.386765",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:20.367845",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:20.490382",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:21.457025",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:21.578353",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:22.560347",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:22.708422",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:23.640430",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:23.789354",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:24.733046",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:24.900729",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:25.836166",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:26.055744",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:26.959044",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:27.148489",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:28.058723",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:28.233108",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:29.142645",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:29.322594",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:30.282228",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:30.445188",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:31.345075",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:31.547386",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:32.446646",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:32.676821",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:33.546899",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:33.769355",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:34.647904",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:34.981080",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:35.772998",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:36.140388",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:36.862600",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:37.242895",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:37.942874",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:38.360701",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:39.081339",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:39.514414",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:40.162946",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:40.608849",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:41.253844",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:42.146336",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:42.342413",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:43.382651",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:43.430986",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:44.545827",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:44.567206",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:45.667434",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:45.684640",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:46.750122",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:46.819724",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:47.841625",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:47.945275",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:48.937887",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:49.035406",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:50.046592",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:50.194218",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:51.154941",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:51.292756",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:52.291370",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:52.508251",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:53.410301",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:53.669879",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:54.559925",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:54.877579",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:55.671811",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:56.014656",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:56.796612",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:57.287318",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:57.884756",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:58.448629",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:59.008158",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:03:59.624127",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_62e8656a",
+      "success": false,
+      "value": null
+    }
+  },
+  {
+    "timestamp": "2026-02-14T17:04:00.108639",
+    "phase": "데이터소스",
+    "action": "데이터 수집",
+    "data": {
+      "source_id": "ds_787c194e",
+      "success": false,
+      "value": null
     }
   }
 ]
