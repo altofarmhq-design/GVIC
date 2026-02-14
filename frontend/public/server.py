@@ -3075,6 +3075,879 @@ async def load_data_sources():
 api_router.include_router(auth_router)
 
 # Include the router in the main app
+
+# ==================== Signal Tracer API ====================
+# 시그널 추적기 - 단일 후기의 처리 과정을 단계별로 시각화
+
+class SignalTracerInput(BaseModel):
+    """시그널 추적기 입력"""
+    content: str = Field(..., description="후기 내용")
+    rating: int = Field(default=5, ge=1, le=5, description="평점 (1-5)")
+    # 튜닝 가능한 파라미터
+    sigma: Optional[List[float]] = Field(default=None, description="시그마 가중치 [V_pub, V_pro, V_ind]")
+    omega_min: Optional[List[float]] = Field(default=None, description="오메가 최소값")
+    omega_max: Optional[List[float]] = Field(default=None, description="오메가 최대값")
+    # 키워드 가중치
+    keyword_weights: Optional[Dict[str, float]] = Field(default=None, description="키워드별 가중치")
+
+class SignalTracerResponse(BaseModel):
+    """시그널 추적기 응답 - 5단계 결과"""
+    success: bool
+    trace_id: str
+    steps: Dict[str, Any]
+
+# 키워드 사전 (시그널 분류용)
+SIGNAL_KEYWORDS = {
+    "society": {  # 사회/규제 관점
+        "positive": ["안전", "인증", "친환경", "무첨가", "자연", "유기농", "검증"],
+        "negative": ["위험", "부작용", "알러지", "환경오염", "플라스틱", "화학"]
+    },
+    "production": {  # 생산/기업 관점
+        "positive": ["품질", "포장", "배송", "꼼꼼", "신속", "정품", "유통기한"],
+        "negative": ["불량", "파손", "지연", "오배송", "누락", "하자"]
+    },
+    "consumer": {  # 소비자 관점
+        "positive": ["효과", "만족", "추천", "재구매", "좋아요", "최고", "가성비"],
+        "negative": ["실망", "비싸", "효과없", "후회", "비추", "가격"]
+    }
+}
+
+# AI 기반 시그널 감지기 초기화
+from core.signal_detector import GVICSignalDetector
+from core.gvic_models import Signal, SignalModule, SignalInput, GVICAsset, generate_id
+
+signal_detector = None
+
+def get_signal_detector():
+    global signal_detector
+    if signal_detector is None:
+        try:
+            signal_detector = GVICSignalDetector()
+        except Exception as e:
+            print(f"Signal detector init failed: {e}")
+            return None
+    return signal_detector
+
+
+class AISignalAnalysisInput(BaseModel):
+    """AI 기반 시그널 분석 입력"""
+    content: str = Field(..., description="분석할 텍스트")
+    include_perspective_mapping: bool = Field(default=True, description="3관점 매핑 포함 여부")
+
+
+@api_router.post("/signal-tracer/ai-analyze")
+async def ai_analyze_signal(
+    request: AISignalAnalysisInput,
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    AI 기반 시그널 분석 - 시그널 유형 자동 감지 및 특징 추출
+    
+    ID 체계:
+    - input_id: 입력 고유 ID
+    - module_id: 모듈 고유 ID  
+    - signal_id: 개별 시그널 고유 ID
+    - requester_id: 요구자 ID
+    """
+    # ID 생성
+    requester_id = current_user.get("user_id")
+    input_id = generate_id("INP")
+    module_id = generate_id("MOD")
+    
+    detector = get_signal_detector()
+    if detector is None:
+        raise HTTPException(status_code=500, detail="AI 시그널 감지기 초기화 실패")
+    
+    try:
+        result = await detector.detect_and_extract(
+            text=request.content,
+            session_id=f"gvic_{input_id}"
+        )
+        
+        if not result.get("success", False):
+            raise HTTPException(
+                status_code=500, 
+                detail=f"분석 실패: {result.get('error', 'Unknown error')}"
+            )
+        
+        # 시그널 유형 라벨
+        signal_type = result.get("signal_type", "unknown")
+        signal_type_labels = {
+            "product_review": "상품/서비스 후기",
+            "requirement": "요구사항/기능요청",
+            "complaint": "불만/클레임",
+            "inquiry": "문의/질문",
+            "news": "뉴스/기사",
+            "feedback": "피드백/제안",
+            "conversation": "일상대화",
+            "data": "데이터/수치",
+            "unknown": "분류불가"
+        }
+        
+        # 개별 시그널에 ID 부여
+        discovered_signals = result.get("discovered_signals", [])
+        signals_with_id = []
+        for sig in discovered_signals:
+            signal_id = generate_id("SIG")
+            sig_with_id = {
+                "signal_id": signal_id,
+                "module_id": module_id,
+                "input_id": input_id,
+                **sig
+            }
+            signals_with_id.append(sig_with_id)
+        
+        return {
+            "success": True,
+            
+            # ID 체계
+            "input_id": input_id,
+            "module_id": module_id,
+            "requester_id": requester_id,
+            
+            # 입력 정보
+            "raw_content": request.content,
+            "content_length": len(request.content),
+            
+            # 모듈 정보
+            "signal_type": signal_type,
+            "signal_type_label": signal_type_labels.get(signal_type, "알 수 없음"),
+            "signal_type_confidence": result.get("signal_type_confidence", 0),
+            "signal_type_reason": result.get("signal_type_reason", ""),
+            
+            # 시그널들 (각각 signal_id 포함)
+            "discovered_signals": signals_with_id,
+            "signal_count": len(signals_with_id),
+            
+            # 분석 결과
+            "overall_sentiment": result.get("overall_sentiment", "neutral"),
+            "key_themes": result.get("key_themes", []),
+            "summary": result.get("summary", ""),
+            
+            # 3관점 적용 여부
+            "applicable_perspectives": result.get("applicable_perspectives", {
+                "society": False,
+                "production": False,
+                "consumer": False
+            }),
+            "perspective_relevance": result.get("perspective_relevance", ""),
+            
+            # 메타데이터
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"분석 중 오류: {str(e)}")
+
+
+def analyze_keywords(content: str, custom_weights: Optional[Dict[str, float]] = None) -> Dict[str, Any]:
+    """키워드 기반 시그널 분석"""
+    results = {
+        "society": {"positive": [], "negative": [], "score": 0},
+        "production": {"positive": [], "negative": [], "score": 0},
+        "consumer": {"positive": [], "negative": [], "score": 0}
+    }
+    
+    content_lower = content.lower()
+    
+    for domain, keywords in SIGNAL_KEYWORDS.items():
+        pos_count = 0
+        neg_count = 0
+        
+        for kw in keywords["positive"]:
+            if kw in content_lower:
+                results[domain]["positive"].append(kw)
+                weight = custom_weights.get(kw, 1.0) if custom_weights else 1.0
+                pos_count += weight
+                
+        for kw in keywords["negative"]:
+            if kw in content_lower:
+                results[domain]["negative"].append(kw)
+                weight = custom_weights.get(kw, 1.0) if custom_weights else 1.0
+                neg_count += weight
+        
+        # 점수 계산 (0-100)
+        total = pos_count + neg_count
+        if total > 0:
+            results[domain]["score"] = int((pos_count / (pos_count + neg_count + 0.5)) * 100)
+        else:
+            results[domain]["score"] = 50  # 중립
+    
+    return results
+
+@api_router.post("/signal-tracer/analyze", response_model=SignalTracerResponse)
+async def analyze_single_review(request: SignalTracerInput, current_user: dict = Depends(get_current_user)):
+    """
+    시그널 추적기 - 단일 후기를 5단계로 분석
+    회원 전용 기능
+    """
+    trace_id = str(uuid.uuid4())[:8]
+    
+    # 기본 파라미터 설정
+    sigma = request.sigma or [0.33, 0.34, 0.33]
+    omega_min = request.omega_min or [0.2, 0.2, 0.1]
+    omega_max = request.omega_max or [0.5, 0.5, 0.5]
+    
+    # ==================== STEP 1: 입력 ====================
+    step1_input = {
+        "step": 1,
+        "name": "입력 (Input)",
+        "description": "원본 후기 데이터",
+        "data": {
+            "content": request.content,
+            "rating": request.rating,
+            "char_count": len(request.content),
+            "word_count": len(request.content.split())
+        }
+    }
+    
+    # ==================== STEP 2: 표준화 ====================
+    # 평점을 0-100 스케일로 변환
+    normalized_value = (request.rating / 5.0) * 100
+    
+    # 감성 힌트 결정
+    if request.rating >= 4:
+        sentiment_hint = "positive"
+    elif request.rating == 3:
+        sentiment_hint = "neutral"
+    else:
+        sentiment_hint = "negative"
+    
+    step2_standardize = {
+        "step": 2,
+        "name": "표준화 (Standardization)",
+        "description": "GVIC 표준 입력 포맷으로 변환",
+        "transformation": {
+            "rating_scale": "1-5 → 0-100",
+            "formula": f"({request.rating} / 5) × 100 = {normalized_value}"
+        },
+        "data": {
+            "primary_value": normalized_value,
+            "sentiment_hint": sentiment_hint,
+            "source_type": "direct_input",
+            "domain": "product_review"
+        }
+    }
+    
+    # ==================== STEP 3: 시그널 분석 ====================
+    keyword_analysis = analyze_keywords(request.content, request.keyword_weights)
+    
+    # 각 영역별 원시 점수
+    raw_scores = {
+        "V_pub": keyword_analysis["society"]["score"],
+        "V_pro": keyword_analysis["production"]["score"],
+        "V_ind": keyword_analysis["consumer"]["score"]
+    }
+    
+    # 평점 기반 보정
+    rating_factor = normalized_value / 100
+    for key in raw_scores:
+        raw_scores[key] = int(raw_scores[key] * 0.6 + rating_factor * 100 * 0.4)
+    
+    step3_signal = {
+        "step": 3,
+        "name": "시그널 분석 (Signal Analysis)",
+        "description": "3가지 관점에서 시그널 추출",
+        "keyword_analysis": {
+            "society": {
+                "label": "🏛️ 사회·규제 관점",
+                "found_positive": keyword_analysis["society"]["positive"],
+                "found_negative": keyword_analysis["society"]["negative"],
+                "raw_score": keyword_analysis["society"]["score"]
+            },
+            "production": {
+                "label": "🏭 기업·생산 관점",
+                "found_positive": keyword_analysis["production"]["positive"],
+                "found_negative": keyword_analysis["production"]["negative"],
+                "raw_score": keyword_analysis["production"]["score"]
+            },
+            "consumer": {
+                "label": "👤 소비자·고객 관점",
+                "found_positive": keyword_analysis["consumer"]["positive"],
+                "found_negative": keyword_analysis["consumer"]["negative"],
+                "raw_score": keyword_analysis["consumer"]["score"]
+            }
+        },
+        "raw_scores": raw_scores,
+        "rating_adjustment": f"평점({request.rating}점) 기반 40% 보정 적용"
+    }
+    
+    # ==================== STEP 4: 수렴 연산 ====================
+    import numpy as np
+    
+    # 시그마 가중치 적용
+    sigma_arr = np.array(sigma)
+    scores_arr = np.array([raw_scores["V_pub"], raw_scores["V_pro"], raw_scores["V_ind"]])
+    
+    # 가중 평균 계산
+    weighted_scores = scores_arr * sigma_arr
+    
+    # 정규화 (합이 100이 되도록)
+    total = np.sum(weighted_scores)
+    if total > 0:
+        normalized_distribution = (weighted_scores / total) * 100
+    else:
+        normalized_distribution = np.array([33.33, 33.34, 33.33])
+    
+    # 오메가 경계 조건 검증
+    omega_min_arr = np.array(omega_min) * 100
+    omega_max_arr = np.array(omega_max) * 100
+    
+    boundary_violations = []
+    adjusted_distribution = normalized_distribution.copy()
+    
+    for i, (val, min_v, max_v, name) in enumerate(zip(
+        normalized_distribution, 
+        omega_min_arr, 
+        omega_max_arr,
+        ["V_pub", "V_pro", "V_ind"]
+    )):
+        if val < min_v:
+            boundary_violations.append(f"{name}: {val:.1f}% < 최소 {min_v:.1f}%")
+            adjusted_distribution[i] = min_v
+        elif val > max_v:
+            boundary_violations.append(f"{name}: {val:.1f}% > 최대 {max_v:.1f}%")
+            adjusted_distribution[i] = max_v
+    
+    # 재정규화
+    if boundary_violations:
+        adjusted_distribution = (adjusted_distribution / np.sum(adjusted_distribution)) * 100
+    
+    step4_convergence = {
+        "step": 4,
+        "name": "수렴 연산 (Convergence)",
+        "description": "Σ 시그마 가중치 적용 및 Ω 오메가 경계 검증",
+        "sigma_applied": {
+            "weights": {"V_pub": sigma[0], "V_pro": sigma[1], "V_ind": sigma[2]},
+            "formula": "weighted_score = raw_score × sigma",
+            "weighted_scores": {
+                "V_pub": round(weighted_scores[0], 2),
+                "V_pro": round(weighted_scores[1], 2),
+                "V_ind": round(weighted_scores[2], 2)
+            }
+        },
+        "omega_validation": {
+            "boundaries": {
+                "V_pub": f"{omega_min[0]*100:.0f}% ~ {omega_max[0]*100:.0f}%",
+                "V_pro": f"{omega_min[1]*100:.0f}% ~ {omega_max[1]*100:.0f}%",
+                "V_ind": f"{omega_min[2]*100:.0f}% ~ {omega_max[2]*100:.0f}%"
+            },
+            "violations": boundary_violations if boundary_violations else ["없음 - 경계 조건 충족"],
+            "is_valid": len(boundary_violations) == 0
+        },
+        "distribution": {
+            "before_adjustment": {
+                "V_pub": round(normalized_distribution[0], 2),
+                "V_pro": round(normalized_distribution[1], 2),
+                "V_ind": round(normalized_distribution[2], 2)
+            },
+            "after_adjustment": {
+                "V_pub": round(adjusted_distribution[0], 2),
+                "V_pro": round(adjusted_distribution[1], 2),
+                "V_ind": round(adjusted_distribution[2], 2)
+            }
+        }
+    }
+    
+    # ==================== STEP 5: 최종 출력 ====================
+    # 종합 점수 계산
+    final_score = int(np.sum(scores_arr * sigma_arr))
+    
+    # 인사이트 생성
+    insights = []
+    
+    # 긍정 키워드 기반 인사이트
+    all_positive = (
+        keyword_analysis["society"]["positive"] + 
+        keyword_analysis["production"]["positive"] + 
+        keyword_analysis["consumer"]["positive"]
+    )
+    all_negative = (
+        keyword_analysis["society"]["negative"] + 
+        keyword_analysis["production"]["negative"] + 
+        keyword_analysis["consumer"]["negative"]
+    )
+    
+    if all_positive:
+        insights.append({"type": "positive", "text": f"긍정 요소: {', '.join(all_positive)}"})
+    if all_negative:
+        insights.append({"type": "negative", "text": f"개선 필요: {', '.join(all_negative)}"})
+    
+    # 영역별 인사이트
+    max_domain = max(["V_pub", "V_pro", "V_ind"], key=lambda x: adjusted_distribution[["V_pub", "V_pro", "V_ind"].index(x)])
+    domain_labels = {"V_pub": "사회·규제", "V_pro": "기업·생산", "V_ind": "소비자·고객"}
+    insights.append({
+        "type": "info", 
+        "text": f"주요 관점: {domain_labels[max_domain]} ({adjusted_distribution[['V_pub', 'V_pro', 'V_ind'].index(max_domain)]:.1f}%)"
+    })
+    
+    # 분류 결정
+    if final_score >= 70:
+        classification = "긍정"
+        classification_color = "green"
+    elif final_score >= 40:
+        classification = "중립"
+        classification_color = "yellow"
+    else:
+        classification = "부정"
+        classification_color = "red"
+    
+    step5_output = {
+        "step": 5,
+        "name": "최종 출력 (Output)",
+        "description": "분석 결과 및 인사이트",
+        "final_score": {
+            "value": final_score,
+            "max": 100,
+            "classification": classification,
+            "color": classification_color
+        },
+        "distribution_chart": {
+            "V_pub": {"label": "🏛️ 사회·규제", "value": round(adjusted_distribution[0], 1)},
+            "V_pro": {"label": "🏭 기업·생산", "value": round(adjusted_distribution[1], 1)},
+            "V_ind": {"label": "👤 소비자·고객", "value": round(adjusted_distribution[2], 1)}
+        },
+        "insights": insights,
+        "recommendations": [
+            "이 후기는 제품 품질에 대한 피드백을 포함합니다." if keyword_analysis["production"]["positive"] or keyword_analysis["production"]["negative"] else None,
+            "소비자 만족도 관련 의견이 포함되어 있습니다." if keyword_analysis["consumer"]["positive"] or keyword_analysis["consumer"]["negative"] else None,
+            "사회적/규제적 관점의 언급이 있습니다." if keyword_analysis["society"]["positive"] or keyword_analysis["society"]["negative"] else None
+        ]
+    }
+    # None 제거
+    step5_output["recommendations"] = [r for r in step5_output["recommendations"] if r]
+    
+    # 전체 응답 조립
+    return SignalTracerResponse(
+        success=True,
+        trace_id=trace_id,
+        steps={
+            "step1_input": step1_input,
+            "step2_standardize": step2_standardize,
+            "step3_signal": step3_signal,
+            "step4_convergence": step4_convergence,
+            "step5_output": step5_output
+        }
+    )
+
+@api_router.get("/signal-tracer/keywords")
+async def get_signal_keywords(current_user: dict = Depends(get_current_user)):
+    """시그널 분석에 사용되는 키워드 사전 조회"""
+    return {
+        "keywords": SIGNAL_KEYWORDS,
+        "description": {
+            "society": "사회·규제 관점 (환경, 안전, 인증 등)",
+            "production": "기업·생산 관점 (품질, 포장, 배송 등)",
+            "consumer": "소비자·고객 관점 (효과, 만족, 가성비 등)"
+        }
+    }
+
+@api_router.put("/signal-tracer/keywords")
+async def update_signal_keywords(
+    keywords: Dict[str, Dict[str, List[str]]],
+    current_user: dict = Depends(require_role(["admin", "super_admin"]))
+):
+    """시그널 키워드 사전 업데이트 (관리자 전용)"""
+    global SIGNAL_KEYWORDS
+    SIGNAL_KEYWORDS = keywords
+    return {"success": True, "message": "키워드 사전이 업데이트되었습니다."}
+
+
+# ==================== GVIC 자산 관리 API ====================
+# GVIC 자산 - 분석된 데이터를 구조화된 자산으로 저장
+
+class GVICAssetCreate(BaseModel):
+    """GVIC 자산 생성 요청"""
+    content: str
+    rating: int
+    analysis_result: Dict[str, Any]
+
+class GVICAssetCreateV2(BaseModel):
+    content: str
+    rating: int = 5
+    analysis_result: dict
+    visibility: str = "showcase"  # "showcase" (공개) or "private" (유료요구자 전용)
+
+@api_router.post("/gvic-assets")
+async def create_gvic_asset(
+    request: GVICAssetCreate,
+    current_user: dict = Depends(get_current_user)
+):
+    """AI 분석 결과를 GVIC 자산(모듈)으로 저장"""
+    try:
+        result = request.analysis_result
+        
+        # 유료 요구자 여부 확인 (role 기반 또는 별도 필드로 관리)
+        # 유료 요구자: ext_admin, ext_operator 등 외부 역할 또는 별도 표시
+        user_role = current_user.get("role", "visitor")
+        is_paid_requester = user_role in ["ext_admin", "ext_operator"] or current_user.get("is_paid", False)
+        
+        # 기본 visibility 결정: 유료 요구자는 private, 그 외는 showcase
+        visibility = "private" if is_paid_requester else "showcase"
+        
+        # AI 분석 결과인지 기존 키워드 분석 결과인지 확인
+        is_ai_result = "signal_type" in result and "discovered_signals" in result
+        
+        if is_ai_result:
+            discovered_signals = result.get("discovered_signals", [])
+            
+            overall_sentiment = result.get("overall_sentiment", "neutral")
+            if overall_sentiment == "positive":
+                classification = "긍정"
+            elif overall_sentiment == "negative":
+                classification = "부정"
+            elif overall_sentiment == "mixed":
+                classification = "혼합"
+            else:
+                classification = "중립"
+            
+            signal_texts = [sig.get("text", "") for sig in discovered_signals]
+            signal_types = list(set([sig.get("type", "") for sig in discovered_signals]))
+            hidden_meanings = [sig.get("hidden_meaning", "") for sig in discovered_signals if sig.get("hidden_meaning")]
+            
+            asset = {
+                "asset_id": f"AST_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}_{uuid.uuid4().hex[:6].upper()}",
+                "raw_content": request.content,
+                "content_length": len(request.content),
+                "module_id": result.get("module_id"),
+                "input_id": result.get("input_id"),
+                "signal_type": result.get("signal_type"),
+                "signal_type_label": result.get("signal_type_label"),
+                "signal_count": result.get("signal_count", 0),
+                "discovered_signals": discovered_signals,
+                "signal_texts": signal_texts,
+                "signal_types": signal_types,
+                "hidden_meanings": hidden_meanings,
+                "summary": result.get("summary", ""),
+                "key_themes": result.get("key_themes", []),
+                "overall_sentiment": overall_sentiment,
+                "classification": classification,
+                "applicable_perspectives": result.get("applicable_perspectives", {}),
+                "perspective_relevance": result.get("perspective_relevance", ""),
+                "created_by": current_user.get("user_id"),
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "used_count": 0,
+                "used_for": [],
+                "full_analysis": result,
+                # 접근 제어
+                "visibility": visibility,
+                "owner_id": current_user.get("user_id")
+            }
+        else:
+            steps = result.get("steps", {})
+            step5 = steps.get("step5_output", {})
+            step4 = steps.get("step4_convergence", {})
+            final_score = step5.get("final_score", {})
+            distribution = step4.get("distribution", {}).get("after_adjustment", {})
+            
+            asset = {
+                "asset_id": f"AST_{uuid.uuid4().hex[:8].upper()}",
+                "raw_content": request.content,
+                "content_length": len(request.content),
+                "rating": request.rating,
+                "score": final_score.get("value", 0),
+                "classification": final_score.get("classification", "미분류"),
+                "v_pub": distribution.get("V_pub", 0),
+                "v_pro": distribution.get("V_pro", 0),
+                "v_ind": distribution.get("V_ind", 0),
+                "signal_type": "legacy_keyword",
+                "signal_type_label": "키워드 분석 (레거시)",
+                "summary": "",
+                "key_themes": [],
+                "signal_texts": [],
+                "full_analysis": result,
+                "created_by": current_user.get("user_id"),
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "used_count": 0,
+                "used_for": [],
+                "visibility": visibility,
+                "owner_id": current_user.get("user_id")
+            }
+        
+        await db.gvic_assets.insert_one(asset)
+        
+        return {"success": True, "asset_id": asset["asset_id"], "message": "자산(모듈)이 저장되었습니다."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"자산 저장 실패: {str(e)}")
+
+@api_router.get("/gvic-assets")
+async def get_gvic_assets(
+    limit: int = 50,
+    classification: Optional[str] = None,
+    search: Optional[str] = None,
+    signal_type: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """GVIC 자산(모듈) 목록 조회 - 모듈화된 데이터 검색"""
+    try:
+        query = {}
+        if classification:
+            query["classification"] = classification
+        if signal_type:
+            query["signal_type"] = signal_type
+        
+        # 모듈화된 데이터 검색 (원시 content가 아닌 모듈 데이터 검색)
+        if search:
+            search_lower = search.lower()
+            query["$or"] = [
+                # 시그널 유형 레이블
+                {"signal_type_label": {"$regex": search, "$options": "i"}},
+                # 시그널 텍스트들
+                {"signal_texts": {"$regex": search, "$options": "i"}},
+                # 요약
+                {"summary": {"$regex": search, "$options": "i"}},
+                # 주요 테마
+                {"key_themes": {"$regex": search, "$options": "i"}},
+                # 숨겨진 의미
+                {"hidden_meanings": {"$regex": search, "$options": "i"}},
+                # 시그널 유형들
+                {"signal_types": {"$regex": search, "$options": "i"}},
+                # 관점 관련성
+                {"perspective_relevance": {"$regex": search, "$options": "i"}},
+                # 모듈 ID로도 검색 가능
+                {"module_id": {"$regex": search, "$options": "i"}},
+                {"asset_id": {"$regex": search, "$options": "i"}}
+            ]
+        
+        assets_cursor = db.gvic_assets.find(query, {"_id": 0}).sort("created_at", -1).limit(limit)
+        assets = await assets_cursor.to_list(length=limit)
+        
+        # 통계 계산
+        total = await db.gvic_assets.count_documents({})
+        positive = await db.gvic_assets.count_documents({"classification": "긍정"})
+        neutral = await db.gvic_assets.count_documents({"classification": "중립"})
+        negative = await db.gvic_assets.count_documents({"classification": "부정"})
+        mixed = await db.gvic_assets.count_documents({"classification": "혼합"})
+        
+        # 시그널 유형별 통계
+        signal_type_stats = {}
+        pipeline = [
+            {"$group": {"_id": "$signal_type_label", "count": {"$sum": 1}}},
+            {"$sort": {"count": -1}}
+        ]
+        async for doc in db.gvic_assets.aggregate(pipeline):
+            if doc["_id"]:
+                signal_type_stats[doc["_id"]] = doc["count"]
+        
+        stats = {
+            "total": total,
+            "positive": positive,
+            "neutral": neutral,
+            "negative": negative,
+            "mixed": mixed,
+            "by_signal_type": signal_type_stats
+        }
+        
+        return {"assets": assets, "stats": stats}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"자산 조회 실패: {str(e)}")
+
+@api_router.get("/gvic-warehouse")
+async def get_gvic_warehouse(
+    current_user: dict = Depends(get_current_user)
+):
+    """자산화창고 - 공개 쇼케이스용 탑 10 유사 모듈"""
+    try:
+        # 공개(showcase) 자산만 조회
+        base_query = {"visibility": {"$in": ["showcase", None]}}  # None은 기존 데이터 호환
+        
+        # 시그널 유형별 그룹화 및 카운트 (탑 10)
+        pipeline = [
+            {"$match": base_query},
+            {"$group": {
+                "_id": "$signal_type_label",
+                "count": {"$sum": 1},
+                "sample_assets": {"$push": {
+                    "asset_id": "$asset_id",
+                    "summary": "$summary",
+                    "classification": "$classification",
+                    "key_themes": "$key_themes",
+                    "signal_count": "$signal_count",
+                    "overall_sentiment": "$overall_sentiment"
+                }}
+            }},
+            {"$sort": {"count": -1}},
+            {"$limit": 10},
+            {"$project": {
+                "signal_type": "$_id",
+                "count": 1,
+                "sample_assets": {"$slice": ["$sample_assets", 3]}  # 각 유형별 샘플 3개
+            }}
+        ]
+        
+        top_modules = []
+        async for doc in db.gvic_assets.aggregate(pipeline):
+            if doc.get("_id"):
+                top_modules.append({
+                    "signal_type": doc["signal_type"],
+                    "count": doc["count"],
+                    "samples": doc.get("sample_assets", [])
+                })
+        
+        # 전체 통계 (공개 자산만)
+        total_showcase = await db.gvic_assets.count_documents(base_query)
+        
+        # 감성별 통계
+        sentiment_stats = {
+            "positive": await db.gvic_assets.count_documents({**base_query, "classification": "긍정"}),
+            "negative": await db.gvic_assets.count_documents({**base_query, "classification": "부정"}),
+            "mixed": await db.gvic_assets.count_documents({**base_query, "classification": "혼합"}),
+            "neutral": await db.gvic_assets.count_documents({**base_query, "classification": "중립"})
+        }
+        
+        return {
+            "top_modules": top_modules,
+            "total_showcase": total_showcase,
+            "sentiment_stats": sentiment_stats,
+            "message": "궁금증을 자아내는 자산화창고입니다"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"자산화창고 조회 실패: {str(e)}")
+
+class NLSearchRequest(BaseModel):
+    query: str
+
+@api_router.post("/gvic-warehouse/search")
+async def search_warehouse_nl(
+    request: NLSearchRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """자산화창고 자연어 검색 - AI 기반"""
+    try:
+        from core.signal_detector import GVICSignalDetector
+        detector = GVICSignalDetector()
+        
+        # 자연어 쿼리를 AI로 분석하여 검색 키워드 추출
+        prompt = f"""사용자가 자산화창고에서 다음과 같이 검색했습니다:
+"{request.query}"
+
+이 자연어 검색 쿼리에서 핵심 검색 키워드들을 추출해주세요.
+응답은 JSON 형식으로:
+{{"keywords": ["키워드1", "키워드2", ...], "intent": "검색 의도 요약", "sentiment_filter": "positive/negative/mixed/neutral/all"}}
+"""
+        
+        # AI로 검색 의도 분석
+        search_analysis = await detector._call_llm(prompt)
+        
+        # 검색 실행 (공개 자산만)
+        base_query = {"visibility": {"$in": ["showcase", None]}}
+        
+        # 추출된 키워드로 검색
+        keywords = search_analysis.get("keywords", [request.query])
+        sentiment_filter = search_analysis.get("sentiment_filter", "all")
+        
+        search_conditions = []
+        for kw in keywords:
+            search_conditions.extend([
+                {"signal_type_label": {"$regex": kw, "$options": "i"}},
+                {"summary": {"$regex": kw, "$options": "i"}},
+                {"key_themes": {"$regex": kw, "$options": "i"}},
+                {"signal_texts": {"$regex": kw, "$options": "i"}},
+                {"hidden_meanings": {"$regex": kw, "$options": "i"}}
+            ])
+        
+        if search_conditions:
+            base_query["$or"] = search_conditions
+        
+        if sentiment_filter != "all":
+            sentiment_map = {"positive": "긍정", "negative": "부정", "mixed": "혼합", "neutral": "중립"}
+            if sentiment_filter in sentiment_map:
+                base_query["classification"] = sentiment_map[sentiment_filter]
+        
+        # 검색 결과
+        cursor = db.gvic_assets.find(base_query, {"_id": 0, "full_analysis": 0}).sort("created_at", -1).limit(10)
+        results = await cursor.to_list(length=10)
+        
+        return {
+            "query": request.query,
+            "analysis": {
+                "keywords": keywords,
+                "intent": search_analysis.get("intent", ""),
+                "sentiment_filter": sentiment_filter
+            },
+            "results": results,
+            "count": len(results)
+        }
+    except Exception as e:
+        # AI 분석 실패 시 단순 키워드 검색으로 폴백
+        base_query = {
+            "visibility": {"$in": ["showcase", None]},
+            "$or": [
+                {"summary": {"$regex": request.query, "$options": "i"}},
+                {"key_themes": {"$regex": request.query, "$options": "i"}},
+                {"signal_type_label": {"$regex": request.query, "$options": "i"}}
+            ]
+        }
+        cursor = db.gvic_assets.find(base_query, {"_id": 0, "full_analysis": 0}).sort("created_at", -1).limit(10)
+        results = await cursor.to_list(length=10)
+        
+        return {
+            "query": request.query,
+            "analysis": {"keywords": [request.query], "intent": "단순 검색", "sentiment_filter": "all"},
+            "results": results,
+            "count": len(results)
+        }
+
+@api_router.get("/gvic-assets/my")
+async def get_my_assets(
+    limit: int = 50,
+    current_user: dict = Depends(get_current_user)
+):
+    """내 자산 조회 (유료 요구자용) - 본인 자산만"""
+    try:
+        query = {"owner_id": current_user.get("user_id")}
+        cursor = db.gvic_assets.find(query, {"_id": 0}).sort("created_at", -1).limit(limit)
+        assets = await cursor.to_list(length=limit)
+        
+        total = await db.gvic_assets.count_documents(query)
+        
+        return {"assets": assets, "total": total}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"내 자산 조회 실패: {str(e)}")
+
+@api_router.get("/gvic-assets/{asset_id}")
+async def get_gvic_asset(
+    asset_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """특정 GVIC 자산 상세 조회"""
+    asset = await db.gvic_assets.find_one({"asset_id": asset_id}, {"_id": 0})
+    if not asset:
+        raise HTTPException(status_code=404, detail="자산을 찾을 수 없습니다.")
+    return asset
+
+@api_router.delete("/gvic-assets/{asset_id}")
+async def delete_gvic_asset(
+    asset_id: str,
+    current_user: dict = Depends(require_role(["admin", "super_admin"]))
+):
+    """GVIC 자산 삭제 (관리자 전용)"""
+    result = await db.gvic_assets.delete_one({"asset_id": asset_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="자산을 찾을 수 없습니다.")
+    return {"success": True, "message": "자산이 삭제되었습니다."}
+
+@api_router.post("/gvic-assets/{asset_id}/use")
+async def record_asset_usage(
+    asset_id: str,
+    usage_type: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """자산 사용 기록"""
+    result = await db.gvic_assets.update_one(
+        {"asset_id": asset_id},
+        {
+            "$inc": {"used_count": 1},
+            "$push": {"used_for": {"type": usage_type, "at": datetime.now(timezone.utc).isoformat()}}
+        }
+    )
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="자산을 찾을 수 없습니다.")
+    return {"success": True, "message": "사용 기록이 추가되었습니다."}
+
+
 app.include_router(api_router)
 
 app.add_middleware(
