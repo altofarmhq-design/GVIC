@@ -104,32 +104,45 @@ export const MonitoringTab = () => {
         </div>
       </div>
 
-      {/* Metrics Row */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      {/* Metrics Row - 실제 데이터 */}
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <MetricCard 
-          icon={Activity} 
-          label="총 소비량" 
-          value={current.consumption?.total?.toFixed(1) || 0}
+          icon={Zap} 
+          label="총 분석" 
+          value={totalAnalyzed}
           variant="cyan"
         />
         <MetricCard 
-          icon={Radio} 
-          label="효율성" 
-          value={`${efficiency.toFixed(1)}%`}
-          variant={efficiency >= 90 ? "teal" : efficiency >= 70 ? "amber" : "rose"}
+          icon={Database} 
+          label="자산화" 
+          value={totalAssets}
+          variant="purple"
         />
         <MetricCard 
-          icon={status === "optimal" ? CheckCircle : AlertTriangle} 
-          label="상태" 
-          value={status === "optimal" ? "최적" : status === "adjusting" ? "조정중" : "경고"}
-          variant={status === "optimal" ? "teal" : status === "adjusting" ? "amber" : "rose"}
+          icon={CheckCircle} 
+          label="성공률" 
+          value={`${successRate.toFixed(1)}%`}
+          variant={successRate >= 90 ? "teal" : successRate >= 70 ? "amber" : "rose"}
         />
         <MetricCard 
-          icon={AlertTriangle} 
-          label="위반 사항" 
-          value={distribution?.violations?.length || 0}
-          variant={distribution?.is_valid ? "teal" : "rose"}
+          icon={Clock} 
+          label="최근 1시간" 
+          value={lastHourCount}
+          variant="amber"
         />
+        <Card className="bg-slate-800/50 border-slate-700">
+          <CardContent className="py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <currentStatus.icon className="w-5 h-5 text-slate-400" />
+                <span className="text-slate-400 text-sm">상태</span>
+              </div>
+              <Badge className={`${currentStatus.color} text-white`}>
+                {currentStatus.label}
+              </Badge>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Charts Row */}
