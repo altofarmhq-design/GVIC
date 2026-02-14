@@ -3465,7 +3465,7 @@ async def create_gvic_asset(
             "used_for": []
         }
         
-        db.gvic_assets.insert_one(asset)
+        await db.gvic_assets.insert_one(asset)
         
         return {"success": True, "asset_id": asset["asset_id"], "message": "자산이 저장되었습니다."}
     except Exception as e:
