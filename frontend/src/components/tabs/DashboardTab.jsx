@@ -164,64 +164,159 @@ export const DashboardTab = ({ dashboard, systemStatus }) => {
 
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Distribution Chart */}
+        {/* 감성 분포 Chart - 실제 데이터 */}
         <Card className="bg-slate-800/50 border-slate-700">
           <CardHeader>
             <CardTitle className="text-slate-100 flex items-center gap-2">
-              <PieChartIcon className="w-5 h-5" /> 분배 비율 (Σ)
+              <PieChartIcon className="w-5 h-5" /> 감성 분포
             </CardTitle>
             <CardDescription className="text-slate-400">
-              특허 6: 가중 분배 모델 기반
+              실제 분석된 시그널의 감성 분포
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="h-64" data-testid="distribution-chart">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={pieData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={90}
-                    paddingAngle={2}
-                    dataKey="value"
-                  >
-                    {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <RechartsTooltip 
-                    contentStyle={{ background: '#1e293b', border: '1px solid #475569', borderRadius: '8px' }}
-                    labelStyle={{ color: '#f1f5f9' }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
+              {pieData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={pieData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={90}
+                      paddingAngle={2}
+                      dataKey="value"
+                    >
+                      {pieData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <RechartsTooltip 
+                      contentStyle={{ background: '#1e293b', border: '1px solid #475569', borderRadius: '8px' }}
+                      labelStyle={{ color: '#f1f5f9' }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-full flex items-center justify-center text-slate-500">
+                  <div className="text-center">
+                    <Database className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                    <p>분석 데이터가 없습니다</p>
+                    <p className="text-sm">시그널분석 탭에서 분석을 시작하세요</p>
+                  </div>
+                </div>
+              )}
             </div>
             <div className="flex justify-center gap-6 mt-4">
               {pieData.map((item, idx) => (
                 <div key={idx} className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full" style={{ background: item.color }} />
-                  <span className="text-slate-300 text-sm">{item.name}: {item.value.toFixed(1)}%</span>
+                  <span className="text-slate-300 text-sm">{item.name}: {item.value}</span>
                 </div>
               ))}
             </div>
           </CardContent>
         </Card>
 
-        {/* Balance Gauge */}
+        {/* 실시간 처리 현황 차트 */}
         <Card className="bg-slate-800/50 border-slate-700">
           <CardHeader>
             <CardTitle className="text-slate-100 flex items-center gap-2">
-              <CheckCircle className="w-5 h-5" /> 균형 상태 (Ω)
+              <TrendingUp className="w-5 h-5" /> 실시간 처리 현황
             </CardTitle>
             <CardDescription className="text-slate-400">
-              특허 1: 경계 조건 기반 수렴 제어
+              최근 분석된 시그널 수 추이
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="h-64" data-testid="balance-gauge">
-              <ResponsiveContainer width="100%" height="100%">
+            <div className="h-64" data-testid="realtime-chart">
+              {chartData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                    <XAxis dataKey="time" stroke="#94a3b8" tick={{ fontSize: 10 }} />
+                    <YAxis stroke="#94a3b8" tick={{ fontSize: 10 }} />
+                    <RechartsTooltip
+                      contentStyle={{ background: '#1e293b', border: '1px solid #475569', borderRadius: '8px' }}
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="signals" 
+                      stroke="#8b5cf6" 
+                      fill="#8b5cf6" 
+                      fillOpacity={0.3}
+                      name="시그널 수"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-full flex items-center justify-center text-slate-500">
+                  <div className="text-center">
+                    <Activity className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                    <p>처리 기록이 없습니다</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* 시그널 유형별 통계 */}
+      {realStats?.by_signal_type && Object.keys(realStats.by_signal_type).length > 0 && (
+        <Card className="bg-slate-800/50 border-slate-700">
+          <CardHeader>
+            <CardTitle className="text-slate-100 flex items-center gap-2">
+              <BarChart3 className="w-5 h-5" /> 시그널 유형별 통계
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {Object.entries(realStats.by_signal_type).map(([type, count]) => (
+                <div key={type} className="bg-slate-900/50 rounded-lg p-3 text-center">
+                  <p className="text-2xl font-bold text-violet-400">{count}</p>
+                  <p className="text-slate-400 text-xs">{type}</p>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* 최근 처리 이력 */}
+      {realStats?.recent_signals?.length > 0 && (
+        <Card className="bg-slate-800/50 border-slate-700">
+          <CardHeader>
+            <CardTitle className="text-slate-100 flex items-center gap-2">
+              <Clock className="w-5 h-5" /> 최근 처리 이력
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {realStats.recent_signals.slice(0, 5).map((signal, idx) => (
+                <div key={idx} className="flex items-center justify-between bg-slate-900/50 rounded p-2">
+                  <div className="flex items-center gap-3">
+                    <span className="text-slate-500 text-xs">{signal.time_display}</span>
+                    <Badge variant="outline" className="text-xs">{signal.signal_type_label}</Badge>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-slate-400 text-xs">{signal.signal_count}개 시그널</span>
+                    <Badge className={`text-xs ${
+                      signal.overall_sentiment === 'positive' ? 'bg-green-600' :
+                      signal.overall_sentiment === 'negative' ? 'bg-red-600' :
+                      signal.overall_sentiment === 'mixed' ? 'bg-purple-600' :
+                      'bg-slate-600'
+                    }`}>
+                      {signal.overall_sentiment}
+                    </Badge>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
                 <RadialBarChart 
                   cx="50%" 
                   cy="50%" 
