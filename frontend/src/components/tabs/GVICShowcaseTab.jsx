@@ -1,19 +1,18 @@
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect } from "react";
 import axios from "axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
 import { 
   Play, 
   RotateCcw, 
   Zap,
   FileText,
   ArrowRight,
+  ArrowDown,
   Database,
   TrendingUp,
   BarChart3,
@@ -24,9 +23,15 @@ import {
   Target,
   Sparkles,
   Save,
-  Eye,
   Search,
-  Filter
+  User,
+  Hash,
+  Box,
+  GitBranch,
+  Eye,
+  MessageSquare,
+  Tag,
+  Lightbulb
 } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 
@@ -35,16 +40,11 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 export const GVICShowcaseTab = () => {
   // 입력 상태
   const [content, setContent] = useState("");
-  const [rating, setRating] = useState(4);
-  
-  // 파라미터
-  const [sigma, setSigma] = useState([0.33, 0.34, 0.33]);
   
   // 분석 결과
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [animationStep, setAnimationStep] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [error, setError] = useState(null);
   
   // 자산 상태
   const [assets, setAssets] = useState([]);
@@ -72,39 +72,31 @@ export const GVICShowcaseTab = () => {
     loadAssets();
   }, [loadAssets]);
 
-  // 분석 및 애니메이션 실행
+  // AI 분석 실행
   const handleAnalyze = useCallback(async () => {
-    if (!content.trim()) return;
+    if (!content.trim()) {
+      setError("텍스트를 입력해주세요.");
+      return;
+    }
     
     setLoading(true);
-    setIsAnimating(true);
-    setAnimationStep(0);
+    setError(null);
     setResult(null);
-    
-    // 애니메이션 시퀀스
-    const steps = [1, 2, 3, 4, 5];
-    for (let i = 0; i < steps.length; i++) {
-      await new Promise(resolve => setTimeout(resolve, 600));
-      setAnimationStep(steps[i]);
-    }
     
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post(`${API_URL}/api/signal-tracer/analyze`, {
-        content,
-        rating,
-        sigma
+      const response = await axios.post(`${API_URL}/api/signal-tracer/ai-analyze`, {
+        content: content
       }, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       setResult(response.data);
     } catch (err) {
-      console.error("Analysis failed:", err);
+      setError(err.response?.data?.detail || "분석 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
-      setIsAnimating(false);
     }
-  }, [content, rating, sigma]);
+  }, [content]);
 
   // 자산으로 저장
   const handleSaveAsset = useCallback(async () => {
@@ -114,7 +106,7 @@ export const GVICShowcaseTab = () => {
       const token = localStorage.getItem('token');
       await axios.post(`${API_URL}/api/gvic-assets`, {
         content,
-        rating,
+        rating: 5,
         analysis_result: result
       }, {
         headers: { 'Authorization': `Bearer ${token}` }
@@ -125,14 +117,21 @@ export const GVICShowcaseTab = () => {
       console.error("Failed to save asset:", err);
       alert("저장 실패");
     }
-  }, [content, rating, result, loadAssets]);
+  }, [content, result, loadAssets]);
 
   // 샘플 데이터
   const samples = [
-    { content: "효과가 정말 좋아요! 포장도 꼼꼼하고 배송도 빨랐어요.", rating: 5 },
-    { content: "가격이 좀 비싸요. 효과는 있는데 환경에 안 좋은 플라스틱이 아쉬워요.", rating: 3 },
-    { content: "배송이 지연되었고 포장이 파손되어 왔어요. 실망입니다.", rating: 1 },
+    { label: "상품 후기", content: "효과가 정말 좋아요! 포장도 꼼꼼하고 배송도 빨랐어요. 재구매 의사 있습니다." },
+    { label: "요구사항", content: "실제 시그널이 어떻게 gvic에서 가공되고 결과를 얻게 되는 구나를 알 수 있어야 겠지. 모니터 화면에 꽉차게 시각적 구현하는 것도 좋겠다." },
+    { label: "체념적 만족", content: "두 번째 구매할 때 2kg를 주문했는데 키로 수도 맛도 믿음이 안 갔는데. 사장님께서 직접 전화 주시고 친절하게 대응하시기에 미안함도 있고. 맛은 맛있어요. 그냥 그것에 만족할게요." },
   ];
+
+  // 초기화
+  const handleReset = () => {
+    setContent("");
+    setResult(null);
+    setError(null);
+  };
 
   return (
     <div className="h-[calc(100vh-140px)] flex flex-col">
@@ -143,7 +142,7 @@ export const GVICShowcaseTab = () => {
             <Sparkles className="w-6 h-6 text-amber-400" />
             GVIC 쇼케이스
           </h2>
-          <p className="text-slate-400 text-sm">시그널이 GVIC에서 어떻게 가공되어 자산이 되는지 확인하세요</p>
+          <p className="text-slate-400 text-sm">AI 기반 시그널 감지 및 모듈화 시스템</p>
         </div>
         
         <div className="flex gap-2">
@@ -152,7 +151,7 @@ export const GVICShowcaseTab = () => {
             onClick={() => setActiveView("flow")}
             className="gap-2"
           >
-            <Zap className="w-4 h-4" /> 시그널 흐름
+            <Zap className="w-4 h-4" /> 시그널 분석
           </Button>
           <Button
             variant={activeView === "assets" ? "default" : "outline"}
@@ -161,34 +160,271 @@ export const GVICShowcaseTab = () => {
           >
             <Database className="w-4 h-4" /> 자산 저장소
           </Button>
-          <Button
-            variant={activeView === "usage" ? "default" : "outline"}
-            onClick={() => setActiveView("usage")}
-            className="gap-2"
-          >
-            <TrendingUp className="w-4 h-4" /> 활용 현황
-          </Button>
         </div>
       </div>
 
       {/* 메인 컨텐츠 */}
       {activeView === "flow" && (
-        <SignalFlowView
-          content={content}
-          setContent={setContent}
-          rating={rating}
-          setRating={setRating}
-          sigma={sigma}
-          setSigma={setSigma}
-          samples={samples}
-          result={result}
-          loading={loading}
-          animationStep={animationStep}
-          isAnimating={isAnimating}
-          onAnalyze={handleAnalyze}
-          onSaveAsset={handleSaveAsset}
-          onReset={() => { setContent(""); setResult(null); setAnimationStep(0); }}
-        />
+        <div className="flex-1 grid grid-cols-5 gap-4">
+          {/* 좌측: 입력 */}
+          <div className="col-span-2 flex flex-col gap-4">
+            <Card className="bg-slate-800/50 border-slate-700 flex-1">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-slate-100 text-lg flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-blue-400" />
+                  시그널 입력
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Textarea
+                  placeholder="분석할 텍스트를 입력하세요... (어떤 형태든 가능)"
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  className="bg-slate-900 border-slate-600 text-slate-100 min-h-[180px] text-base"
+                />
+                
+                {/* 샘플 */}
+                <div>
+                  <p className="text-slate-400 text-xs mb-2">샘플 텍스트:</p>
+                  <div className="flex flex-wrap gap-1">
+                    {samples.map((s, i) => (
+                      <Button
+                        key={i}
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setContent(s.content)}
+                        className="text-xs h-7"
+                      >
+                        {s.label}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex gap-2">
+                  <Button 
+                    onClick={handleAnalyze}
+                    disabled={loading || !content.trim()}
+                    className="flex-1 gap-2 bg-violet-600 hover:bg-violet-700 h-12 text-base"
+                  >
+                    {loading ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        AI 분석 중...
+                      </>
+                    ) : (
+                      <>
+                        <Zap className="w-5 h-5" />
+                        AI 분석 시작
+                      </>
+                    )}
+                  </Button>
+                  <Button variant="outline" onClick={handleReset} className="h-12">
+                    <RotateCcw className="w-5 h-5" />
+                  </Button>
+                </div>
+
+                {error && (
+                  <div className="bg-red-900/30 border border-red-600 rounded-lg p-3 text-red-400 text-sm">
+                    {error}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* 우측: 결과 */}
+          <div className="col-span-3 flex flex-col gap-4">
+            {!result ? (
+              <Card className="bg-slate-800/30 border-slate-700 border-dashed flex-1 flex items-center justify-center">
+                <div className="text-center py-12">
+                  <Sparkles className="w-16 h-16 text-slate-600 mx-auto mb-4" />
+                  <p className="text-slate-500 text-lg">텍스트를 입력하고 "AI 분석 시작" 버튼을 클릭하세요</p>
+                  <p className="text-slate-600 text-sm mt-2">
+                    GVIC가 시그널 유형을 자동 감지하고 특징을 추출합니다
+                  </p>
+                </div>
+              </Card>
+            ) : (
+              <ScrollArea className="flex-1">
+                <div className="space-y-4 pr-4">
+                  {/* ID 체계 */}
+                  <Card className="bg-slate-900/50 border-slate-700">
+                    <CardContent className="py-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="text-slate-300 font-medium flex items-center gap-2">
+                          <GitBranch className="w-4 h-4 text-violet-400" />
+                          ID 추적 체계
+                        </h3>
+                        <Button size="sm" onClick={handleSaveAsset} className="gap-1 bg-amber-600 hover:bg-amber-700">
+                          <Save className="w-4 h-4" /> 자산 저장
+                        </Button>
+                      </div>
+                      <div className="grid grid-cols-4 gap-3 text-xs">
+                        <div className="bg-slate-800 rounded p-2">
+                          <p className="text-slate-500 flex items-center gap-1"><User className="w-3 h-3" /> 요구자</p>
+                          <p className="text-slate-300 font-mono truncate">{result.requester_id}</p>
+                        </div>
+                        <div className="bg-slate-800 rounded p-2">
+                          <p className="text-slate-500 flex items-center gap-1"><FileText className="w-3 h-3" /> 입력</p>
+                          <p className="text-blue-400 font-mono truncate">{result.input_id}</p>
+                        </div>
+                        <div className="bg-slate-800 rounded p-2">
+                          <p className="text-slate-500 flex items-center gap-1"><Box className="w-3 h-3" /> 모듈</p>
+                          <p className="text-emerald-400 font-mono truncate">{result.module_id}</p>
+                        </div>
+                        <div className="bg-slate-800 rounded p-2">
+                          <p className="text-slate-500 flex items-center gap-1"><Hash className="w-3 h-3" /> 시그널</p>
+                          <p className="text-amber-400 font-mono">{result.signal_count}개</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* 시그널 유형 감지 */}
+                  <Card className="bg-gradient-to-r from-violet-900/30 to-blue-900/30 border-violet-600">
+                    <CardContent className="py-4">
+                      <div className="flex items-start gap-4">
+                        <div className="w-16 h-16 bg-violet-600 rounded-xl flex items-center justify-center">
+                          <Eye className="w-8 h-8 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-slate-400 text-xs">1단계: 시그널 유형 감지</p>
+                          <h3 className="text-2xl font-bold text-white mt-1">
+                            {result.signal_type_label}
+                          </h3>
+                          <div className="flex items-center gap-2 mt-2">
+                            <Badge className={`${
+                              result.signal_type_confidence >= 0.8 ? 'bg-green-600' :
+                              result.signal_type_confidence >= 0.5 ? 'bg-yellow-600' : 'bg-red-600'
+                            }`}>
+                              신뢰도 {(result.signal_type_confidence * 100).toFixed(0)}%
+                            </Badge>
+                            <span className="text-slate-400 text-sm">{result.signal_type}</span>
+                          </div>
+                          <p className="text-slate-300 text-sm mt-2">{result.signal_type_reason}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* 발견된 시그널들 */}
+                  <Card className="bg-slate-800/50 border-slate-700">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-slate-100 text-base flex items-center gap-2">
+                        <Zap className="w-5 h-5 text-amber-400" />
+                        2단계: 발견된 시그널 ({result.signal_count}개)
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        {result.discovered_signals.map((sig, idx) => (
+                          <div key={sig.signal_id} className="bg-slate-900/50 rounded-lg p-3 border-l-4 border-amber-500">
+                            <div className="flex items-start justify-between mb-2">
+                              <div className="flex items-center gap-2">
+                                <span className="text-amber-400 font-mono text-xs">{sig.signal_id}</span>
+                                <Badge variant="outline" className={`text-xs ${
+                                  sig.sentiment === 'positive' ? 'text-green-400 border-green-600' :
+                                  sig.sentiment === 'negative' ? 'text-red-400 border-red-600' :
+                                  sig.sentiment === 'mixed' ? 'text-purple-400 border-purple-600' :
+                                  'text-slate-400 border-slate-600'
+                                }`}>
+                                  {sig.sentiment}
+                                </Badge>
+                                <Badge className="bg-slate-700 text-xs">{sig.type}</Badge>
+                              </div>
+                              <span className="text-slate-500 text-xs">
+                                강도: {(sig.intensity * 100).toFixed(0)}%
+                              </span>
+                            </div>
+                            <p className="text-slate-200 text-sm mb-2">"{sig.text}"</p>
+                            <p className="text-slate-400 text-xs mb-1">
+                              <span className="text-slate-500">맥락:</span> {sig.context}
+                            </p>
+                            {sig.hidden_meaning && (
+                              <p className="text-violet-400 text-xs flex items-start gap-1">
+                                <Lightbulb className="w-3 h-3 mt-0.5 flex-shrink-0" />
+                                <span className="text-slate-500">숨겨진 의미:</span> {sig.hidden_meaning}
+                              </p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* 분석 요약 */}
+                  <Card className="bg-slate-800/50 border-slate-700">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-slate-100 text-base flex items-center gap-2">
+                        <MessageSquare className="w-5 h-5 text-blue-400" />
+                        3단계: 모듈화 결과
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {/* 요약 */}
+                      <div className="bg-slate-900/50 rounded-lg p-3">
+                        <p className="text-slate-400 text-xs mb-1">요약</p>
+                        <p className="text-slate-200">{result.summary}</p>
+                      </div>
+
+                      {/* 주요 테마 */}
+                      <div>
+                        <p className="text-slate-400 text-xs mb-2">주요 테마</p>
+                        <div className="flex flex-wrap gap-2">
+                          {result.key_themes.map((theme, idx) => (
+                            <Badge key={idx} variant="outline" className="text-slate-300 border-slate-600">
+                              <Tag className="w-3 h-3 mr-1" />
+                              {theme}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* 전체 감성 */}
+                      <div className="flex items-center gap-4">
+                        <div>
+                          <p className="text-slate-400 text-xs mb-1">전체 감성</p>
+                          <Badge className={`${
+                            result.overall_sentiment === 'positive' ? 'bg-green-600' :
+                            result.overall_sentiment === 'negative' ? 'bg-red-600' :
+                            result.overall_sentiment === 'mixed' ? 'bg-purple-600' :
+                            'bg-slate-600'
+                          }`}>
+                            {result.overall_sentiment}
+                          </Badge>
+                        </div>
+                        <Separator orientation="vertical" className="h-8 bg-slate-700" />
+                        <div>
+                          <p className="text-slate-400 text-xs mb-1">3관점 분석 적용</p>
+                          <div className="flex gap-2">
+                            <Badge variant="outline" className={result.applicable_perspectives?.society ? 'text-blue-400 border-blue-600' : 'text-slate-600 border-slate-700'}>
+                              🏛️ 사회
+                            </Badge>
+                            <Badge variant="outline" className={result.applicable_perspectives?.production ? 'text-emerald-400 border-emerald-600' : 'text-slate-600 border-slate-700'}>
+                              🏭 생산
+                            </Badge>
+                            <Badge variant="outline" className={result.applicable_perspectives?.consumer ? 'text-amber-400 border-amber-600' : 'text-slate-600 border-slate-700'}>
+                              👤 소비자
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* 3관점 적용 이유 */}
+                      {result.perspective_relevance && (
+                        <div className="bg-slate-900/50 rounded-lg p-3">
+                          <p className="text-slate-400 text-xs mb-1">3관점 분석 적합성</p>
+                          <p className="text-slate-300 text-sm">{result.perspective_relevance}</p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+              </ScrollArea>
+            )}
+          </div>
+        </div>
       )}
 
       {activeView === "assets" && (
@@ -200,285 +436,6 @@ export const GVICShowcaseTab = () => {
           onRefresh={loadAssets}
         />
       )}
-
-      {activeView === "usage" && (
-        <AssetUsageView stats={assetStats} assets={assets} />
-      )}
-    </div>
-  );
-};
-
-// ==================== 시그널 흐름 뷰 ====================
-const SignalFlowView = ({
-  content, setContent, rating, setRating, sigma, setSigma,
-  samples, result, loading, animationStep, isAnimating,
-  onAnalyze, onSaveAsset, onReset
-}) => {
-  const steps = [
-    { id: 1, name: "입력", icon: FileText, color: "blue" },
-    { id: 2, name: "표준화", icon: Layers, color: "emerald" },
-    { id: 3, name: "시그널분석", icon: Zap, color: "violet" },
-    { id: 4, name: "수렴", icon: Target, color: "amber" },
-    { id: 5, name: "출력", icon: BarChart3, color: "rose" },
-  ];
-
-  return (
-    <div className="flex-1 flex flex-col gap-4">
-      {/* 파이프라인 시각화 */}
-      <Card className="bg-slate-900/50 border-slate-700">
-        <CardContent className="py-6">
-          <div className="flex items-center justify-between px-8">
-            {steps.map((step, idx) => (
-              <div key={step.id} className="flex items-center">
-                <div className={`
-                  flex flex-col items-center transition-all duration-500
-                  ${animationStep >= step.id ? 'scale-110' : 'scale-100 opacity-50'}
-                `}>
-                  <div className={`
-                    w-16 h-16 rounded-full flex items-center justify-center
-                    transition-all duration-500
-                    ${animationStep >= step.id 
-                      ? `bg-${step.color}-500 shadow-lg shadow-${step.color}-500/50` 
-                      : 'bg-slate-700'}
-                  `}
-                  style={{
-                    backgroundColor: animationStep >= step.id 
-                      ? step.color === 'blue' ? '#3b82f6'
-                      : step.color === 'emerald' ? '#10b981'
-                      : step.color === 'violet' ? '#8b5cf6'
-                      : step.color === 'amber' ? '#f59e0b'
-                      : '#f43f5e'
-                      : '#334155',
-                    boxShadow: animationStep >= step.id 
-                      ? `0 0 20px ${
-                        step.color === 'blue' ? '#3b82f680'
-                        : step.color === 'emerald' ? '#10b98180'
-                        : step.color === 'violet' ? '#8b5cf680'
-                        : step.color === 'amber' ? '#f59e0b80'
-                        : '#f43f5e80'
-                      }`
-                      : 'none'
-                  }}
-                  >
-                    <step.icon className={`w-8 h-8 ${animationStep >= step.id ? 'text-white' : 'text-slate-500'}`} />
-                  </div>
-                  <span className={`mt-2 text-sm font-medium ${animationStep >= step.id ? 'text-slate-200' : 'text-slate-500'}`}>
-                    {step.name}
-                  </span>
-                </div>
-                
-                {idx < steps.length - 1 && (
-                  <div className="mx-4 flex items-center">
-                    <div className={`
-                      w-20 h-1 rounded transition-all duration-500
-                      ${animationStep > step.id ? 'bg-gradient-to-r from-slate-400 to-slate-400' : 'bg-slate-700'}
-                    `}
-                    style={{
-                      background: animationStep > step.id 
-                        ? 'linear-gradient(90deg, #94a3b8, #94a3b8)'
-                        : '#334155'
-                    }}
-                    />
-                    <ArrowRight className={`w-5 h-5 mx-1 ${animationStep > step.id ? 'text-slate-400' : 'text-slate-700'}`} />
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* 입력 및 결과 */}
-      <div className="flex-1 grid grid-cols-2 gap-4">
-        {/* 좌측: 입력 */}
-        <Card className="bg-slate-800/50 border-slate-700">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-slate-100 text-lg flex items-center gap-2">
-              <FileText className="w-5 h-5 text-blue-400" />
-              입력 데이터
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Textarea
-              placeholder="분석할 후기를 입력하세요..."
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              className="bg-slate-900 border-slate-600 text-slate-100 min-h-[100px]"
-            />
-            
-            <div>
-              <label className="text-slate-300 text-sm flex justify-between mb-2">
-                <span>평점</span>
-                <span className="text-yellow-400">{"⭐".repeat(rating)}</span>
-              </label>
-              <Slider
-                value={[rating]}
-                onValueChange={([v]) => setRating(v)}
-                min={1}
-                max={5}
-                step={1}
-                className="[&_[role=slider]]:bg-yellow-500"
-              />
-            </div>
-
-            {/* 시그마 설정 */}
-            <div className="space-y-2">
-              <p className="text-slate-300 text-sm font-medium">관점 비중 (Σ)</p>
-              <div className="grid grid-cols-3 gap-2 text-xs text-center">
-                <div>
-                  <span className="text-blue-400">🏛️ {(sigma[0]*100).toFixed(0)}%</span>
-                </div>
-                <div>
-                  <span className="text-emerald-400">🏭 {(sigma[1]*100).toFixed(0)}%</span>
-                </div>
-                <div>
-                  <span className="text-amber-400">👤 {(sigma[2]*100).toFixed(0)}%</span>
-                </div>
-              </div>
-            </div>
-
-            {/* 샘플 */}
-            <div className="flex flex-wrap gap-1">
-              {samples.map((s, i) => (
-                <Button
-                  key={i}
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => { setContent(s.content); setRating(s.rating); }}
-                  className="text-xs h-7"
-                >
-                  샘플 {i+1}
-                </Button>
-              ))}
-            </div>
-
-            <div className="flex gap-2">
-              <Button 
-                onClick={onAnalyze}
-                disabled={loading || !content.trim()}
-                className="flex-1 gap-2 bg-violet-600 hover:bg-violet-700"
-              >
-                {loading ? (
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <Play className="w-4 h-4" />
-                )}
-                {loading ? "분석 중..." : "분석 시작"}
-              </Button>
-              <Button variant="outline" onClick={onReset} className="gap-2">
-                <RotateCcw className="w-4 h-4" />
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* 우측: 결과 */}
-        <Card className="bg-slate-800/50 border-slate-700">
-          <CardHeader className="pb-3 flex flex-row items-center justify-between">
-            <CardTitle className="text-slate-100 text-lg flex items-center gap-2">
-              <BarChart3 className="w-5 h-5 text-rose-400" />
-              분석 결과
-            </CardTitle>
-            {result && (
-              <Button size="sm" onClick={onSaveAsset} className="gap-1 bg-amber-600 hover:bg-amber-700">
-                <Save className="w-4 h-4" /> 자산 저장
-              </Button>
-            )}
-          </CardHeader>
-          <CardContent>
-            {!result ? (
-              <div className="h-[300px] flex items-center justify-center text-slate-500">
-                {isAnimating ? (
-                  <div className="text-center">
-                    <div className="w-12 h-12 border-4 border-violet-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-                    <p>시그널 처리 중...</p>
-                  </div>
-                ) : (
-                  <p>후기를 입력하고 분석을 시작하세요</p>
-                )}
-              </div>
-            ) : (
-              <ScrollArea className="h-[300px]">
-                <div className="space-y-4 pr-4">
-                  {/* 최종 점수 */}
-                  <div className="text-center py-4 bg-slate-900/50 rounded-lg">
-                    <div className={`
-                      inline-flex items-center justify-center w-20 h-20 rounded-full
-                      ${result.steps.step5_output.final_score.color === 'green' ? 'bg-green-900/50 border-2 border-green-500' :
-                        result.steps.step5_output.final_score.color === 'red' ? 'bg-red-900/50 border-2 border-red-500' :
-                        'bg-yellow-900/50 border-2 border-yellow-500'}
-                    `}>
-                      <div>
-                        <p className="text-3xl font-bold text-white">{result.steps.step5_output.final_score.value}</p>
-                        <p className="text-xs text-slate-400">/100</p>
-                      </div>
-                    </div>
-                    <Badge className={`mt-2 ${
-                      result.steps.step5_output.final_score.color === 'green' ? 'bg-green-600' :
-                      result.steps.step5_output.final_score.color === 'red' ? 'bg-red-600' : 'bg-yellow-600'
-                    }`}>
-                      {result.steps.step5_output.final_score.classification}
-                    </Badge>
-                  </div>
-
-                  {/* 시그널 분포 */}
-                  <div className="space-y-2">
-                    <p className="text-slate-300 text-sm font-medium">시그널 분포</p>
-                    {[
-                      { key: 'V_pub', label: '🏛️ 사회·규제', color: 'bg-blue-500' },
-                      { key: 'V_pro', label: '🏭 기업·생산', color: 'bg-emerald-500' },
-                      { key: 'V_ind', label: '👤 소비자·고객', color: 'bg-amber-500' }
-                    ].map(({ key, label, color }) => (
-                      <div key={key} className="flex items-center gap-2">
-                        <span className="text-slate-400 text-xs w-24">{label}</span>
-                        <div className="flex-1 h-5 bg-slate-700 rounded overflow-hidden">
-                          <div className={`h-full ${color} transition-all duration-1000`}
-                            style={{ width: `${result.steps.step4_convergence.distribution.after_adjustment[key]}%` }}
-                          />
-                        </div>
-                        <span className="text-slate-300 text-sm w-12 text-right">
-                          {result.steps.step4_convergence.distribution.after_adjustment[key]}%
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* 감지된 키워드 */}
-                  <div>
-                    <p className="text-slate-300 text-sm font-medium mb-2">감지된 키워드</p>
-                    <div className="flex flex-wrap gap-1">
-                      {Object.entries(result.steps.step3_signal.keyword_analysis).map(([domain, data]) => (
-                        <>
-                          {data.found_positive.map((kw, i) => (
-                            <Badge key={`${domain}-pos-${i}`} className="text-xs bg-green-600">+{kw}</Badge>
-                          ))}
-                          {data.found_negative.map((kw, i) => (
-                            <Badge key={`${domain}-neg-${i}`} className="text-xs bg-red-600">-{kw}</Badge>
-                          ))}
-                        </>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* 인사이트 */}
-                  <div>
-                    <p className="text-slate-300 text-sm font-medium mb-2">인사이트</p>
-                    {result.steps.step5_output.insights.map((insight, i) => (
-                      <div key={i} className={`text-sm p-2 rounded mb-1 ${
-                        insight.type === 'positive' ? 'bg-green-900/30 text-green-400' :
-                        insight.type === 'negative' ? 'bg-red-900/30 text-red-400' :
-                        'bg-slate-900/50 text-slate-300'
-                      }`}>
-                        {insight.text}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </ScrollArea>
-            )}
-          </CardContent>
-        </Card>
-      </div>
     </div>
   );
 };
@@ -551,14 +508,14 @@ const AssetStorageView = ({ assets, stats, searchQuery, setSearchQuery, onRefres
               <div className="text-center py-12 text-slate-500">
                 <Database className="w-12 h-12 mx-auto mb-4 opacity-50" />
                 <p>저장된 자산이 없습니다</p>
-                <p className="text-sm">시그널 흐름 탭에서 분석 후 자산으로 저장하세요</p>
+                <p className="text-sm">시그널 분석 후 "자산 저장" 버튼을 클릭하세요</p>
               </div>
             ) : (
               <div className="space-y-2">
                 {filteredAssets.map((asset, idx) => (
                   <div key={asset.asset_id || idx} className="bg-slate-900/50 rounded-lg p-3 flex items-center gap-4">
                     <div className={`
-                      w-10 h-10 rounded-full flex items-center justify-center
+                      w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold
                       ${asset.classification === '긍정' ? 'bg-green-900/50 text-green-400' :
                         asset.classification === '부정' ? 'bg-red-900/50 text-red-400' :
                         'bg-yellow-900/50 text-yellow-400'}
@@ -567,7 +524,7 @@ const AssetStorageView = ({ assets, stats, searchQuery, setSearchQuery, onRefres
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-slate-200 text-sm truncate">{asset.content}</p>
-                      <p className="text-slate-500 text-xs">{asset.created_at}</p>
+                      <p className="text-slate-500 text-xs font-mono">{asset.asset_id}</p>
                     </div>
                     <Badge className={
                       asset.classification === '긍정' ? 'bg-green-600' :
@@ -575,131 +532,11 @@ const AssetStorageView = ({ assets, stats, searchQuery, setSearchQuery, onRefres
                     }>
                       {asset.classification || '미분류'}
                     </Badge>
-                    <div className="text-xs text-slate-400">
-                      <p>🏛️ {asset.v_pub?.toFixed(1) || '-'}%</p>
-                      <p>🏭 {asset.v_pro?.toFixed(1) || '-'}%</p>
-                      <p>👤 {asset.v_ind?.toFixed(1) || '-'}%</p>
-                    </div>
                   </div>
                 ))}
               </div>
             )}
           </ScrollArea>
-        </CardContent>
-      </Card>
-    </div>
-  );
-};
-
-// ==================== 자산 활용 현황 뷰 ====================
-const AssetUsageView = ({ stats, assets }) => {
-  const usageData = [
-    { 
-      icon: TrendingUp, 
-      title: "예측 모델 학습", 
-      description: "자산 데이터를 기반으로 미래 트렌드 예측 모델 개선",
-      count: stats?.used_for_prediction || Math.floor((stats?.total || 0) * 0.7),
-      color: "violet"
-    },
-    { 
-      icon: BarChart3, 
-      title: "트렌드 분석", 
-      description: "시간별/카테고리별 감성 변화 추적",
-      count: stats?.used_for_trend || Math.floor((stats?.total || 0) * 0.9),
-      color: "blue"
-    },
-    { 
-      icon: Target, 
-      title: "비교 리포트", 
-      description: "경쟁 제품/기간 간 비교 분석에 활용",
-      count: stats?.used_for_comparison || Math.floor((stats?.total || 0) * 0.3),
-      color: "emerald"
-    },
-    { 
-      icon: AlertTriangle, 
-      title: "이상 탐지 기준", 
-      description: "정상 범위 벗어난 이상 신호 감지 기준 설정",
-      count: stats?.used_for_anomaly || Math.floor((stats?.total || 0) * 0.15),
-      color: "amber"
-    },
-  ];
-
-  return (
-    <div className="flex-1 flex flex-col gap-4">
-      {/* 활용 현황 카드 */}
-      <div className="grid grid-cols-2 gap-4">
-        {usageData.map((usage, idx) => (
-          <Card key={idx} className="bg-slate-800/50 border-slate-700">
-            <CardContent className="py-6">
-              <div className="flex items-start gap-4">
-                <div className={`
-                  w-14 h-14 rounded-lg flex items-center justify-center
-                  ${usage.color === 'violet' ? 'bg-violet-900/50' :
-                    usage.color === 'blue' ? 'bg-blue-900/50' :
-                    usage.color === 'emerald' ? 'bg-emerald-900/50' : 'bg-amber-900/50'}
-                `}>
-                  <usage.icon className={`w-7 h-7 ${
-                    usage.color === 'violet' ? 'text-violet-400' :
-                    usage.color === 'blue' ? 'text-blue-400' :
-                    usage.color === 'emerald' ? 'text-emerald-400' : 'text-amber-400'
-                  }`} />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-slate-100 font-medium">{usage.title}</h3>
-                  <p className="text-slate-400 text-sm mt-1">{usage.description}</p>
-                  <div className="mt-3 flex items-baseline gap-2">
-                    <span className={`text-2xl font-bold ${
-                      usage.color === 'violet' ? 'text-violet-400' :
-                      usage.color === 'blue' ? 'text-blue-400' :
-                      usage.color === 'emerald' ? 'text-emerald-400' : 'text-amber-400'
-                    }`}>{usage.count.toLocaleString()}</span>
-                    <span className="text-slate-500 text-sm">건 활용</span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* GVIC 가치 흐름 */}
-      <Card className="flex-1 bg-slate-800/50 border-slate-700">
-        <CardHeader>
-          <CardTitle className="text-slate-100 text-lg flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-amber-400" />
-            GVIC 가치 창출 흐름
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-around py-8">
-            {[
-              { label: "원시 데이터", value: "후기/리뷰", icon: FileText },
-              { label: "시그널 추출", value: "3관점 분석", icon: Zap },
-              { label: "자산화", value: `${stats?.total || 0}건`, icon: Database },
-              { label: "가치 창출", value: "인사이트", icon: TrendingUp },
-            ].map((step, idx) => (
-              <div key={idx} className="flex items-center">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-violet-600 to-amber-600 rounded-full flex items-center justify-center mx-auto mb-2">
-                    <step.icon className="w-8 h-8 text-white" />
-                  </div>
-                  <p className="text-slate-300 font-medium">{step.label}</p>
-                  <p className="text-slate-500 text-sm">{step.value}</p>
-                </div>
-                {idx < 3 && (
-                  <ArrowRight className="w-8 h-8 text-slate-600 mx-4" />
-                )}
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-6 p-4 bg-slate-900/50 rounded-lg">
-            <p className="text-slate-300 text-sm text-center">
-              💡 GVIC는 원시 데이터를 <span className="text-violet-400 font-medium">3가지 관점(사회·생산·소비자)</span>으로 분석하여
-              <span className="text-amber-400 font-medium"> 구조화된 자산</span>으로 변환합니다.
-              이 자산은 예측, 트렌드 분석, 비교 리포트, 이상 탐지 등 다양한 비즈니스 인사이트 창출에 활용됩니다.
-            </p>
-          </div>
         </CardContent>
       </Card>
     </div>
