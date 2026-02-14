@@ -614,6 +614,129 @@ import random
 import time
 
 # 모니터링 데이터 저장소 (메모리)
+# ==================== 실시간 시그널 모니터링 시스템 ====================
+real_signal_monitor = {
+    "signal_history": [],          # 실제 시그널 처리 기록
+    "analysis_history": [],        # 분석 이력
+    "asset_history": [],           # 자산화 이력
+    "alerts": [],                  # 알림
+    "stats": {
+        "total_analyzed": 0,       # 총 분석 건수
+        "total_assets": 0,         # 총 자산화 건수
+        "success_rate": 0,         # 성공률
+        "by_signal_type": {},      # 시그널 유형별 통계
+        "by_sentiment": {},        # 감성별 통계
+        "last_hour_count": 0,      # 최근 1시간 처리량
+        "last_update": None
+    }
+}
+
+def record_signal_analysis(input_text: str, result: dict, success: bool = True):
+    """실제 시그널 분석 결과 기록"""
+    now = datetime.now(timezone.utc)
+    
+    record = {
+        "timestamp": now.isoformat(),
+        "time_display": now.strftime("%H:%M:%S"),
+        "input_length": len(input_text),
+        "success": success,
+        "signal_type": result.get("signal_type", "unknown"),
+        "signal_type_label": result.get("signal_type_label", "알 수 없음"),
+        "signal_count": result.get("signal_count", 0),
+        "overall_sentiment": result.get("overall_sentiment", "neutral"),
+        "module_id": result.get("module_id", ""),
+        "input_id": result.get("input_id", "")
+    }
+    
+    # 히스토리에 추가 (최대 100개 유지)
+    real_signal_monitor["signal_history"].append(record)
+    if len(real_signal_monitor["signal_history"]) > 100:
+        real_signal_monitor["signal_history"] = real_signal_monitor["signal_history"][-100:]
+    
+    # 통계 업데이트
+    stats = real_signal_monitor["stats"]
+    stats["total_analyzed"] += 1
+    stats["last_update"] = now.isoformat()
+    
+    # 시그널 유형별 통계
+    sig_type = result.get("signal_type_label", "unknown")
+    stats["by_signal_type"][sig_type] = stats["by_signal_type"].get(sig_type, 0) + 1
+    
+    # 감성별 통계
+    sentiment = result.get("overall_sentiment", "neutral")
+    stats["by_sentiment"][sentiment] = stats["by_sentiment"].get(sentiment, 0) + 1
+    
+    # 성공률 계산
+    success_count = sum(1 for r in real_signal_monitor["signal_history"] if r.get("success", False))
+    stats["success_rate"] = success_count / len(real_signal_monitor["signal_history"]) if real_signal_monitor["signal_history"] else 0
+    
+    # 최근 1시간 처리량
+    one_hour_ago = now - timedelta(hours=1)
+    stats["last_hour_count"] = sum(
+        1 for r in real_signal_monitor["signal_history"] 
+        if datetime.fromisoformat(r["timestamp"].replace('Z', '+00:00')) > one_hour_ago
+    )
+
+def record_asset_creation(asset_data: dict):
+    """자산화 기록"""
+    now = datetime.now(timezone.utc)
+    
+    record = {
+        "timestamp": now.isoformat(),
+        "time_display": now.strftime("%H:%M:%S"),
+        "asset_id": asset_data.get("asset_id", ""),
+        "signal_type": asset_data.get("signal_type_label", ""),
+        "classification": asset_data.get("classification", ""),
+        "signal_count": asset_data.get("signal_count", 0)
+    }
+    
+    real_signal_monitor["asset_history"].append(record)
+    if len(real_signal_monitor["asset_history"]) > 50:
+        real_signal_monitor["asset_history"] = real_signal_monitor["asset_history"][-50:]
+    
+    real_signal_monitor["stats"]["total_assets"] += 1
+
+def get_realtime_signal_stats():
+    """실시간 시그널 통계 조회"""
+    stats = real_signal_monitor["stats"]
+    history = real_signal_monitor["signal_history"]
+    
+    # 최근 20개 기록의 시그널 수 합계 (차트용)
+    recent_signals = history[-20:] if history else []
+    chart_data = [
+        {
+            "time": r["time_display"],
+            "signals": r["signal_count"],
+            "sentiment": 1 if r["overall_sentiment"] == "positive" else -1 if r["overall_sentiment"] == "negative" else 0
+        }
+        for r in recent_signals
+    ]
+    
+    # 상태 결정
+    if stats["last_hour_count"] > 50:
+        status = "active"
+    elif stats["last_hour_count"] > 10:
+        status = "normal"
+    elif stats["last_hour_count"] > 0:
+        status = "low"
+    else:
+        status = "idle"
+    
+    return {
+        "total_analyzed": stats["total_analyzed"],
+        "total_assets": stats["total_assets"],
+        "success_rate": stats["success_rate"],
+        "last_hour_count": stats["last_hour_count"],
+        "by_signal_type": stats["by_signal_type"],
+        "by_sentiment": stats["by_sentiment"],
+        "status": status,
+        "chart_data": chart_data,
+        "recent_signals": recent_signals[-10:],
+        "recent_assets": real_signal_monitor["asset_history"][-10:],
+        "last_update": stats["last_update"]
+    }
+
+# 기존 시뮬레이션 데이터 (호환성 유지)
 monitoring_data = {
     "consumption": [],
     "distribution_history": [],
@@ -622,28 +745,46 @@ monitoring_data = {
 }
 
 def generate_monitoring_data():
-    """실시간 모니터링 데이터 생성 (특허6 ConsumptionMonitor 시뮬레이션)"""
+    """실시간 모니터링 데이터 생성 - 실제 데이터 + 시뮬레이션 혼합"""
     now = datetime.now(timezone.utc)
     sigma = config_mgr.get_sigma()
     
-    # 소비량 시뮬레이션 (약간의 변동 추가)
-    base_consumption = [100, 120, 80]  # 공공, 생산, 개인 기본 소비량
-    consumption = {
-        "timestamp": now.isoformat(),
-        "public": base_consumption[0] * (1 + random.uniform(-0.1, 0.1)),
-        "productive": base_consumption[1] * (1 + random.uniform(-0.1, 0.1)),
-        "individual": base_consumption[2] * (1 + random.uniform(-0.1, 0.1)),
-        "total": sum(base_consumption) * (1 + random.uniform(-0.05, 0.05))
-    }
+    # 실제 시그널 데이터가 있으면 활용
+    real_stats = get_realtime_signal_stats()
     
-    # 분배 비율 변동 추적
+    if real_stats["total_analyzed"] > 0:
+        # 실제 데이터 기반
+        sentiment_data = real_stats["by_sentiment"]
+        positive = sentiment_data.get("positive", 0)
+        negative = sentiment_data.get("negative", 0)
+        neutral = sentiment_data.get("neutral", 0) + sentiment_data.get("mixed", 0)
+        total = positive + negative + neutral or 1
+        
+        consumption = {
+            "timestamp": now.isoformat(),
+            "public": neutral * 10,      # 중립 → 공공
+            "productive": positive * 10,  # 긍정 → 생산
+            "individual": negative * 10,  # 부정 → 소비자
+            "total": total * 10
+        }
+    else:
+        # 시뮬레이션 데이터
+        base_consumption = [100, 120, 80]
+        consumption = {
+            "timestamp": now.isoformat(),
+            "public": base_consumption[0] * (1 + random.uniform(-0.1, 0.1)),
+            "productive": base_consumption[1] * (1 + random.uniform(-0.1, 0.1)),
+            "individual": base_consumption[2] * (1 + random.uniform(-0.1, 0.1)),
+            "total": sum(base_consumption) * (1 + random.uniform(-0.05, 0.05))
+        }
+    
+    total = consumption["total"] or 1
     actual_ratio = [
-        consumption["public"] / consumption["total"],
-        consumption["productive"] / consumption["total"],
-        consumption["individual"] / consumption["total"]
+        consumption["public"] / total,
+        consumption["productive"] / total,
+        consumption["individual"] / total
     ]
     
-    # 편차 계산
     deviation = [abs(actual_ratio[i] - sigma[i]) for i in range(3)]
     avg_deviation = sum(deviation) / 3
     
@@ -654,7 +795,8 @@ def generate_monitoring_data():
         "deviation": deviation,
         "avg_deviation": avg_deviation,
         "efficiency": 1 - avg_deviation,
-        "status": "optimal" if avg_deviation < 0.05 else "adjusting" if avg_deviation < 0.1 else "alert"
+        "status": "optimal" if avg_deviation < 0.05 else "adjusting" if avg_deviation < 0.1 else "alert",
+        "real_signal_stats": real_stats  # 실제 시그널 통계 포함
     }
 
 @api_router.get("/monitor/realtime")
