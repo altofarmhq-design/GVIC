@@ -3569,35 +3569,97 @@ async def create_gvic_asset(
     request: GVICAssetCreate,
     current_user: dict = Depends(get_current_user)
 ):
-    """분석 결과를 GVIC 자산으로 저장"""
+    """AI 분석 결과를 GVIC 자산(모듈)으로 저장"""
     try:
-        # 분석 결과에서 필요한 정보 추출
-        steps = request.analysis_result.get("steps", {})
-        step5 = steps.get("step5_output", {})
-        step4 = steps.get("step4_convergence", {})
+        result = request.analysis_result
         
-        final_score = step5.get("final_score", {})
-        distribution = step4.get("distribution", {}).get("after_adjustment", {})
+        # AI 분석 결과인지 기존 키워드 분석 결과인지 확인
+        is_ai_result = "signal_type" in result and "discovered_signals" in result
         
-        asset = {
-            "asset_id": f"AST_{uuid.uuid4().hex[:8].upper()}",
-            "content": request.content,
-            "rating": request.rating,
-            "score": final_score.get("value", 0),
-            "classification": final_score.get("classification", "미분류"),
-            "v_pub": distribution.get("V_pub", 0),
-            "v_pro": distribution.get("V_pro", 0),
-            "v_ind": distribution.get("V_ind", 0),
-            "analysis_result": request.analysis_result,
-            "created_by": current_user.get("user_id"),
-            "created_at": datetime.now(timezone.utc).isoformat(),
-            "used_count": 0,
-            "used_for": []
-        }
+        if is_ai_result:
+            # AI 분석 결과에서 모듈화된 데이터 추출
+            discovered_signals = result.get("discovered_signals", [])
+            
+            # 감성 분류 결정
+            overall_sentiment = result.get("overall_sentiment", "neutral")
+            if overall_sentiment == "positive":
+                classification = "긍정"
+            elif overall_sentiment == "negative":
+                classification = "부정"
+            elif overall_sentiment == "mixed":
+                classification = "혼합"
+            else:
+                classification = "중립"
+            
+            # 시그널 텍스트 추출 (검색용)
+            signal_texts = [sig.get("text", "") for sig in discovered_signals]
+            signal_types = list(set([sig.get("type", "") for sig in discovered_signals]))
+            hidden_meanings = [sig.get("hidden_meaning", "") for sig in discovered_signals if sig.get("hidden_meaning")]
+            
+            asset = {
+                "asset_id": f"AST_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}_{uuid.uuid4().hex[:6].upper()}",
+                # 원시 데이터
+                "raw_content": request.content,
+                "content_length": len(request.content),
+                # 모듈화된 핵심 데이터 (검색 대상)
+                "module_id": result.get("module_id"),
+                "input_id": result.get("input_id"),
+                "signal_type": result.get("signal_type"),
+                "signal_type_label": result.get("signal_type_label"),
+                "signal_count": result.get("signal_count", 0),
+                "discovered_signals": discovered_signals,
+                "signal_texts": signal_texts,  # 검색용 시그널 텍스트 배열
+                "signal_types": signal_types,  # 검색용 시그널 유형 배열
+                "hidden_meanings": hidden_meanings,  # 검색용 숨겨진 의미 배열
+                # 분석 요약
+                "summary": result.get("summary", ""),
+                "key_themes": result.get("key_themes", []),
+                "overall_sentiment": overall_sentiment,
+                "classification": classification,
+                # 3관점 분석
+                "applicable_perspectives": result.get("applicable_perspectives", {}),
+                "perspective_relevance": result.get("perspective_relevance", ""),
+                # 메타데이터
+                "created_by": current_user.get("user_id"),
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "used_count": 0,
+                "used_for": [],
+                # 전체 분석 결과 보관
+                "full_analysis": result
+            }
+        else:
+            # 기존 키워드 분석 결과 호환 (레거시)
+            steps = result.get("steps", {})
+            step5 = steps.get("step5_output", {})
+            step4 = steps.get("step4_convergence", {})
+            final_score = step5.get("final_score", {})
+            distribution = step4.get("distribution", {}).get("after_adjustment", {})
+            
+            asset = {
+                "asset_id": f"AST_{uuid.uuid4().hex[:8].upper()}",
+                "raw_content": request.content,
+                "content_length": len(request.content),
+                "rating": request.rating,
+                "score": final_score.get("value", 0),
+                "classification": final_score.get("classification", "미분류"),
+                "v_pub": distribution.get("V_pub", 0),
+                "v_pro": distribution.get("V_pro", 0),
+                "v_ind": distribution.get("V_ind", 0),
+                "signal_type": "legacy_keyword",
+                "signal_type_label": "키워드 분석 (레거시)",
+                "summary": "",
+                "key_themes": [],
+                "signal_texts": [],
+                "full_analysis": result,
+                "created_by": current_user.get("user_id"),
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "used_count": 0,
+                "used_for": []
+            }
         
         await db.gvic_assets.insert_one(asset)
         
-        return {"success": True, "asset_id": asset["asset_id"], "message": "자산이 저장되었습니다."}
+        return {"success": True, "asset_id": asset["asset_id"], "message": "자산(모듈)이 저장되었습니다."}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"자산 저장 실패: {str(e)}")
 
