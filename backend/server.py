@@ -3112,6 +3112,113 @@ SIGNAL_KEYWORDS = {
     }
 }
 
+# AI 기반 시그널 감지기 초기화
+from core.signal_detector import GVICSignalDetector
+signal_detector = None
+
+def get_signal_detector():
+    global signal_detector
+    if signal_detector is None:
+        try:
+            signal_detector = GVICSignalDetector()
+        except Exception as e:
+            print(f"Signal detector init failed: {e}")
+            return None
+    return signal_detector
+
+
+class AISignalAnalysisInput(BaseModel):
+    """AI 기반 시그널 분석 입력"""
+    content: str = Field(..., description="분석할 텍스트")
+    include_perspective_mapping: bool = Field(default=True, description="3관점 매핑 포함 여부")
+
+
+class AISignalAnalysisResponse(BaseModel):
+    """AI 기반 시그널 분석 응답"""
+    success: bool
+    trace_id: str
+    signal_type: str
+    signal_type_label: str
+    signal_type_confidence: float
+    signal_type_reason: str
+    discovered_signals: List[Dict[str, Any]]
+    overall_sentiment: str
+    key_themes: List[str]
+    summary: str
+    applicable_perspectives: Dict[str, bool]
+    perspective_relevance: str
+    raw_response: Optional[str] = None
+
+
+@api_router.post("/signal-tracer/ai-analyze")
+async def ai_analyze_signal(
+    request: AISignalAnalysisInput,
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    AI 기반 시그널 분석 - 시그널 유형 자동 감지 및 특징 추출
+    
+    1. 시그널 유형 감지: 이 텍스트가 무엇인지 파악
+    2. 시그널 특징 추출: 텍스트에서 발견되는 모든 의미있는 시그널을 추출
+    3. 감성 및 맥락 분석: 각 시그널의 감성과 숨겨진 의미 파악
+    """
+    trace_id = str(uuid.uuid4())[:8]
+    
+    detector = get_signal_detector()
+    if detector is None:
+        raise HTTPException(status_code=500, detail="AI 시그널 감지기 초기화 실패")
+    
+    try:
+        result = await detector.detect_and_extract(
+            text=request.content,
+            session_id=f"gvic_{trace_id}"
+        )
+        
+        if not result.get("success", False):
+            raise HTTPException(
+                status_code=500, 
+                detail=f"분석 실패: {result.get('error', 'Unknown error')}"
+            )
+        
+        # 시그널 유형 라벨
+        signal_type = result.get("signal_type", "unknown")
+        signal_type_labels = {
+            "product_review": "상품/서비스 후기",
+            "requirement": "요구사항/기능요청",
+            "complaint": "불만/클레임",
+            "inquiry": "문의/질문",
+            "news": "뉴스/기사",
+            "feedback": "피드백/제안",
+            "conversation": "일상대화",
+            "data": "데이터/수치",
+            "unknown": "분류불가"
+        }
+        
+        return {
+            "success": True,
+            "trace_id": trace_id,
+            "signal_type": signal_type,
+            "signal_type_label": signal_type_labels.get(signal_type, "알 수 없음"),
+            "signal_type_confidence": result.get("signal_type_confidence", 0),
+            "signal_type_reason": result.get("signal_type_reason", ""),
+            "discovered_signals": result.get("discovered_signals", []),
+            "overall_sentiment": result.get("overall_sentiment", "neutral"),
+            "key_themes": result.get("key_themes", []),
+            "summary": result.get("summary", ""),
+            "applicable_perspectives": result.get("applicable_perspectives", {
+                "society": False,
+                "production": False,
+                "consumer": False
+            }),
+            "perspective_relevance": result.get("perspective_relevance", "")
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"분석 중 오류: {str(e)}")
+
+
 def analyze_keywords(content: str, custom_weights: Optional[Dict[str, float]] = None) -> Dict[str, Any]:
     """키워드 기반 시그널 분석"""
     results = {
