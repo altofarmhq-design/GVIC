@@ -14,7 +14,7 @@ import {
 import { 
   LayoutDashboard, Play, Database, Bell, Settings, 
   Zap, RefreshCw, Network, Radio, Layers, Brain, Target, GitCompare, Cloud,
-  Users, LogOut, User, Shield, FileText
+  Users, LogOut, User, Shield, FileText, Sparkles
 } from 'lucide-react';
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
