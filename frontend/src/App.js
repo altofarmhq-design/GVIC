@@ -32,7 +32,6 @@ import {
   ComparisonTab,
   DataSourcesTab,
   PipelineTab,
-  SignalTracerTab,
   GVICShowcaseTab
 } from "@/components/tabs";
 import UsersTab from "@/components/tabs/UsersTab";
