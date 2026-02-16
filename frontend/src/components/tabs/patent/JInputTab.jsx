@@ -23,7 +23,10 @@ import {
   HelpCircle,
   Target,
   Lightbulb,
-  Package
+  Package,
+  Code,
+  FileCode,
+  Sparkles
 } from 'lucide-react';
 import axios from 'axios';
 
@@ -34,6 +37,7 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
  */
 export const JInputTab = ({ onSignalSubmit }) => {
   const [inputType, setInputType] = useState("text");
+  const [analysisType, setAnalysisType] = useState("general");  // 분석 유형
   
   // 새로운 입력 필드들
   const [purpose, setPurpose] = useState("");        // 왜 질문하는지
@@ -46,6 +50,13 @@ export const JInputTab = ({ onSignalSubmit }) => {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
+
+  // 분석 유형 정의
+  const analysisTypes = [
+    { id: "general", label: "일반 분석", icon: FileText, desc: "텍스트/문서 분석", color: "blue" },
+    { id: "code", label: "코드 분석", icon: Code, desc: "오류 검출/품질 평가", color: "green" },
+    { id: "patent_idea", label: "특허/아이디어", icon: Lightbulb, desc: "신규성/실현가능성", color: "amber" }
+  ];
 
   // 파일 선택 처리
   const handleFileSelect = (e) => {
