@@ -446,6 +446,33 @@ async def ingest_text_signal(request: TextSignalRequest, current_user: dict = De
         logging.getLogger(__name__).error(f"GVIC analysis error: {e}")
         result["gvic_analysis"] = None
     
+    # 크로스 분석 수행 (기존 자산과 비교/연결)
+    try:
+        from gvic_analyzer import cross_analyze_signal
+        keywords = ai_result.get("keywords", [])
+        category = ai_result.get("signal_category", "general")
+        
+        cross_result = await cross_analyze_signal(
+            signal_id=result.get("signal_id"),
+            content=request.content,
+            keywords=keywords,
+            category=category,
+            max_related=5
+        )
+        result["cross_analysis"] = cross_result
+        
+        # DB에 크로스 분석 결과 저장
+        from server import db
+        await db.cross_analyses.update_one(
+            {"signal_id": result.get("signal_id")},
+            {"$set": cross_result},
+            upsert=True
+        )
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).error(f"Cross analysis error: {e}")
+        result["cross_analysis"] = None
+    
     return result
 
 def detect_shopping_platform(url: str) -> str:
