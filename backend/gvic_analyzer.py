@@ -475,30 +475,25 @@ async def extract_insights(
     from collections import Counter
     from datetime import timedelta
     
-    cutoff_date = (datetime.now(timezone.utc) - timedelta(days=time_range_days)).isoformat()
-    
-    # 최근 시그널들 조회
-    recent_signals = await db.pipeline_signals.find(
-        {"created_at": {"$gte": cutoff_date}},
+    # 모든 시그널 조회 (시간 필터 없이)
+    all_signals = await db.pipeline_signals.find(
+        {},
         {"_id": 0, "signal_id": 1, "content": 1, "metadata": 1, "created_at": 1, "category": 1}
     ).to_list(500)
     
-    # 최근 자산들 조회
-    recent_assets = await db.indexed_assets.find(
-        {"created_at": {"$gte": cutoff_date}},
-        {"_id": 0}
-    ).to_list(200)
-    
-    # 전체 자산 조회 (이상치 분석용)
+    # 전체 자산 조회
     all_assets = await db.indexed_assets.find({}, {"_id": 0}).to_list(500)
+    
+    # GVIC 분석 결과 조회
+    gvic_analyses = await db.gvic_analyses.find({}, {"_id": 0}).to_list(200)
     
     insights = {
         "analysis_type": "insight_extraction",
         "time_range_days": time_range_days,
         "data_summary": {
-            "recent_signals": len(recent_signals),
-            "recent_assets": len(recent_assets),
-            "total_assets": len(all_assets)
+            "total_signals": len(all_signals),
+            "total_assets": len(all_assets),
+            "total_gvic_analyses": len(gvic_analyses)
         },
         "patterns": {},
         "trends": {},
