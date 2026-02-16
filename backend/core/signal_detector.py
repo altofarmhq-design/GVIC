@@ -6,11 +6,11 @@ import json
 import asyncio
 from typing import Dict, List, Any, Optional
 from dotenv import load_dotenv
-from emergentintegrations.llm.chat import LlmChat, UserMessage
+from local_llm import LlmChat, UserMessage
 
 load_dotenv()
 
-EMERGENT_LLM_KEY = os.environ.get("EMERGENT_LLM_KEY")
+EMERGENT_LLM_KEY = os.environ.get("OPENAI_API_KEY", "")
 
 # 시그널 유형 정의
 SIGNAL_TYPES = {
