@@ -204,6 +204,10 @@ function Dashboard() {
               <TabsTrigger value="settings" className="data-[state=active]:bg-slate-700 gap-1 text-xs px-2 py-1.5">
                 <Settings className="w-3.5 h-3.5" /> 설정
               </TabsTrigger>
+
+              <TabsTrigger value="api-webhook" className="data-[state=active]:bg-purple-600/30 gap-1 text-xs px-2 py-1.5">
+                <Key className="w-3.5 h-3.5" /> API연동
+              </TabsTrigger>
               
               {isAdmin() && (
                 <TabsTrigger value="users" className="data-[state=active]:bg-slate-700 gap-1 text-xs px-2 py-1.5">
