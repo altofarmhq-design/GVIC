@@ -1,25 +1,5 @@
 [
   {
-    "timestamp": "2026-02-14T14:02:39.130456",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
-    "timestamp": "2026-02-14T14:02:40.235355",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
     "timestamp": "2026-02-14T14:02:41.323362",
     "phase": "데이터소스",
     "action": "데이터 수집",
@@ -9967,6 +9947,22 @@
   },
   {
     "timestamp": "2026-02-15T00:13:34.950976",
+    "phase": "리포트",
+    "action": "PDF 생성",
+    "data": {
+      "records": 20
+    }
+  },
+  {
+    "timestamp": "2026-02-16T05:56:08.610542",
+    "phase": "리포트",
+    "action": "PDF 생성",
+    "data": {
+      "records": 20
+    }
+  },
+  {
+    "timestamp": "2026-02-16T05:56:13.136829",
     "phase": "리포트",
     "action": "PDF 생성",
     "data": {

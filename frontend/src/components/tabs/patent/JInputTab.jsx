@@ -570,58 +570,400 @@ export const JInputTab = ({ onSignalSubmit }) => {
               </div>
             </Card>
           ) : (
-            <ScrollArea className="h-[550px]">
+            <ScrollArea className="h-[600px]">
               <div className="space-y-4 pr-4">
-                {/* 처리 결과 */}
+                {/* 처리 결과 요약 */}
                 <Card className="bg-green-900/20 border-green-600">
                   <CardContent className="py-4">
                     <div className="flex items-center gap-3 mb-3">
                       <CheckCircle2 className="w-6 h-6 text-green-400" />
                       <div>
-                        <p className="text-green-300 font-medium">파이프라인 처리 완료</p>
+                        <p className="text-green-300 font-medium">분석 완료</p>
                         <p className="text-slate-400 text-sm">시그널 ID: {result.signal_id}</p>
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div className="grid grid-cols-3 gap-2 text-sm">
                       <div className="bg-slate-800 rounded p-2">
-                        <p className="text-slate-500">분류</p>
+                        <p className="text-slate-500 text-xs">분석 유형</p>
+                        <Badge className="bg-blue-600 mt-1">
+                          {result.ai_analysis?.analysis_type === 'code' ? '💻 코드 분석' :
+                           result.ai_analysis?.analysis_type === 'patent_idea' ? '💡 특허/아이디어' : '📝 일반 분석'}
+                        </Badge>
+                      </div>
+                      <div className="bg-slate-800 rounded p-2">
+                        <p className="text-slate-500 text-xs">분류</p>
                         <Badge className={
-                          result.category === 'wanted' ? 'bg-blue-600' :
-                          result.category === 'unwanted' ? 'bg-amber-600' : 'bg-slate-600'
+                          result.category === 'wanted' ? 'bg-emerald-600 mt-1' :
+                          result.category === 'unwanted' ? 'bg-amber-600 mt-1' : 'bg-slate-600 mt-1'
                         }>
                           {result.category === 'wanted' ? '원하는 것' :
                            result.category === 'unwanted' ? '자산화 대상' : 'Null'}
                         </Badge>
                       </div>
                       <div className="bg-slate-800 rounded p-2">
-                        <p className="text-slate-500">처리 단계</p>
-                        <p className="text-slate-200">{Object.keys(result.stages_completed || {}).length}개 완료</p>
+                        <p className="text-slate-500 text-xs">신뢰도</p>
+                        <p className="text-slate-200 mt-1">{((result.ai_analysis?.confidence || 0) * 100).toFixed(0)}%</p>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                {/* 요청 결과 */}
-                <Card className="bg-blue-900/20 border-blue-600">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-blue-300 text-base flex items-center gap-2">
-                      <Lightbulb className="w-5 h-5" />
-                      요청하신 결과
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-slate-300 text-sm">
-                      {result.analysis_result || "시그널이 성공적으로 처리되었습니다. 상세 분석 결과는 각 단계별 탭에서 확인할 수 있습니다."}
-                    </p>
-                  </CardContent>
-                </Card>
+                {/* AI 분석 요약 */}
+                {result.ai_analysis?.analysis_summary && (
+                  <Card className="bg-blue-900/20 border-blue-600">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-blue-300 text-base flex items-center gap-2">
+                        <Sparkles className="w-5 h-5" />
+                        AI 분석 요약
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-slate-200 text-sm leading-relaxed">
+                        {result.ai_analysis.analysis_summary}
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* 일반 분석 결과 */}
+                {result.ai_analysis?.analysis_type === 'general' && result.ai_analysis?.purpose_analysis && (
+                  <>
+                    <Card className="bg-slate-800/50 border-slate-700">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-slate-100 text-base flex items-center gap-2">
+                          <Target className="w-5 h-5 text-blue-400" />
+                          목적 분석
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <div>
+                          <p className="text-slate-500 text-xs mb-1">해석</p>
+                          <p className="text-slate-300 text-sm">{result.ai_analysis.purpose_analysis.interpretation}</p>
+                        </div>
+                        <div>
+                          <p className="text-slate-500 text-xs mb-1">분석 결과</p>
+                          <p className="text-slate-300 text-sm">{result.ai_analysis.purpose_analysis.findings}</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {result.ai_analysis?.expected_result && (
+                      <Card className="bg-emerald-900/20 border-emerald-600">
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-emerald-300 text-base flex items-center gap-2">
+                            <Lightbulb className="w-5 h-5" />
+                            기대 결과 답변
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                          <p className="text-slate-200 text-sm leading-relaxed">
+                            {result.ai_analysis.expected_result.answer}
+                          </p>
+                          {result.ai_analysis.expected_result.evidence?.length > 0 && (
+                            <div>
+                              <p className="text-slate-500 text-xs mb-2">근거</p>
+                              <ul className="space-y-1">
+                                {result.ai_analysis.expected_result.evidence.map((ev, idx) => (
+                                  <li key={idx} className="text-slate-400 text-sm flex items-start gap-2">
+                                    <span className="text-emerald-400">•</span> {ev}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    )}
+                  </>
+                )}
+
+                {/* 코드 분석 결과 */}
+                {result.ai_analysis?.analysis_type === 'code' && (
+                  <>
+                    {/* 문법 오류 */}
+                    {result.ai_analysis?.syntax_errors?.length > 0 && (
+                      <Card className="bg-red-900/20 border-red-600">
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-red-300 text-base flex items-center gap-2">
+                            <AlertCircle className="w-5 h-5" />
+                            문법/컴파일 오류 ({result.ai_analysis.syntax_errors.length}건)
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-2">
+                          {result.ai_analysis.syntax_errors.map((err, idx) => (
+                            <div key={idx} className="bg-slate-800 rounded p-3">
+                              <div className="flex items-center gap-2 mb-2">
+                                <Badge variant="outline" className="text-red-400 border-red-600 text-xs">
+                                  Line {err.line}
+                                </Badge>
+                                <span className="text-red-300 text-sm font-medium">{err.error}</span>
+                              </div>
+                              <p className="text-slate-400 text-sm">💡 {err.suggestion}</p>
+                            </div>
+                          ))}
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    {/* 버그 가능성 */}
+                    {result.ai_analysis?.potential_bugs?.length > 0 && (
+                      <Card className="bg-amber-900/20 border-amber-600">
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-amber-300 text-base flex items-center gap-2">
+                            <AlertCircle className="w-5 h-5" />
+                            버그 가능성 ({result.ai_analysis.potential_bugs.length}건)
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-2">
+                          {result.ai_analysis.potential_bugs.map((bug, idx) => (
+                            <div key={idx} className="bg-slate-800 rounded p-3">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-amber-300 text-sm">{bug.location}</span>
+                                <Badge className={
+                                  bug.severity === 'high' ? 'bg-red-600' :
+                                  bug.severity === 'medium' ? 'bg-amber-600' : 'bg-slate-600'
+                                }>{bug.severity}</Badge>
+                              </div>
+                              <p className="text-slate-300 text-sm mb-1">{bug.issue}</p>
+                              <p className="text-slate-400 text-sm">🔧 {bug.fix}</p>
+                            </div>
+                          ))}
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    {/* 코드 품질 */}
+                    {result.ai_analysis?.code_quality && (
+                      <Card className="bg-slate-800/50 border-slate-700">
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-slate-100 text-base">코드 품질 평가</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid grid-cols-4 gap-2 mb-3">
+                            {[
+                              { label: '가독성', value: result.ai_analysis.code_quality.readability_score },
+                              { label: '유지보수성', value: result.ai_analysis.code_quality.maintainability_score },
+                              { label: '효율성', value: result.ai_analysis.code_quality.efficiency_score },
+                              { label: '종합', value: result.ai_analysis.code_quality.overall_score }
+                            ].map((item, idx) => (
+                              <div key={idx} className="text-center">
+                                <p className="text-slate-500 text-xs mb-1">{item.label}</p>
+                                <div className={`text-lg font-bold ${
+                                  item.value >= 0.8 ? 'text-green-400' :
+                                  item.value >= 0.6 ? 'text-amber-400' : 'text-red-400'
+                                }`}>
+                                  {(item.value * 100).toFixed(0)}%
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                          <p className="text-slate-400 text-sm">{result.ai_analysis.code_quality.comments}</p>
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    {/* 개선 제안 */}
+                    {result.ai_analysis?.improvements?.length > 0 && (
+                      <Card className="bg-blue-900/20 border-blue-600">
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-blue-300 text-base flex items-center gap-2">
+                            <Lightbulb className="w-5 h-5" />
+                            개선 제안
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-2">
+                          {result.ai_analysis.improvements.map((imp, idx) => (
+                            <div key={idx} className="bg-slate-800 rounded p-3">
+                              <div className="flex items-center justify-between mb-2">
+                                <Badge variant="outline" className="text-blue-400 border-blue-600 text-xs">
+                                  {imp.category}
+                                </Badge>
+                                <Badge className={
+                                  imp.priority === 'high' ? 'bg-red-600' :
+                                  imp.priority === 'medium' ? 'bg-amber-600' : 'bg-slate-600'
+                                }>{imp.priority}</Badge>
+                              </div>
+                              <p className="text-slate-300 text-sm">{imp.suggestion}</p>
+                              {imp.example && (
+                                <pre className="mt-2 p-2 bg-slate-900 rounded text-xs text-green-400 overflow-x-auto">
+                                  {imp.example}
+                                </pre>
+                              )}
+                            </div>
+                          ))}
+                        </CardContent>
+                      </Card>
+                    )}
+                  </>
+                )}
+
+                {/* 특허/아이디어 분석 결과 */}
+                {result.ai_analysis?.analysis_type === 'patent_idea' && (
+                  <>
+                    {/* 핵심 개념 */}
+                    {result.ai_analysis?.core_concept && (
+                      <Card className="bg-slate-800/50 border-slate-700">
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-slate-100 text-base flex items-center gap-2">
+                            <Target className="w-5 h-5 text-blue-400" />
+                            핵심 개념
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                          <div className="bg-blue-900/30 rounded p-3">
+                            <p className="text-blue-300 font-medium">{result.ai_analysis.core_concept.main_idea}</p>
+                          </div>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <p className="text-slate-500 text-xs mb-2">핵심 요소</p>
+                              <div className="flex flex-wrap gap-1">
+                                {result.ai_analysis.core_concept.key_elements?.map((elem, idx) => (
+                                  <Badge key={idx} variant="outline" className="text-slate-300 border-slate-600 text-xs">
+                                    {elem}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                            <div>
+                              <p className="text-slate-500 text-xs mb-2">기술 분야</p>
+                              <p className="text-slate-300 text-sm">{result.ai_analysis.core_concept.technical_domain}</p>
+                            </div>
+                          </div>
+                          <div>
+                            <p className="text-slate-500 text-xs mb-1">해결하는 문제</p>
+                            <p className="text-slate-300 text-sm">{result.ai_analysis.core_concept.problem_solved}</p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    {/* 평가 점수 */}
+                    <Card className="bg-gradient-to-r from-emerald-900/20 to-blue-900/20 border-emerald-600">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-emerald-300 text-base">종합 평가</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="grid grid-cols-4 gap-3">
+                          {[
+                            { label: '신규성', value: result.ai_analysis?.novelty_assessment?.novelty_score, color: 'blue' },
+                            { label: '실현가능성', value: result.ai_analysis?.feasibility?.technical_feasibility_score, color: 'green' },
+                            { label: '시장성', value: result.ai_analysis?.market_potential?.market_score, color: 'amber' },
+                            { label: '혁신성', value: result.ai_analysis?.overall_evaluation?.innovation_score, color: 'purple' }
+                          ].map((item, idx) => (
+                            <div key={idx} className="text-center bg-slate-800/50 rounded-lg p-3">
+                              <p className="text-slate-500 text-xs mb-2">{item.label}</p>
+                              <div className={`text-2xl font-bold ${
+                                (item.value || 0) >= 0.8 ? 'text-green-400' :
+                                (item.value || 0) >= 0.6 ? 'text-amber-400' : 'text-red-400'
+                              }`}>
+                                {item.value ? (item.value * 100).toFixed(0) : '-'}%
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        {result.ai_analysis?.feasibility?.timeline_estimate && (
+                          <div className="mt-3 flex items-center justify-center gap-2 text-slate-400 text-sm">
+                            <Clock className="w-4 h-4" />
+                            예상 개발 기간: <span className="text-slate-200">{result.ai_analysis.feasibility.timeline_estimate}</span>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+
+                    {/* 시장 잠재력 */}
+                    {result.ai_analysis?.market_potential && (
+                      <Card className="bg-amber-900/20 border-amber-600">
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-amber-300 text-base flex items-center gap-2">
+                            <Package className="w-5 h-5" />
+                            시장 잠재력
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <p className="text-slate-500 text-xs mb-2">타겟 시장</p>
+                              <ul className="space-y-1">
+                                {result.ai_analysis.market_potential.target_markets?.map((market, idx) => (
+                                  <li key={idx} className="text-slate-300 text-sm flex items-start gap-2">
+                                    <span className="text-amber-400">•</span> {market}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                            <div>
+                              <p className="text-slate-500 text-xs mb-2">응용 분야</p>
+                              <ul className="space-y-1">
+                                {result.ai_analysis.market_potential.application_areas?.map((area, idx) => (
+                                  <li key={idx} className="text-slate-300 text-sm flex items-start gap-2">
+                                    <span className="text-amber-400">•</span> {area}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          </div>
+                          <div>
+                            <p className="text-slate-500 text-xs mb-1">수익화 가능성</p>
+                            <p className="text-slate-300 text-sm">{result.ai_analysis.market_potential.monetization_potential}</p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    {/* 종합 추천 */}
+                    {result.ai_analysis?.overall_evaluation?.recommendation && (
+                      <Card className="bg-purple-900/20 border-purple-600">
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-purple-300 text-base flex items-center gap-2">
+                            <Lightbulb className="w-5 h-5" />
+                            종합 추천
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                          <p className="text-slate-200 text-sm">{result.ai_analysis.overall_evaluation.recommendation}</p>
+                          {result.ai_analysis.overall_evaluation.next_steps?.length > 0 && (
+                            <div>
+                              <p className="text-slate-500 text-xs mb-2">다음 단계</p>
+                              <ul className="space-y-1">
+                                {result.ai_analysis.overall_evaluation.next_steps.map((step, idx) => (
+                                  <li key={idx} className="text-slate-300 text-sm flex items-start gap-2">
+                                    <span className="text-purple-400">{idx + 1}.</span> {step}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    )}
+                  </>
+                )}
+
+                {/* 핵심 포인트 */}
+                {result.ai_analysis?.key_points?.length > 0 && (
+                  <Card className="bg-slate-800/50 border-slate-700">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-slate-100 text-base">핵심 포인트</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="space-y-2">
+                        {result.ai_analysis.key_points.map((point, idx) => (
+                          <li key={idx} className="flex items-start gap-2 text-slate-300 text-sm">
+                            <CheckCircle2 className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+                            {point}
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
+                )}
 
                 {/* 관련 자산 추천 */}
-                <Card className="bg-amber-900/20 border-amber-600">
+                <Card className="bg-slate-800/30 border-slate-700">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-amber-300 text-base flex items-center gap-2">
-                      <Package className="w-5 h-5" />
-                      관련 모듈화 자산 추천
+                    <CardTitle className="text-slate-300 text-base flex items-center gap-2">
+                      <Package className="w-5 h-5 text-slate-500" />
+                      관련 모듈화 자산
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -640,29 +982,10 @@ export const JInputTab = ({ onSignalSubmit }) => {
                         ))}
                       </div>
                     ) : (
-                      <p className="text-slate-400 text-sm">
-                        아직 관련된 모듈화 자산이 없습니다. 시스템이 더 많은 시그널을 학습하면 관련 자산을 추천해 드립니다.
+                      <p className="text-slate-500 text-sm">
+                        관련된 모듈화 자산이 없습니다.
                       </p>
                     )}
-                  </CardContent>
-                </Card>
-
-                {/* 단계별 처리 상태 */}
-                <Card className="bg-slate-800/50 border-slate-700">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-slate-100 text-base">처리 단계</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-1">
-                      {Object.entries(result.stages_completed || {}).map(([stage, status]) => (
-                        <div key={stage} className="flex items-center justify-between text-sm">
-                          <span className="text-slate-400">{stage}</span>
-                          <Badge className={status === 'completed' ? 'bg-green-600' : 'bg-slate-600'}>
-                            {status}
-                          </Badge>
-                        </div>
-                      ))}
-                    </div>
                   </CardContent>
                 </Card>
               </div>
