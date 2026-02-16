@@ -328,41 +328,36 @@ export const JInputTab = ({ onSignalSubmit }) => {
             <CardHeader className="pb-3">
               <CardTitle className="text-slate-100 text-lg flex items-center gap-2">
                 <Target className="w-5 h-5 text-blue-400" />
-                질문 정의
+                질문 입력
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div>
-                <Label className="text-slate-300 flex items-center gap-2 mb-2">
-                  <HelpCircle className="w-4 h-4 text-amber-400" />
-                  왜 질문하는지 (목적)
-                </Label>
-                <Textarea
-                  placeholder="이 시그널을 분석하는 목적을 입력하세요"
-                  value={purpose}
-                  onChange={(e) => setPurpose(e.target.value)}
-                  className="bg-slate-900 border-slate-600 text-slate-100 min-h-[80px]"
-                />
-              </div>
-              <div>
-                <Label className="text-slate-300 flex items-center gap-2 mb-2">
-                  <Lightbulb className="w-4 h-4 text-emerald-400" />
-                  기대하는 결과
-                </Label>
-                <Textarea
-                  placeholder="어떤 결과를 얻고 싶은지 입력하세요"
-                  value={expectedResult}
-                  onChange={(e) => setExpectedResult(e.target.value)}
-                  className="bg-slate-900 border-slate-600 text-slate-100 min-h-[80px]"
-                />
-              </div>
+              {inputType === "text" && (
+                <div>
+                  <Textarea
+                    placeholder="질문이나 분석할 내용을 자유롭게 입력하세요.&#10;&#10;예시:&#10;• 이 코드의 버그를 찾아주세요&#10;• 새로운 아이디어의 시장성을 분석해주세요&#10;• 이 문서의 핵심 내용을 요약해주세요"
+                    value={textContent}
+                    onChange={(e) => setTextContent(e.target.value)}
+                    className="bg-slate-900 border-slate-600 text-slate-100 min-h-[180px] text-base"
+                  />
+                  <p className="text-xs text-slate-500 mt-2">
+                    💡 AI가 질문의 목적과 기대결과를 자동으로 분석합니다
+                  </p>
+                </div>
+              )}
+              
+              {inputType !== "text" && (
+                <div className="bg-slate-900/50 rounded-lg p-4 text-center text-slate-400 text-sm">
+                  <p>파일 또는 URL 입력 시 아래에서 선택하세요</p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
-          {/* 입력 유형 선택 */}
+          {/* 입력 유형 선택 (파일/URL용) */}
           <Card className="bg-slate-800/50 border-slate-700">
             <CardHeader className="pb-2">
-              <CardTitle className="text-slate-100 text-base">시그널 입력 방식</CardTitle>
+              <CardTitle className="text-slate-100 text-base">입력 방식</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-4 gap-2">
