@@ -61,7 +61,7 @@ npm install
 
 ### MongoDB 시작
 ```batch
-mongod --dbpath C:\data\db
+mongod --dbpath D:\GVIC\data\db
 ```
 
 ---
@@ -109,8 +109,8 @@ REACT_APP_BACKEND_URL=http://localhost:8001
 # MongoDB 서비스 확인
 net start MongoDB
 
-# 수동 시작
-mongod --dbpath "C:\data\db"
+# 수동 시작 (D:\GVIC 프로젝트 내 데이터 디렉토리 사용)
+mongod --dbpath "D:\GVIC\data\db"
 ```
 
 ### 백엔드 포트 충돌
