@@ -334,20 +334,27 @@ export const JInputTab = ({ onSignalSubmit }) => {
             <CardContent className="space-y-4">
               {/* 입력 방식 슬라이드 탭 */}
               <div className="flex items-center gap-1 bg-slate-900/50 rounded-lg p-1">
-                {inputTypes.filter(t => t.enabled).map((type) => {
+                {inputTypes.map((type) => {
                   const Icon = type.icon;
+                  const isDisabled = !type.enabled;
                   return (
                     <button
                       key={type.id}
-                      onClick={() => setInputType(type.id)}
+                      onClick={() => type.enabled && setInputType(type.id)}
+                      disabled={isDisabled}
                       className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md transition-all ${
-                        inputType === type.id
-                          ? 'bg-blue-600 text-white'
-                          : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                        isDisabled
+                          ? 'text-slate-600 cursor-not-allowed'
+                          : inputType === type.id
+                            ? 'bg-blue-600 text-white'
+                            : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
                       }`}
                     >
                       <Icon className="w-4 h-4" />
                       <span className="text-sm">{type.label}</span>
+                      {isDisabled && (
+                        <span className="text-xs text-amber-500 ml-1">(준비중)</span>
+                      )}
                     </button>
                   );
                 })}
