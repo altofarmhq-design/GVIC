@@ -23,17 +23,31 @@ JWT_SECRET = os.environ.get("JWT_SECRET_KEY", "gvic-engine-secret-key-change-in-
 # Simple auth dependency for this module
 async def get_current_user_simple(authorization: str = Header(None)):
     """간단한 인증 확인"""
+    import logging
+    logger = logging.getLogger(__name__)
+    
     if not authorization:
+        logger.error("No authorization header")
         raise HTTPException(status_code=401, detail="인증이 필요합니다")
     
     try:
-        token = authorization.replace("Bearer ", "")
+        # Bearer 토큰 추출
+        if authorization.startswith("Bearer "):
+            token = authorization[7:]
+        else:
+            token = authorization
+        
+        logger.info(f"Token received (first 20 chars): {token[:20]}...")
+        
         payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
+        logger.info(f"Token decoded successfully for user: {payload.get('sub')}")
         return payload
     except jwt.ExpiredSignatureError:
+        logger.error("Token expired")
         raise HTTPException(status_code=401, detail="토큰이 만료되었습니다")
-    except jwt.InvalidTokenError:
-        raise HTTPException(status_code=401, detail="유효하지 않은 토큰입니다")
+    except jwt.InvalidTokenError as e:
+        logger.error(f"Invalid token error: {str(e)}")
+        raise HTTPException(status_code=401, detail=f"유효하지 않은 토큰입니다: {str(e)}")
 
 # Request Models
 class TextSignalRequest(BaseModel):
