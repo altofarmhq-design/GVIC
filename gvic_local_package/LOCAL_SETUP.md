@@ -15,14 +15,30 @@
 
 ---
 
-## 2. 백엔드 설정
+## 2. 프로젝트 루트
+
+```
+D:\GVIC\
+├── backend\
+├── frontend\
+├── data\db\     (MongoDB 데이터)
+├── scripts\
+└── docs\
+```
+
+---
+
+## 3. 백엔드 설정
 
 ```cmd
-cd backend
+cd D:\GVIC\backend
 
 # 가상환경 생성 및 활성화
 python -m venv venv
 venv\Scripts\activate
+
+# emergentintegrations 설치 (필수)
+pip install emergentintegrations --extra-index-url https://d33sy5i8bnduwe.cloudfront.net/simple/
 
 # 패키지 설치
 pip install -r requirements.txt
@@ -30,7 +46,7 @@ pip install -r requirements.txt
 # .env 파일 생성 (.env.example 복사)
 copy .env.example .env
 
-# .env 파일 열어서 OPENAI_API_KEY 입력
+# .env 파일 열어서 EMERGENT_LLM_KEY 입력
 notepad .env
 ```
 
@@ -39,7 +55,7 @@ notepad .env
 MONGO_URL=mongodb://localhost:27017
 DB_NAME=gvic_local
 JWT_SECRET_KEY=your-secret-key
-OPENAI_API_KEY=sk-실제API키입력
+EMERGENT_LLM_KEY=sk-emergent-실제키입력
 ```
 
 ### 백엔드 실행
@@ -49,12 +65,12 @@ python -m uvicorn server:app --reload --host 0.0.0.0 --port 8001
 
 ---
 
-## 3. 프론트엔드 설정
+## 4. 프론트엔드 설정
 
 새 명령 프롬프트 창 열기:
 
 ```cmd
-cd frontend
+cd D:\GVIC\frontend
 
 # 패키지 설치
 npm install
@@ -65,7 +81,7 @@ npm start
 
 ---
 
-## 4. 첫 번째 관리자 계정 생성
+## 5. 첫 번째 관리자 계정 생성
 
 백엔드가 실행 중인 상태에서 새 명령 프롬프트:
 
@@ -82,7 +98,7 @@ curl -X POST http://localhost:8001/api/auth/register -H "Content-Type: applicati
 
 ---
 
-## 5. 접속
+## 6. 접속
 
 브라우저에서 http://localhost:3000 접속
 
@@ -99,6 +115,7 @@ pip install bcrypt==4.0.1
 ### MongoDB 연결 오류
 - MongoDB 서비스가 실행 중인지 확인
 - Windows: 서비스 앱에서 "MongoDB Server" 확인
+- 수동 시작: `mongod --dbpath "D:\GVIC\data\db"`
 
 ### CORS 오류
 - 백엔드와 프론트엔드가 모두 실행 중인지 확인
