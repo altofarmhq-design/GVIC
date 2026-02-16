@@ -419,6 +419,33 @@ async def ingest_text_signal(request: TextSignalRequest, current_user: dict = De
     # AI 분석 결과 추가
     result["ai_analysis"] = ai_result
     
+    # GVIC 결이론 분석 수행 (5:3:2)
+    try:
+        from gvic_analyzer import analyze_with_gvic_lens
+        gvic_result = await analyze_with_gvic_lens(
+            content=request.content,
+            ai_analysis=ai_result,
+            purpose=request.purpose
+        )
+        result["gvic_analysis"] = gvic_result
+        
+        # DB에 GVIC 분석 결과 저장
+        from server import db
+        await db.gvic_analyses.update_one(
+            {"signal_id": result.get("signal_id")},
+            {"$set": {
+                "signal_id": result.get("signal_id"),
+                "analysis_type": "gvic_532",
+                "result": gvic_result,
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }},
+            upsert=True
+        )
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).error(f"GVIC analysis error: {e}")
+        result["gvic_analysis"] = None
+    
     return result
 
 def detect_shopping_platform(url: str) -> str:
