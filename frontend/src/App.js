@@ -260,6 +260,10 @@ function Dashboard() {
               <TabsTrigger value="my-assets" className="data-[state=active]:bg-amber-600/30 gap-1 text-xs px-2 py-1.5">
                 <Coins className="w-3.5 h-3.5" /> 내 자산
               </TabsTrigger>
+
+              <TabsTrigger value="market" className="data-[state=active]:bg-emerald-600/30 gap-1 text-xs px-2 py-1.5">
+                <ShoppingCart className="w-3.5 h-3.5" /> 마켓
+              </TabsTrigger>
               
               {isAdmin() && (
                 <TabsTrigger value="users" className="data-[state=active]:bg-slate-700 gap-1 text-xs px-2 py-1.5">
