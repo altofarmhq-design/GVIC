@@ -57,18 +57,25 @@ async def get_current_user_simple(authorization: str = Header(None)):
         raise HTTPException(status_code=401, detail="유효하지 않은 토큰입니다. 다시 로그인해주세요.")
 
 # Request Models
+class ClassificationRatio(BaseModel):
+    wanted: int = 5
+    unwanted: int = 3
+    null: int = 2
+
 class TextSignalRequest(BaseModel):
     type: str = "text"
     content: str
     purpose: str = ""           # 왜 질문하는지
     expected_result: str = ""   # 기대하는 결과
     analysis_type: str = "general"  # 분석 유형: general, code, patent_idea
+    classification_ratio: ClassificationRatio = None  # 5:3:2 비율
 
 class UrlSignalRequest(BaseModel):
     url: str
     purpose: str = ""
     expected_result: str = ""
     analysis_type: str = "general"
+    classification_ratio: ClassificationRatio = None
 
 # Helper Functions
 def generate_signal_id():
