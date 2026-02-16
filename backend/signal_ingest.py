@@ -147,13 +147,21 @@ def extract_text_from_txt(file_content: bytes) -> str:
 
 @router.post("/ingest")
 async def ingest_text_signal(request: TextSignalRequest, current_user: dict = Depends(get_current_user_simple)):
-    """텍스트 시그널 입력 → 파이프라인 자동 실행"""
+    """텍스트 시그널 입력 → 파이프라인 자동 실행 + AI 분석"""
     if not request.content.strip():
         raise HTTPException(status_code=400, detail="내용이 비어있습니다")
     
     # 파이프라인 엔진 가져오기
     from server import get_pipeline_engine
     pipeline = get_pipeline_engine()
+    
+    # AI 분석 수행
+    from core.ai_analyzer import analyze_signal
+    ai_result = await analyze_signal(
+        content=request.content,
+        purpose=request.purpose,
+        expected_result=request.expected_result
+    )
     
     # 파이프라인 실행
     result = await pipeline.create_signal(
@@ -163,7 +171,8 @@ async def ingest_text_signal(request: TextSignalRequest, current_user: dict = De
         metadata={
             "input_method": "text",
             "purpose": request.purpose,
-            "expected_result": request.expected_result
+            "expected_result": request.expected_result,
+            "ai_analysis": ai_result
         },
         user_id=current_user.get("sub")
     )
@@ -171,7 +180,9 @@ async def ingest_text_signal(request: TextSignalRequest, current_user: dict = De
     # 관련 자산 추천 추가
     related_assets = await pipeline.find_related_assets(request.content, request.purpose)
     result["related_assets"] = related_assets
-    result["analysis_result"] = f"시그널이 '{result.get('category', 'unknown')}' 카테고리로 분류되었습니다."
+    
+    # AI 분석 결과 추가
+    result["ai_analysis"] = ai_result
     
     return result
 
