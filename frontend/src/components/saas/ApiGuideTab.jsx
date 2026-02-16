@@ -459,17 +459,38 @@ analyzeProduct('product_123', reviews)
                 <Input 
                   placeholder="https://your-server.com/webhook/gvic"
                   className="bg-slate-900 border-slate-700"
+                  value={webhookUrl}
+                  onChange={(e) => setWebhookUrl(e.target.value)}
                 />
               </div>
               <div className="space-y-2">
                 <Label>이벤트 구독</Label>
                 <div className="flex flex-wrap gap-2">
-                  {['analysis_complete', 'complaint_alert', 'insight_summary'].map(event => (
-                    <Badge key={event} className="bg-violet-500/20 text-violet-400 cursor-pointer">
-                      <Check className="w-3 h-3 mr-1" /> {event}
+                  {[
+                    { id: 'analysis_complete', label: '분석 완료', desc: '리뷰 분석이 완료되면 알림' },
+                    { id: 'complaint_alert', label: '불만 알림', desc: '심각한 불만이 감지되면 알림' },
+                    { id: 'insight_summary', label: '인사이트 요약', desc: '주간/월간 인사이트 요약' }
+                  ].map(event => (
+                    <Badge 
+                      key={event.id} 
+                      className={`cursor-pointer transition-all ${
+                        subscribedEvents[event.id] 
+                          ? 'bg-violet-500/20 text-violet-400 hover:bg-violet-500/30' 
+                          : 'bg-slate-700 text-slate-400 hover:bg-slate-600'
+                      }`}
+                      onClick={() => toggleEvent(event.id)}
+                      title={event.desc}
+                    >
+                      {subscribedEvents[event.id] ? (
+                        <Check className="w-3 h-3 mr-1" />
+                      ) : (
+                        <span className="w-3 h-3 mr-1 inline-block" />
+                      )}
+                      {event.label}
                     </Badge>
                   ))}
                 </div>
+                <p className="text-xs text-slate-500 mt-1">클릭하여 이벤트를 활성화/비활성화하세요</p>
               </div>
               <div className="p-4 bg-slate-900 rounded-lg">
                 <p className="text-slate-400 text-sm mb-2">웹훅 페이로드 예시</p>
