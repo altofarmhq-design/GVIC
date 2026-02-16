@@ -180,7 +180,8 @@ async def create_checkout_session(
         StripeCheckout, CheckoutSessionRequest, CheckoutSessionResponse
     )
     
-    user_id = current_user.get("user_id")
+    # JWT에서 user_id는 'sub' 또는 'user_id'로 저장됨
+    user_id = current_user.get("sub") or current_user.get("user_id") or ""
     email = current_user.get("email", "")
     
     # 플랜 확인
