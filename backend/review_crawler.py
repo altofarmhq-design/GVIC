@@ -368,17 +368,68 @@ async def crawl_coupang_reviews(url: str, max_reviews: int) -> tuple:
             author_elem = elem.select_one('.sdp-review__article__list__info__user__name, .reviewer-name')
             author = author_elem.get_text(strip=True) if author_elem else f"구매자{idx+1}"
             
+            # 날짜 추출
+            date_elem = elem.select_one('.sdp-review__article__list__info__product-info__reg-date, [class*="date"]')
+            date = date_elem.get_text(strip=True) if date_elem else None
+            
+            # 구매 옵션 추출
+            option_elem = elem.select_one('.sdp-review__article__list__info__product-info__name, [class*="option"]')
+            purchase_option = option_elem.get_text(strip=True) if option_elem else None
+            
+            # 도움이 됐어요 수
+            helpful_elem = elem.select_one('[class*="helpful"], [class*="vote"]')
+            helpful_count = 0
+            if helpful_elem:
+                helpful_text = helpful_elem.get_text(strip=True)
+                helpful_match = re.search(r'(\d+)', helpful_text)
+                if helpful_match:
+                    helpful_count = int(helpful_match.group(1))
+            
             reviews.append(ReviewData(
                 review_id=f"coupang_{uuid.uuid4().hex[:8]}",
                 author=author,
                 rating=rating,
-                content=content
+                content=content,
+                date=date,
+                purchase_option=purchase_option,
+                helpful_count=helpful_count
             ))
             
         except Exception as e:
             continue
     
     return product_info, reviews
+
+
+class CoupangReviewCrawler:
+    """쿠팡 리뷰 크롤러 (페이지네이션 지원)
+    
+    참고: 쿠팡은 JavaScript 렌더링이 필요한 경우가 많아
+    완전한 크롤링을 위해서는 Playwright 사용을 권장합니다.
+    """
+    
+    REVIEWS_PER_PAGE = 15
+    MAX_PAGES = 30
+    
+    async def extract_product_id(self, url: str) -> Optional[str]:
+        """URL에서 상품 ID 추출"""
+        # coupang.com/vp/products/12345
+        match = re.search(r'/products/(\d+)', url)
+        if match:
+            return match.group(1)
+        
+        # coupang.com/...-P12345...
+        match = re.search(r'-P(\d+)', url)
+        if match:
+            return match.group(1)
+        
+        return None
+    
+    async def crawl(self, url: str, max_reviews: int) -> tuple:
+        """쿠팡 리뷰 크롤링"""
+        # 쿠팡은 API 직접 호출이 어려워 기본 크롤러 사용
+        return await crawl_coupang_reviews(url, max_reviews)
+
 
 async def crawl_generic_reviews(url: str, max_reviews: int) -> tuple:
     """일반적인 리뷰 크롤링 (범용)"""
