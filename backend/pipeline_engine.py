@@ -444,6 +444,117 @@ class GVICPipeline:
                 "reason": "자산화 단계 스킵됨"
             })
     
+    async def _stage_module(self, signal_id: str, asset_doc: Dict):
+        """모듈화 단계 - 자산 패키징, 판매, 보상 분배
+        
+        특허 B, C, F, I 단계:
+        - B: 모듈 패키징 (유사 자산 그룹화)
+        - C: 가격 책정 (가치 기반)
+        - F: 판매 등록
+        - I: 보상 분배 구조 설정
+        """
+        await self._update_stage(signal_id, PipelineStage.MODULE, PipelineStatus.PROCESSING)
+        
+        asset_id = asset_doc.get("asset_id")
+        value_score = asset_doc.get("value_score", 0.5)
+        labels = asset_doc.get("labels", [])
+        tags = asset_doc.get("tags", [])
+        
+        # ===== B단계: 모듈 패키징 =====
+        # 유사한 자산들과 그룹화 (라벨 기반)
+        similar_assets = []
+        if labels:
+            cursor = self.assets_collection.find({
+                "asset_id": {"$ne": asset_id},
+                "labels": {"$in": labels[:5]},  # 상위 5개 라벨로 검색
+                "status": "stored"
+            }).limit(5)
+            
+            async for similar in cursor:
+                similar_assets.append({
+                    "asset_id": similar.get("asset_id"),
+                    "shared_labels": list(set(labels) & set(similar.get("labels", [])))
+                })
+        
+        module_info = {
+            "module_id": self._generate_id("MOD"),
+            "primary_asset": asset_id,
+            "grouped_assets": [a["asset_id"] for a in similar_assets],
+            "group_size": len(similar_assets) + 1
+        }
+        
+        # ===== C단계: 가격 책정 =====
+        # 가치 점수 기반 가격 산정 (0~100 크레딧)
+        base_price = int(value_score * 100)
+        
+        # 그룹 크기에 따른 가격 조정
+        group_bonus = min(len(similar_assets) * 5, 25)  # 최대 25 크레딧 보너스
+        
+        # 분석 유형에 따른 가격 조정
+        analysis_type = asset_doc.get("analysis_type", "general")
+        type_multiplier = {
+            "patent_idea": 1.5,
+            "code": 1.3,
+            "general": 1.0
+        }.get(analysis_type, 1.0)
+        
+        final_price = int((base_price + group_bonus) * type_multiplier)
+        
+        pricing_info = {
+            "base_price": base_price,
+            "group_bonus": group_bonus,
+            "type_multiplier": type_multiplier,
+            "final_price": final_price,
+            "currency": "credit"
+        }
+        
+        # ===== F단계: 판매 등록 =====
+        sale_status = "available" if final_price >= 30 else "pending_review"
+        
+        sale_info = {
+            "status": sale_status,
+            "listed_at": datetime.now(timezone.utc).isoformat() if sale_status == "available" else None,
+            "price": final_price,
+            "views": 0,
+            "purchases": 0
+        }
+        
+        # ===== I단계: 보상 분배 구조 =====
+        # 기여자 보상 비율 설정
+        reward_structure = {
+            "contributor_share": 0.7,      # 원본 기여자 70%
+            "platform_share": 0.2,         # 플랫폼 20%
+            "curator_share": 0.1,          # 큐레이터/운영자 10%
+            "potential_reward": int(final_price * 0.7),  # 기여자 예상 보상
+            "reward_currency": "credit"
+        }
+        
+        # 모듈 문서 업데이트
+        module_result = {
+            "module_info": module_info,
+            "pricing": pricing_info,
+            "sale": sale_info,
+            "reward_structure": reward_structure,
+            "completed_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        # 자산 문서 업데이트
+        await self.assets_collection.update_one(
+            {"asset_id": asset_id},
+            {"$set": {
+                "module_status": "completed",
+                "module_info": module_info,
+                "pricing": pricing_info,
+                "sale_status": sale_status,
+                "reward_structure": reward_structure,
+                "modulized_at": datetime.now(timezone.utc)
+            }}
+        )
+        
+        await self._update_stage(signal_id, PipelineStage.MODULE, PipelineStatus.COMPLETED, module_result)
+        
+        logger.info(f"Asset {asset_id} modulized: price={final_price}, status={sale_status}")
+    
     async def _get_stages_summary(self, signal_id: str) -> Dict[str, str]:
         """단계별 상태 요약"""
         signal = await self.signals_collection.find_one({"signal_id": signal_id})
