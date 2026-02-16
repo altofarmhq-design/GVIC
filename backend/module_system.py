@@ -3,7 +3,10 @@ GVIC 모듈 및 자산 인덱싱 시스템
 - 모듈: 동일 특성의 자산들을 묶은 판매 단위
 - 자산: 질문에서 추출된 특성별 자산 (하나의 질문 → 여러 자산)
 - 인덱싱: 특성 기반 + 질문자 기반 인덱스
-- 보상 분배: 모듈 구매 시 20%를 자산 수(n)로 나누어 원 질문자에게 분배
+- 보상 분배: 5:3:2 결이론 적용
+  - 5 (50%): 공공 - 이용자, 주주, 구성원에게 환원
+  - 3 (30%): 운영 - 플랫폼 시스템 유지/발전
+  - 2 (20%): 기획/관리 - GVIC 운영자 보상
 """
 from fastapi import APIRouter, HTTPException, Depends, Header
 from pydantic import BaseModel, Field
@@ -19,10 +22,15 @@ logger = logging.getLogger(__name__)
 
 JWT_SECRET = os.environ.get("JWT_SECRET_KEY", "gvic-engine-secret-key-change-in-production")
 
-# 환율 및 보상 설정
+# ==================== 5:3:2 결이론 설정 ====================
+# 가치/수익 배분 비율
+PUBLIC_SHARE = 0.50      # 5/10 = 50% → 공공 (이용자, 주주, 구성원)
+OPERATION_SHARE = 0.30   # 3/10 = 30% → 운영 (플랫폼 시스템)
+MANAGEMENT_SHARE = 0.20  # 2/10 = 20% → 기획/관리 (GVIC 운영자)
+
+# 환율 설정
 POINT_TO_CASH_RATIO = 0.001  # 1P = ₩0.001
 CASH_TO_POINT_RATIO = 1000   # ₩1 = 1000P
-PURCHASE_CONTRIBUTOR_SHARE = 0.20  # 구매가의 20%
 
 # ==================== Models ====================
 
