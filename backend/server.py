@@ -3289,6 +3289,10 @@ async def load_data_sources():
 # Include auth router in api_router
 api_router.include_router(auth_router)
 
+# Include signal ingest router
+from signal_ingest import router as signal_router
+app.include_router(signal_router)
+
 # Include the router in the main app
 
 # ==================== Signal Tracer API ====================
