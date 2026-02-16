@@ -69,8 +69,9 @@ class GVICAnalyzer:
         if EMERGENT_LLM_KEY:
             self.llm = LlmChat(
                 api_key=EMERGENT_LLM_KEY,
-                model="gemini-2.0-flash"
-            )
+                session_id="gvic-analyzer",
+                system_message="You are a GVIC signal analysis expert."
+            ).with_model("gemini", "gemini-2.0-flash")
     
     async def analyze(self, content: str, purpose: str = "", expected_result: str = "") -> Dict[str, Any]:
         """시그널 분석 수행"""
