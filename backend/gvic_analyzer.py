@@ -508,7 +508,7 @@ async def extract_insights(
     all_categories = []
     all_words = []
     
-    for signal in recent_signals:
+    for signal in all_signals:
         metadata = signal.get("metadata", {})
         ai_analysis = metadata.get("ai_analysis", {})
         
