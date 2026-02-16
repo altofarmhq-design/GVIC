@@ -534,13 +534,14 @@ def get_user_rank(points: float) -> str:
 async def get_exchange_rate():
     """현금:포인트 환율 정보"""
     return {
+        "point_to_cash_ratio": POINT_TO_CASH_RATIO,
         "cash_to_point_ratio": CASH_TO_POINT_RATIO,
-        "description": f"현금 ₩1 = {CASH_TO_POINT_RATIO} 포인트",
-        "inverse": f"포인트 1P = ₩{1/CASH_TO_POINT_RATIO:,.0f}",
+        "description": f"1P = ₩{POINT_TO_CASH_RATIO} (1000P = ₩1)",
+        "inverse": f"₩1 = {CASH_TO_POINT_RATIO}P",
         "examples": [
-            {"points": 100, "cash": 100 / CASH_TO_POINT_RATIO},
-            {"points": 500, "cash": 500 / CASH_TO_POINT_RATIO},
-            {"points": 1000, "cash": 1000 / CASH_TO_POINT_RATIO},
+            {"points": 1000, "cash": 1000 * POINT_TO_CASH_RATIO},
+            {"points": 10000, "cash": 10000 * POINT_TO_CASH_RATIO},
+            {"points": 100000, "cash": 100000 * POINT_TO_CASH_RATIO},
         ]
     }
 
@@ -551,20 +552,21 @@ async def get_earning_rules():
     """포인트 적립 기준"""
     return {
         "rules": [
-            {"action": "signal_submit", "points": 10, "description": "시그널 제출"},
-            {"action": "code_analysis", "points": 15, "description": "코드 분석 시그널"},
-            {"action": "patent_idea", "points": 25, "description": "특허/아이디어 분석 시그널"},
-            {"action": "file_upload", "points": 5, "description": "파일 첨부 보너스"},
-            {"action": "asset_created", "points": 50, "description": "자산 생성됨"},
-            {"action": "high_value_asset", "points": "최대 50", "description": "고가치 자산 보너스 (가치 점수에 따라)"},
-            {"action": "asset_sold", "points": "구매가 × 20% × 기여비율 × 0.01", "description": "자산 판매 시 기여자 보상"},
-            {"action": "daily_login", "points": 5, "description": "일일 출석"},
-            {"action": "referral", "points": 200, "description": "추천인 보너스"},
-            {"action": "signup_bonus", "points": 100, "description": "신규 가입 보너스"}
+            {"action": "signal_submit", "points": 1000, "description": "시그널 제출"},
+            {"action": "code_analysis", "points": 1500, "description": "코드 분석 시그널"},
+            {"action": "patent_idea", "points": 2500, "description": "특허/아이디어 분석 시그널"},
+            {"action": "file_upload", "points": 500, "description": "파일 첨부 보너스"},
+            {"action": "asset_created", "points": 5000, "description": "자산 생성됨"},
+            {"action": "high_value_asset", "points": "최대 5000", "description": "고가치 자산 보너스 (가치 점수에 따라)"},
+            {"action": "asset_sold", "points": "구매가 × 20% × 기여비율 × 1000", "description": "자산 판매 시 기여자 보상"},
+            {"action": "daily_login", "points": 500, "description": "일일 출석"},
+            {"action": "referral", "points": 20000, "description": "추천인 보너스"},
+            {"action": "signup_bonus", "points": 10000, "description": "신규 가입 보너스"}
         ],
         "conversion": {
-            "ratio": CASH_TO_POINT_RATIO,
-            "note": "유료 전환 시 포인트를 현금으로 대체 가능"
+            "point_to_cash": POINT_TO_CASH_RATIO,
+            "cash_to_point": CASH_TO_POINT_RATIO,
+            "note": "1P = ₩0.001 (1000P = ₩1)"
         },
         "purchase_reward": {
             "contributor_share": f"{PURCHASE_CONTRIBUTOR_SHARE * 100}%",
