@@ -427,20 +427,6 @@ export const JInputTab = ({ onSignalSubmit }) => {
               </p>
             </CardContent>
           </Card>
-                    )}
-                    <type.icon className={`w-6 h-6 mx-auto mb-1 ${
-                      !type.enabled ? 'text-slate-600' :
-                      inputType === type.id ? 'text-blue-400' : 'text-slate-400'
-                    }`} />
-                    <p className={`text-xs font-medium ${
-                      !type.enabled ? 'text-slate-600' :
-                      inputType === type.id ? 'text-blue-300' : 'text-slate-300'
-                    }`}>{type.label}</p>
-                  </button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
 
           {/* 분석 유형 선택 */}
           <Card className="bg-slate-800/50 border-slate-700">
