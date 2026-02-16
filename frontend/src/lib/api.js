@@ -102,7 +102,7 @@ export const api = {
   getAnalysisFiles: () => axios.get(`${API}/analysis/files`),
   getPipelineReports: () => axios.get(`${API}/pipeline/reports`),
   analyzeUrl: (config) => axios.post(`${API}/pipeline/analyze-url`, config),
-  // 데이터 허브 APIs (모든 탭 연동)
+  // Data Hub APIs (모든 탭 연동)
   getHubMonitoring: () => axios.get(`${API}/hub/monitoring`),
   getHubPredictions: () => axios.get(`${API}/hub/predictions`),
   getHubPareto: () => axios.get(`${API}/hub/pareto`),
@@ -110,7 +110,17 @@ export const api = {
   getHubAlerts: (unreadOnly = false) => axios.get(`${API}/hub/alerts?unread_only=${unreadOnly}`),
   markAlertRead: (alertId) => axios.post(`${API}/hub/alerts/${alertId}/read`),
   getAnalysisSessions: (limit = 20) => axios.get(`${API}/hub/sessions?limit=${limit}`),
-  getSessionDetail: (sessionId) => axios.get(`${API}/hub/sessions/${sessionId}`)
+  getSessionDetail: (sessionId) => axios.get(`${API}/hub/sessions/${sessionId}`),
+  
+  // Points System APIs (포인트 시스템)
+  getPointBalance: () => axios.get(`${API}/points/balance`),
+  getPointTransactions: (limit = 50) => axios.get(`${API}/points/transactions?limit=${limit}`),
+  earnPoints: (reason, referenceId, metadata) => axios.post(`${API}/points/earn`, { reason, reference_id: referenceId, metadata }),
+  spendPoints: (amount, reason, referenceId) => axios.post(`${API}/points/spend`, { amount, reason, reference_id: referenceId }),
+  convertPoints: (pointsAmount) => axios.post(`${API}/points/convert`, { points_amount: pointsAmount }),
+  getAssetSummary: () => axios.get(`${API}/points/asset-summary`),
+  getExchangeRate: () => axios.get(`${API}/points/exchange-rate`),
+  getEarningRules: () => axios.get(`${API}/points/earning-rules`)
 };
 
 // Export individual functions for easier imports
