@@ -117,17 +117,29 @@ def extract_text_from_txt(file_content: bytes) -> str:
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"TXT 처리 실패: {str(e)}")
 
-# API Endpoints
+# API Endpoints - 파이프라인 연동
+# MongoDB와 파이프라인 엔진은 server.py에서 초기화됨
+
 @router.post("/ingest")
 async def ingest_text_signal(request: TextSignalRequest, current_user: dict = Depends(get_current_user_simple)):
-    """텍스트 시그널 입력"""
+    """텍스트 시그널 입력 → 파이프라인 자동 실행"""
     if not request.content.strip():
         raise HTTPException(status_code=400, detail="내용이 비어있습니다")
     
-    signal_id = generate_signal_id()
+    # 파이프라인 엔진 가져오기
+    from server import get_pipeline_engine
+    pipeline = get_pipeline_engine()
     
-    return {
-        "success": True,
+    # 파이프라인 실행
+    result = await pipeline.create_signal(
+        signal_type="text",
+        content=request.content,
+        source="direct_input",
+        metadata={"input_method": "text"},
+        user_id=current_user.get("sub")
+    )
+    
+    return result
         "signal_id": signal_id,
         "type": "text",
         "content_length": len(request.content),
