@@ -419,8 +419,21 @@ export const MyAssetsTab = () => {
                     유료 전환 시 적립된 포인트를 현금으로 대체하여 사용할 수 있습니다.
                   </p>
                   <div className="mt-2 text-xs text-slate-500">
-                    • 환율: ₩1 = 0.1 포인트<br/>
-                    • 예시: 1,000P = ₩10,000
+                    • 환율: 1P = ₩0.001 (1000P = ₩1)<br/>
+                    • 예시: 10,000P = ₩10
+                  </div>
+                </div>
+                
+                {/* 구매 보상 정보 */}
+                <div className="bg-purple-900/20 rounded-lg p-4 mt-2 border border-purple-700/50">
+                  <p className="text-purple-400 text-sm font-medium mb-2">🎁 구매 보상</p>
+                  <p className="text-slate-400 text-xs">
+                    누군가 자산을 구매하면 기여자에게 보상이 분배됩니다.
+                  </p>
+                  <div className="mt-2 text-xs text-slate-500">
+                    • 구매가의 20%가 기여자에게 분배<br/>
+                    • 기여 비율에 따라 배분<br/>
+                    • 예시: ₩10,000 구매 → ₩2,000 (2,000,000P) 보상
                   </div>
                 </div>
               </div>
