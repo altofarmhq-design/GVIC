@@ -3379,6 +3379,10 @@ app.include_router(points_router)
 from module_system import router as module_router
 app.include_router(module_router)
 
+# Include review crawler router (쇼핑몰 리뷰 크롤링)
+from review_crawler import router as crawl_router
+app.include_router(crawl_router)
+
 # ==================== Pipeline API ====================
 
 @api_router.get("/pipeline/stats")
