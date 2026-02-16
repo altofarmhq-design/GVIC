@@ -766,6 +766,10 @@ async def get_purchase_history(
 @router.get("/reward-rules")
 async def get_reward_rules():
     """보상 분배 규칙 조회"""
+    example_price = 10000
+    example_share = example_price * PURCHASE_CONTRIBUTOR_SHARE
+    example_points = example_share * CASH_TO_POINT_RATIO
+    
     return {
         "purchase_reward": {
             "contributor_share": PURCHASE_CONTRIBUTOR_SHARE,
@@ -777,14 +781,14 @@ async def get_reward_rules():
             "description": "각 기여자(질문자)는 해당 모듈이 기여한 비율만큼 보상을 받습니다"
         },
         "point_conversion": {
-            "ratio": CASH_TO_POINT_RATIO,
-            "description": f"보상은 포인트로 적립됩니다 (현금 ₩1 = {CASH_TO_POINT_RATIO}P)"
+            "point_to_cash": POINT_TO_CASH_RATIO,
+            "cash_to_point": CASH_TO_POINT_RATIO,
+            "description": f"1P = ₩{POINT_TO_CASH_RATIO} (₩1 = {CASH_TO_POINT_RATIO}P)"
         },
         "example": {
-            "purchase_price": 10000,
-            "contributor_share": 10000 * PURCHASE_CONTRIBUTOR_SHARE,
-            "single_contributor_reward_cash": 10000 * PURCHASE_CONTRIBUTOR_SHARE * 1.0,
-            "single_contributor_reward_points": 10000 * PURCHASE_CONTRIBUTOR_SHARE * 1.0 * CASH_TO_POINT_RATIO,
-            "description": "₩10,000 구매 시, 단일 기여자는 ₩2,000 (= 20P) 보상"
+            "purchase_price": example_price,
+            "contributor_share_cash": example_share,
+            "single_contributor_reward_points": example_points,
+            "description": f"₩{example_price:,} 구매 시, 단일 기여자는 ₩{example_share:,} (= {example_points:,.0f}P) 보상"
         }
     }
