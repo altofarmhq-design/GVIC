@@ -266,7 +266,7 @@ export const DashboardTab = ({ dashboard, systemStatus }) => {
         <MetricCard 
           icon={CheckCircle} 
           label="성공률" 
-          value={`${(successRate * 100).toFixed(1)}%`}
+          value={`${successRate.toFixed(1)}%`}
           variant="teal"
         />
         <MetricCard 
