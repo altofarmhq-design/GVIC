@@ -421,12 +421,12 @@ async def purchase_module(
     current_user: dict = Depends(get_current_user)
 ):
     """
-    모듈 구매 및 기여자 보상 분배
+    모듈 구매 및 5:3:2 결이론 기반 가치 분배
     
-    보상 분배 로직:
-    1. 구매가의 20%를 기여자에게 분배
-    2. 20%를 모듈 내 자산 수(n)로 나눔
-    3. 각 자산의 원 질문자에게 1/n 씩 분배
+    5:3:2 분배 로직:
+    - 5 (50%): 공공 환원 → 기여자들에게 분배 (자산 수 n으로 나눔)
+    - 3 (30%): 운영 → 플랫폼 시스템 적립
+    - 2 (20%): 기획/관리 → GVIC 운영자 보상
     """
     from server import db
     
@@ -450,11 +450,20 @@ async def purchase_module(
     if not assets:
         raise HTTPException(status_code=400, detail="모듈에 자산이 없습니다")
     
-    # 보상 계산
-    total_contributor_reward = request.purchase_price * PURCHASE_CONTRIBUTOR_SHARE  # 20%
+    # ==================== 5:3:2 결이론 적용 ====================
+    purchase_price = request.purchase_price
+    
+    # 5 (50%): 공공 환원 - 기여자들에게 분배
+    public_share_total = purchase_price * PUBLIC_SHARE
     asset_count = len(assets)
-    reward_per_asset = total_contributor_reward / asset_count  # 1/n 분배
+    reward_per_asset = public_share_total / asset_count
     reward_points_per_asset = reward_per_asset * CASH_TO_POINT_RATIO
+    
+    # 3 (30%): 운영 - 플랫폼 적립
+    operation_share_total = purchase_price * OPERATION_SHARE
+    
+    # 2 (20%): 기획/관리 - GVIC 운영자 보상
+    management_share_total = purchase_price * MANAGEMENT_SHARE
     
     # 기여자별 보상 분배
     contributor_rewards = {}  # contributor_id -> {cash, points, assets}
