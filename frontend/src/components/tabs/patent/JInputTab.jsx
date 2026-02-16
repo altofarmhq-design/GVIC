@@ -118,6 +118,13 @@ export const JInputTab = ({ onSignalSubmit }) => {
     
     try {
       const token = localStorage.getItem('token');
+      
+      if (!token) {
+        setError('로그인이 필요합니다. 페이지를 새로고침 후 다시 로그인해주세요.');
+        setSubmitting(false);
+        return;
+      }
+      
       const response = await axios.post(`${API_URL}/api/signal/ingest/url`, {
         url: urlInput
       }, {
