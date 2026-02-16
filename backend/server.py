@@ -3305,6 +3305,30 @@ api_router.include_router(auth_router)
 from signal_ingest import router as signal_router
 app.include_router(signal_router)
 
+# ==================== Pipeline API ====================
+
+@api_router.get("/pipeline/stats")
+async def get_pipeline_stats():
+    """파이프라인 통계"""
+    return await pipeline_engine.get_dashboard_stats()
+
+@api_router.get("/pipeline/signals")
+async def get_pipeline_signals(stage: str = None, limit: int = 50):
+    """파이프라인 시그널 목록"""
+    if stage:
+        return await pipeline_engine.get_stage_signals(stage, limit)
+    else:
+        stats = await pipeline_engine.get_dashboard_stats()
+        return stats.get("recent_signals", [])
+
+@api_router.get("/pipeline/signal/{signal_id}")
+async def get_signal_detail(signal_id: str):
+    """시그널 상세 정보"""
+    signal = await pipeline_engine.get_signal_detail(signal_id)
+    if not signal:
+        raise HTTPException(status_code=404, detail="시그널을 찾을 수 없습니다")
+    return signal
+
 # Include the router in the main app
 
 # ==================== Signal Tracer API ====================
