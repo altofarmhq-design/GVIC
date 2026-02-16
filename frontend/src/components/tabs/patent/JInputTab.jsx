@@ -989,6 +989,105 @@ export const JInputTab = ({ onSignalSubmit }) => {
                   </>
                 )}
 
+                {/* GVIC 결이론 분석 (5:3:2) */}
+                {result.gvic_analysis?.success && (
+                  <Card className="bg-gradient-to-br from-purple-900/30 to-slate-900/50 border-purple-600">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-purple-300 text-base flex items-center gap-2">
+                        <Target className="w-5 h-5" />
+                        GVIC 결이론 분석 (5:3:2)
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {/* 5:3:2 점수 표시 */}
+                      <div className="grid grid-cols-3 gap-3">
+                        <div className="bg-blue-500/10 p-3 rounded-lg border border-blue-500/30 text-center">
+                          <div className="flex items-center justify-center gap-1 mb-2">
+                            <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">5</div>
+                            <span className="text-blue-400 text-xs font-medium">공공 기여</span>
+                          </div>
+                          <p className="text-2xl font-bold text-blue-300">
+                            {result.gvic_analysis.gvic_interpretation?.public_score || 0}
+                          </p>
+                          <p className="text-xs text-slate-500 mt-1">점</p>
+                        </div>
+                        <div className="bg-amber-500/10 p-3 rounded-lg border border-amber-500/30 text-center">
+                          <div className="flex items-center justify-center gap-1 mb-2">
+                            <div className="w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center text-white text-xs font-bold">3</div>
+                            <span className="text-amber-400 text-xs font-medium">플랫폼 운영</span>
+                          </div>
+                          <p className="text-2xl font-bold text-amber-300">
+                            {result.gvic_analysis.gvic_interpretation?.operation_score || 0}
+                          </p>
+                          <p className="text-xs text-slate-500 mt-1">점</p>
+                        </div>
+                        <div className="bg-purple-500/10 p-3 rounded-lg border border-purple-500/30 text-center">
+                          <div className="flex items-center justify-center gap-1 mb-2">
+                            <div className="w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold">2</div>
+                            <span className="text-purple-400 text-xs font-medium">기획/관리</span>
+                          </div>
+                          <p className="text-2xl font-bold text-purple-300">
+                            {result.gvic_analysis.gvic_interpretation?.management_score || 0}
+                          </p>
+                          <p className="text-xs text-slate-500 mt-1">점</p>
+                        </div>
+                      </div>
+
+                      {/* 총 가치 */}
+                      <div className="bg-slate-800/50 rounded-lg p-3 text-center">
+                        <p className="text-slate-400 text-xs mb-1">5:3:2 가중 총 가치</p>
+                        <p className="text-3xl font-bold text-white">
+                          {result.gvic_analysis.value_breakdown_532?.total_value?.toFixed(1) || 0}
+                        </p>
+                      </div>
+
+                      {/* 상세 분석 */}
+                      <div className="space-y-3 pt-2 border-t border-slate-700">
+                        {result.gvic_analysis.gvic_interpretation?.public_contribution && (
+                          <div>
+                            <p className="text-blue-400 text-xs font-medium mb-1">📢 공공 기여 분석</p>
+                            <p className="text-slate-300 text-sm">{result.gvic_analysis.gvic_interpretation.public_contribution}</p>
+                          </div>
+                        )}
+                        {result.gvic_analysis.gvic_interpretation?.operation_utility && (
+                          <div>
+                            <p className="text-amber-400 text-xs font-medium mb-1">⚙️ 운영 활용 분석</p>
+                            <p className="text-slate-300 text-sm">{result.gvic_analysis.gvic_interpretation.operation_utility}</p>
+                          </div>
+                        )}
+                        {result.gvic_analysis.gvic_interpretation?.management_potential && (
+                          <div>
+                            <p className="text-purple-400 text-xs font-medium mb-1">📋 기획/관리 가치</p>
+                            <p className="text-slate-300 text-sm">{result.gvic_analysis.gvic_interpretation.management_potential}</p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* GVIC 인사이트 */}
+                      {result.gvic_analysis.gvic_insight && (
+                        <div className="bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-lg p-3 border border-purple-500/30">
+                          <p className="text-purple-300 text-xs font-medium mb-1">💡 GVIC 인사이트</p>
+                          <p className="text-slate-200 text-sm">{result.gvic_analysis.gvic_insight}</p>
+                        </div>
+                      )}
+
+                      {/* 추천 액션 */}
+                      {result.gvic_analysis.recommended_actions?.length > 0 && (
+                        <div>
+                          <p className="text-slate-400 text-xs font-medium mb-2">🎯 권장 액션</p>
+                          <div className="flex flex-wrap gap-2">
+                            {result.gvic_analysis.recommended_actions.map((action, idx) => (
+                              <Badge key={idx} variant="outline" className="text-slate-300 border-slate-600 text-xs">
+                                {action}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+
                 {/* 핵심 포인트 */}
                 {result.ai_analysis?.key_points?.length > 0 && (
                   <Card className="bg-slate-800/50 border-slate-700">
