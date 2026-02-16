@@ -1,43 +1,19 @@
 # GVIC Seller Intelligence Hub - PRD
 
 **Last Updated**: 2026-02-16
-**Version**: 3.4.0
+**Version**: 4.0.0
 
 ## 1. 제품 개요
 
 ### 1.1 비전
-**"데이터 사일로를 깨는 AI 인사이트 프로토콜"**
+**"고객 리뷰 기반 셀러 인사이트 플랫폼"**
 
-### 1.2 결제 시스템
-GVIC는 6가지 결제 수단을 지원하여 사용자가 선택적으로 사용할 수 있습니다.
+이커머스 셀러를 위한 SaaS 서비스로, 고객 리뷰를 분석하여 4대 인사이트(강점, 건의사항, 불만, 신제품 욕구)를 추출합니다.
 
----
-
-## CHANGELOG
-
-### 2026-02-16 (통합 결제 시스템 완료)
-
-#### 통합 결제 시스템 ✅
-- **[NEW]** Unified Payment 모듈 (`/backend/saas/unified_payment.py`)
-  - Strategy Pattern 기반 결제 어댑터 설계
-  - 6개 결제 수단 지원
-  - 결제 수단별 시뮬레이션 모드 (API 키 미설정 시)
-
-#### 지원 결제 수단
-
-| 결제 수단 | 아이콘 | 상태 | 필요 API 키 |
-|----------|--------|------|------------|
-| **Stripe** | 💳 | 실제 연동 | STRIPE_API_KEY |
-| **카카오페이** | 🟡 | 시뮬레이션* | KAKAOPAY_ADMIN_KEY, KAKAOPAY_CID |
-| **네이버페이** | 🟢 | 시뮬레이션* | NAVERPAY_CLIENT_ID, NAVERPAY_CLIENT_SECRET |
-| **토스페이먼츠** | 🔵 | 시뮬레이션* | TOSS_CLIENT_KEY, TOSS_SECRET_KEY |
-| **삼성페이** | ⚫ | 시뮬레이션* | SAMSUNGPAY_SERVICE_ID |
-| **Payco** | 🔴 | 시뮬레이션* | PAYCO_SELLER_KEY, PAYCO_CP_ID |
-
-*시뮬레이션: API 키 설정 시 실제 연동으로 전환됨
-
-#### 테스트 결과
-- 테스트 에이전트 검증: **26/26 통과 (100%)**
+### 1.2 핵심 기능
+- **4대 인사이트 분석**: 강점(유지/보강), 건의사항(서비스 개선), 불만(긴급 개선), 신제품 욕구(개발 기회)
+- **개선점 자산화**: HS Code 기반 품목군별 개선점 DB 구축
+- **다중 결제 지원**: Stripe + 한국 결제(카카오페이, 네이버페이, 토스 등)
 
 ---
 
@@ -53,49 +29,22 @@ GVIC는 6가지 결제 수단을 지원하여 사용자가 선택적으로 사�
 
 ---
 
-## 3. API 엔드포인트
+## 3. 결제 수단
 
-### 3.1 통합 결제 API (NEW)
+| 결제 수단 | 아이콘 | 상태 | 필요 API 키 |
+|----------|--------|------|------------|
+| **Stripe** | 💳 | 실제 연동 | STRIPE_API_KEY |
+| **카카오페이** | 🟡 | 시뮬레이션* | KAKAOPAY_ADMIN_KEY |
+| **네이버페이** | 🟢 | 시뮬레이션* | NAVERPAY_CLIENT_ID |
+| **토스페이먼츠** | 🔵 | 시뮬레이션* | TOSS_CLIENT_KEY |
+| **삼성페이** | ⚫ | 시뮬레이션* | SAMSUNGPAY_SERVICE_ID |
+| **Payco** | 🔴 | 시뮬레이션* | PAYCO_SELLER_KEY |
 
-| 메서드 | 엔드포인트 | 설명 |
-|--------|-----------|------|
-| GET | `/api/payments/methods` | 결제 수단 목록 (6개) |
-| POST | `/api/payments/unified/checkout` | 통합 결제 세션 생성 |
-| POST | `/api/payments/unified/verify` | 결제 승인/검증 |
-| GET | `/api/payments/unified/status/{order_id}` | 결제 상태 조회 |
-| GET | `/api/payments/config/required-keys` | 필요 API 키 목록 |
-
-### 3.2 기존 결제 API
-
-| 메서드 | 엔드포인트 | 설명 |
-|--------|-----------|------|
-| GET | `/api/payments/plans` | 구독 플랜 목록 |
-| GET | `/api/payments/subscription/status` | 구독 상태 |
-| POST | `/api/payments/subscription/cancel` | 구독 취소 |
-| GET | `/api/payments/usage/check` | 사용량 확인 |
+*시뮬레이션: API 키 설정 시 실제 연동으로 전환됨
 
 ---
 
-## 4. 코드 구조
-
-```
-/app/backend/
-├── saas/
-│   ├── review_analyzer.py      # 리뷰 분석
-│   ├── qa_manager.py           # Q&A 관리
-│   ├── dashboard_service.py    # 대시보드
-│   ├── shop_manager.py         # 쇼핑몰/제품
-│   ├── product_insights.py     # 4대 인사이트
-│   ├── improvement_assets.py   # 개선점 자산화
-│   ├── payment_service.py      # 기본 결제 (Stripe)
-│   ├── stripe_webhook.py       # Stripe 웹훅
-│   └── unified_payment.py      # [NEW] 통합 결제 (6개 수단)
-└── server.py
-```
-
----
-
-## 5. 마일스톤 진행률
+## 4. 마일스톤 진행률
 
 | Phase | 상태 | 설명 |
 |-------|------|------|
@@ -103,60 +52,105 @@ GVIC는 6가지 결제 수단을 지원하여 사용자가 선택적으로 사�
 | Phase 1 | ✅ 100% | API 연동 + 온보딩 |
 | Phase 2 | ✅ 100% | 4대 인사이트 엔진 |
 | Phase 2.5 | ✅ 100% | 개선점 자산화 |
-| Phase 3 | ✅ 100% | **결제 + 과금 (확장 완료)** |
-| Phase 4 | ⬜ 0% | 프론트엔드 대시보드 |
+| Phase 3 | ✅ 100% | 결제 + 과금 |
+| **Phase 4** | ✅ 100% | **프론트엔드 대시보드** |
 
-**전체 진행률: 85%**
+**전체 진행률: 100%**
 
 ---
 
-## 6. 실제 연동 시 필요한 설정
+## 5. 코드 구조
 
-### 환경변수 (.env)
-
-```bash
-# Stripe (해외 카드)
-STRIPE_API_KEY=sk_live_xxxxx
-
-# 카카오페이
-KAKAOPAY_ADMIN_KEY=xxxxx
-KAKAOPAY_CID=xxxxx
-
-# 네이버페이
-NAVERPAY_CLIENT_ID=xxxxx
-NAVERPAY_CLIENT_SECRET=xxxxx
-NAVERPAY_CHAIN_ID=xxxxx
-
-# 토스페이먼츠
-TOSS_CLIENT_KEY=xxxxx
-TOSS_SECRET_KEY=xxxxx
-
-# 삼성페이
-SAMSUNGPAY_SERVICE_ID=xxxxx
-
-# Payco
-PAYCO_SELLER_KEY=xxxxx
-PAYCO_CP_ID=xxxxx
+```
+/app/
+├── backend/
+│   ├── saas/
+│   │   ├── review_analyzer.py
+│   │   ├── qa_manager.py
+│   │   ├── dashboard_service.py
+│   │   ├── shop_manager.py       # 쇼핑몰/제품/API키 관리
+│   │   ├── product_insights.py   # 4대 인사이트 분석
+│   │   ├── improvement_assets.py # 개선점 자산화 + HS Code
+│   │   ├── payment_service.py    # Stripe 결제
+│   │   ├── stripe_webhook.py
+│   │   └── unified_payment.py    # 통합 결제 (6개 수단)
+│   └── server.py
+└── frontend/
+    └── src/
+        ├── components/
+        │   └── saas/             # SaaS 대시보드 컴포넌트
+        │       ├── SaasDashboard.jsx
+        │       ├── MyProductsTab.jsx
+        │       ├── BillingTab.jsx
+        │       └── ApiGuideTab.jsx
+        ├── lib/api.js           # API 클라이언트
+        └── App.js               # SaaS 라우터
 ```
 
 ---
 
-## 7. 다음 단계 (Phase 4)
+## 6. API 엔드포인트
 
-### Phase 4: 프론트엔드 대시보드
-- 쇼핑몰/제품 관리 UI
-- 4대 인사이트 시각화
-- 구독 플랜 선택 및 결제 UI (6개 결제 수단)
-- 품목군별 자산 대시보드
-- API 연동 가이드 UI
+### 6.1 쇼핑몰/제품 관리
+| 메서드 | 엔드포인트 | 설명 |
+|--------|-----------|------|
+| POST | `/api/shop/shops` | 쇼핑몰 등록 |
+| GET | `/api/shop/shops` | 쇼핑몰 목록 |
+| POST | `/api/shop/shops/{id}/products` | 제품 등록 |
+| GET | `/api/shop/products` | 전체 제품 목록 |
+
+### 6.2 4대 인사이트
+| 메서드 | 엔드포인트 | 설명 |
+|--------|-----------|------|
+| POST | `/api/insights/analyze/{product_id}` | 제품 분석 |
+| GET | `/api/insights/product/{product_id}` | 분석 결과 조회 |
+
+### 6.3 결제
+| 메서드 | 엔드포인트 | 설명 |
+|--------|-----------|------|
+| GET | `/api/payments/methods` | 결제 수단 목록 |
+| POST | `/api/payments/unified/checkout` | 통합 결제 |
+| GET | `/api/payments/subscription/status` | 구독 상태 |
 
 ---
 
-## 8. 테스트 계정
-- Email: admin@gvic.com
-- Password: gvicgvic!
+## 7. 테스트 계정
+- **Email**: admin@gvic.com
+- **Password**: gvicgvic!
+
+---
+
+## 8. CHANGELOG
+
+### 2026-02-16 (Phase 4 완료)
+
+#### 프론트엔드 대시보드 ✅
+- **[NEW]** SaaS 대시보드 리브랜딩 완료
+  - 기존 특허 기반 탭 제거
+  - 새 탭 구조: 대시보드, 내 상품, 결제, API 가이드, 설정
+- **[NEW]** `SaasDashboard.jsx`: 메인 대시보드 (4대 인사이트 현황, 빠른 시작)
+- **[NEW]** `MyProductsTab.jsx`: 쇼핑몰/제품 등록 관리
+- **[NEW]** `BillingTab.jsx`: 구독 플랜 선택 및 결제 수단
+- **[NEW]** `ApiGuideTab.jsx`: API 키 발급, 문서, 코드 샘플, 웹훅 설정
+- **[FIX]** BillingTab price undefined 에러 수정
+
+#### 테스트 결과
+- 테스트 에이전트 검증: **Frontend 90%** (5/5 탭 정상, 1개 버그 수정)
+
+---
+
+## 9. 다음 단계 (P1/P2)
+
+### P1 - 인사이트 시각화
+- 4대 인사이트 상세 대시보드 (차트, 그래프)
+- 제품별 트렌드 분석
+
+### P2 - 고급 기능
+- 크롤러 강화 (Playwright로 JS 기반 사이트 크롤링)
+- 관리자 대시보드
+- 경쟁 상품 비교 분석
 
 ---
 
 *Last Updated: 2026-02-16*
-*Version: 3.4.0*
+*Version: 4.0.0*
