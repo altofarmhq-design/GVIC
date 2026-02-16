@@ -341,12 +341,25 @@ async def get_supported_formats():
         ],
         "이미지": [
             {"ext": "image", "name": "이미지", "formats": ".jpg, .jpeg, .png, .gif, .webp, .bmp"}
+        ],
+        "코드": [
+            {"ext": "code", "name": "프로그래밍 코드", "formats": ".py, .js, .ts, .java, .c, .cpp, .go, .html, .css, .sql 등"}
         ]
     }
     return {
         "supported_formats": SUPPORTED_FORMATS,
         "by_category": formats_by_category,
-        "all_extensions": list(SUPPORTED_FORMATS.keys())
+        "all_extensions": list(SUPPORTED_FORMATS.keys()),
+        "code_extensions": CODE_EXTENSIONS
+    }
+
+@router.get("/analysis-types")
+async def get_analysis_types():
+    """사용 가능한 분석 유형 조회"""
+    from core.ai_analyzer import get_analysis_types
+    return {
+        "analysis_types": get_analysis_types(),
+        "default": "general"
     }
 
 @router.post("/ingest")
@@ -359,12 +372,13 @@ async def ingest_text_signal(request: TextSignalRequest, current_user: dict = De
     from server import get_pipeline_engine
     pipeline = get_pipeline_engine()
     
-    # AI 분석 수행
+    # AI 분석 수행 (분석 유형 포함)
     from core.ai_analyzer import analyze_signal
     ai_result = await analyze_signal(
         content=request.content,
         purpose=request.purpose,
-        expected_result=request.expected_result
+        expected_result=request.expected_result,
+        analysis_type=request.analysis_type
     )
     
     # 파이프라인 실행
@@ -376,6 +390,7 @@ async def ingest_text_signal(request: TextSignalRequest, current_user: dict = De
             "input_method": "text",
             "purpose": request.purpose,
             "expected_result": request.expected_result,
+            "analysis_type": request.analysis_type,
             "ai_analysis": ai_result
         },
         user_id=current_user.get("sub")
