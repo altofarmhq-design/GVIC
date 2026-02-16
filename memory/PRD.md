@@ -5,12 +5,33 @@
 ## 1. 제품 개요
 
 ### 1.1 비전
-GVIC는 12개 특허를 기반으로 한 AI 기반 시그널 분석 및 자산화 플랫폼입니다.
+GVIC는 14개 특허를 기반으로 한 AI 기반 시그널 분석 및 자산화 플랫폼입니다.
 모든 입력 시그널의 "의도"를 핵심 자산으로 취급하여, 자동 분석/축적/상품화/가치 교환을 수행합니다.
 
 ## CHANGELOG
 
-### 2026-02-16 (최신)
+### 2026-02-16 (최신 - 14개 특허 백엔드 리팩토링 완료)
+- **[REFACTOR]** 14개 특허 기반 백엔드 모듈 구조 완성
+  - `/app/backend/patents/` 디렉토리에 11개 특허 모듈 구현
+  - 총 59개 Patent API 엔드포인트 등록
+  - 테스트 에이전트 검증 완료 (45/45 테스트 통과, 100%)
+  
+- **특허 모듈 구현 완료:**
+  | 모듈 코드 | 파일명 | 기능 | 주요 API |
+  |----------|--------|------|----------|
+  | J:Platform | j_platform.py | 입력 채널 관리 | /api/patent/j/channels, /stats, /validate |
+  | LL:Intelligence | ll_intelligence.py | AI 의도 분석 | /api/patent/ll/analyze, /classify, /intent-types |
+  | H:Core | h_core.py | 5:3:2 결이론 설정 | /api/patent/h/532-theory, /calculate-532, /sigma, /omega |
+  | A:Gate | a_gate.py | 시그널 평가/필터링 | /api/patent/a/rules, /evaluate, /stats |
+  | E:Shield | e_shield.py | 보안 검사 | /api/patent/e/scan, /hash, /verify-integrity |
+  | G:Refine | g_refine.py | 데이터 정제 | /api/patent/g/clean, /normalize, /extract-keywords, /summarize |
+  | B:Calc | b_calc.py | 가치 계산 | /api/patent/b/calculate-value, /calculate-reward |
+  | C:Exec | c_exec.py | 실행 관리 | /api/patent/c/execute, /actions, /queue, /history |
+  | F:Field | f_field.py | 마켓플레이스 | /api/patent/f/marketplace, /register, /listing |
+  | D:Ledger | d_ledger.py | 분산원장 | /api/patent/d/record, /query, /verify-chain, /balance |
+  | I:Integrity | i_integrity.py | 무결성 감사 | /api/patent/i/health, /system-check, /audit-logs |
+
+### 2026-02-16 (이전)
 - **[FIX]** URL 처리 실패 버그 수정 - 쇼핑몰 URL 크롤러 라우팅 구현
   - `signal_ingest.py`에 `detect_shopping_platform()` 함수 추가
   - 네이버 스마트스토어, 쿠팡, 11번가, G마켓, 옥션, Amazon, AliExpress URL 감지
