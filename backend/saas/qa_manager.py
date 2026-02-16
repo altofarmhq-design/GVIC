@@ -326,18 +326,24 @@ async def generate_faq(
     # FAQ 생성
     faqs = manager.generate_faq_from_questions(qa_items)
     
-    # DB에 저장
+    # DB에 저장 및 응답용 리스트 생성
+    response_faqs = []
     for faq in faqs:
-        faq["faq_id"] = f"FAQ_{uuid.uuid4().hex[:8]}"
-        faq["user_id"] = user_id
-        faq["generated_at"] = datetime.now(timezone.utc).isoformat()
-        await db.generated_faqs.insert_one(faq)
+        faq_record = {
+            **faq,
+            "faq_id": f"FAQ_{uuid.uuid4().hex[:8]}",
+            "user_id": user_id,
+            "generated_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.generated_faqs.insert_one(faq_record)
+        # _id 제외하고 응답에 추가
+        response_faqs.append({k: v for k, v in faq_record.items() if k != "_id"})
     
     return {
         "success": True,
         "total_questions": len(qa_items),
-        "faqs_generated": len(faqs),
-        "faqs": faqs
+        "faqs_generated": len(response_faqs),
+        "faqs": response_faqs
     }
 
 
