@@ -85,8 +85,9 @@ async def extract_text_from_image(
     try:
         llm = LlmChat(
             api_key=EMERGENT_LLM_KEY,
-            model="gemini-2.0-flash"
-        )
+            session_id=f"ocr-{uuid.uuid4().hex[:8]}",
+            system_message="You are an OCR expert that extracts text from images and returns results in JSON format."
+        ).with_model("gemini", "gemini-2.0-flash")
         
         # 이미지와 함께 메시지 전송
         response = await llm.send_message(
