@@ -11,6 +11,12 @@ GVIC는 12개 특허를 기반으로 한 AI 기반 시그널 분석 및 자산�
 ## CHANGELOG
 
 ### 2026-02-16 (최신)
+- **[FIX]** URL 처리 실패 버그 수정 - 쇼핑몰 URL 크롤러 라우팅 구현
+  - `signal_ingest.py`에 `detect_shopping_platform()` 함수 추가
+  - 네이버 스마트스토어, 쿠팡, 11번가, G마켓, 옥션, Amazon, AliExpress URL 감지
+  - 쇼핑몰 URL → 리뷰 크롤러로 라우팅 (`input_type='shopping_url'`)
+  - 일반 URL → 텍스트 추출 처리 (`input_type='generic_url'`)
+- **[VERIFIED]** 테스트 에이전트 검증 완료 (백엔드 17/17 통과, 프론트엔드 100%)
 - **[FEATURE]** P1: API 연동 기능 구현
   - 외부 시스템 웹훅 API 엔드포인트 (`/api/webhook/signal`, `/api/webhook/signal/batch`, `/api/webhook/event`)
   - API 키 생성/관리/삭제 기능
@@ -226,9 +232,20 @@ scripts\start_all.bat
 
 ## 7. 테스트 계정
 - Email: admin@gvic.com
-- Password: password
+- Password: gvicgvic!
 - Role: super_admin
 
+## 8. 다음 우선순위 작업
+
+### P2 (예정)
+- [ ] 이미지 OCR 처리 기능 추가 - 이미지 파일에서 텍스트 추출
+
+### P3 (미래)
+- [ ] 백엔드 리팩토링 (특허 기반 모듈 분리)
+- [ ] 벡터 유사도 검색으로 자산 검색 강화
+- [ ] 실제 결제 시스템 연동 (Stripe)
+- [ ] 실시간 연속 시그널 수집 기능
+
 ---
-*Last Updated: 2025-02-16*
-*Version: 2.0.0*
+*Last Updated: 2026-02-16*
+*Version: 2.1.0*
