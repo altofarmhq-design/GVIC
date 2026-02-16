@@ -62,11 +62,13 @@ class TextSignalRequest(BaseModel):
     content: str
     purpose: str = ""           # 왜 질문하는지
     expected_result: str = ""   # 기대하는 결과
+    analysis_type: str = "general"  # 분석 유형: general, code, patent_idea
 
 class UrlSignalRequest(BaseModel):
     url: str
     purpose: str = ""
     expected_result: str = ""
+    analysis_type: str = "general"
 
 # Helper Functions
 def generate_signal_id():
