@@ -3387,6 +3387,10 @@ app.include_router(crawl_router)
 from gvic_analyzer import router as gvic_analyzer_router
 app.include_router(gvic_analyzer_router)
 
+# Include OCR processor router (이미지 텍스트 추출)
+from ocr_processor import router as ocr_router
+app.include_router(ocr_router)
+
 # ==================== Pipeline API ====================
 
 @api_router.get("/pipeline/stats")
