@@ -160,9 +160,18 @@ async def ingest_text_signal(request: TextSignalRequest, current_user: dict = De
         signal_type="text",
         content=request.content,
         source="direct_input",
-        metadata={"input_method": "text"},
+        metadata={
+            "input_method": "text",
+            "purpose": request.purpose,
+            "expected_result": request.expected_result
+        },
         user_id=current_user.get("sub")
     )
+    
+    # 관련 자산 추천 추가
+    related_assets = await pipeline.find_related_assets(request.content, request.purpose)
+    result["related_assets"] = related_assets
+    result["analysis_result"] = f"시그널이 '{result.get('category', 'unknown')}' 카테고리로 분류되었습니다."
     
     return result
 
