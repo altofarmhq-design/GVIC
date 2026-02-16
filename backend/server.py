@@ -3422,11 +3422,15 @@ try:
     from saas.review_analyzer import router as saas_review_router
     from saas.qa_manager import router as saas_qa_router
     from saas.dashboard_service import router as saas_dashboard_router
+    from saas.shop_manager import router as shop_manager_router
+    from saas.product_insights import router as product_insights_router
     
     app.include_router(saas_review_router)
     app.include_router(saas_qa_router)
     app.include_router(saas_dashboard_router)
-    logger.info("SaaS modules loaded: review_analyzer, qa_manager, dashboard_service")
+    app.include_router(shop_manager_router)
+    app.include_router(product_insights_router)
+    logger.info("SaaS modules loaded: review_analyzer, qa_manager, dashboard_service, shop_manager, product_insights")
 except Exception as e:
     logger.warning(f"SaaS modules not loaded: {e}")
 
