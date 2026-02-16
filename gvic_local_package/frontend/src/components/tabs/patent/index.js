@@ -1,0 +1,12 @@
+// 특허 기반 탭 컴포넌트 내보내기
+export { JInputTab } from './JInputTab';
+export { LLIntentTab } from './LLIntentTab';
+export { HCoreTab } from './HCoreTab';
+export { AGateTab } from './AGateTab';
+export { EShieldTab } from './EShieldTab';
+export { GRefineTab } from './GRefineTab';
+export { BCalcTab } from './BCalcTab';
+export { CExecTab } from './CExecTab';
+export { FFieldTab } from './FFieldTab';
+export { DLedgerTab } from './DLedgerTab';
+export { IIntegrityTab } from './IIntegrityTab';

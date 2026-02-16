@@ -8,37 +8,39 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { 
-  LayoutDashboard, Play, Database, Bell, Settings, 
-  Zap, RefreshCw, Network, Radio, Layers, Brain, Target, GitCompare, Cloud,
-  Users, LogOut, User, Shield, FileText, Sparkles
+  LayoutDashboard, RefreshCw, Zap, Users, LogOut, User, Settings,
+  Upload, Brain, Cpu, Eye, ShieldAlert, Sparkles, Calculator,
+  Play, Activity, Database, Lock
 } from 'lucide-react';
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
-import { 
-  DashboardTab, 
-  ProcessingTab, 
-  IntegrationTab, 
-  DataTab, 
-  AlertsTab, 
-  SettingsTab,
-  MonitoringTab,
-  ModelsTab,
-  PredictionTab,
-  ParetoTab,
-  ComparisonTab,
-  DataSourcesTab,
-  PipelineTab,
-  GVICShowcaseTab
-} from "@/components/tabs";
+
+// 기존 탭
+import { DashboardTab, SettingsTab } from "@/components/tabs";
 import UsersTab from "@/components/tabs/UsersTab";
+
+// 특허 기반 탭
+import {
+  JInputTab,
+  LLIntentTab,
+  HCoreTab,
+  AGateTab,
+  EShieldTab,
+  GRefineTab,
+  BCalcTab,
+  CExecTab,
+  FFieldTab,
+  DLedgerTab,
+  IIntegrityTab
+} from "@/components/tabs/patent";
+
 import LoginPage from "@/pages/LoginPage";
 import AuthCallback from "@/pages/AuthCallback";
 
-// Protected Route Component
+// Protected Route
 function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
@@ -58,33 +60,34 @@ function ProtectedRoute({ children }) {
   return children;
 }
 
-// Main Dashboard Component
+// 14개 탭 정의
+const PATENT_TABS = [
+  { id: "j-input", code: "J", name: "입력", icon: Upload, color: "blue", patent: "J" },
+  { id: "ll-intent", code: "LL", name: "의도", icon: Brain, color: "violet", patent: "LL" },
+  { id: "h-core", code: "H", name: "코어", icon: Cpu, color: "purple", patent: "H" },
+  { id: "a-gate", code: "A", name: "게이트", icon: Eye, color: "cyan", patent: "A" },
+  { id: "e-shield", code: "E", name: "방어막", icon: ShieldAlert, color: "red", patent: "E" },
+  { id: "g-refine", code: "G", name: "정제", icon: Sparkles, color: "emerald", patent: "G" },
+  { id: "b-calc", code: "B", name: "산출", icon: Calculator, color: "orange", patent: "B" },
+  { id: "c-exec", code: "C", name: "집행", icon: Play, color: "indigo", patent: "C" },
+  { id: "f-field", code: "F", name: "실행", icon: Activity, color: "pink", patent: "F" },
+  { id: "d-ledger", code: "D", name: "원장", icon: Database, color: "teal", patent: "D" },
+  { id: "i-integrity", code: "I", name: "무결성", icon: Lock, color: "slate", patent: "I" },
+];
+
+// Main Dashboard
 function Dashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [dashboard, setDashboard] = useState(null);
-  const [systemStatus, setSystemStatus] = useState(null);
-  const [logs, setLogs] = useState([]);
-  const [alerts, setAlerts] = useState(null);
-  const [modules, setModules] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  const { user, logout, hasRole, hasPermission, isAdmin } = useAuth();
+  const { user, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
 
   const fetchData = useCallback(async () => {
     try {
-      const [dashRes, statusRes, logsRes, alertsRes, modulesRes] = await Promise.all([
-        api.getDashboard(),
-        api.getStatus().catch(() => ({ data: {} })),
-        api.getLogs(10),
-        api.getAlerts(),
-        api.getModules()
-      ]);
+      const dashRes = await api.getDashboard();
       setDashboard(dashRes.data);
-      setSystemStatus(statusRes.data);
-      setLogs(logsRes.data.logs);
-      setAlerts(alertsRes.data);
-      setModules(modulesRes.data.modules);
     } catch (error) {
       console.error("Fetch error:", error);
     }
@@ -106,18 +109,12 @@ function Dashboard() {
       admin: 'bg-red-500/20 text-red-400',
       operator: 'bg-blue-500/20 text-blue-400',
       visitor: 'bg-gray-500/20 text-gray-400',
-      ext_admin: 'bg-orange-500/20 text-orange-400',
-      ext_operator: 'bg-yellow-500/20 text-yellow-400',
-      ext_visitor: 'bg-slate-500/20 text-slate-400'
     };
     const labels = {
       super_admin: '최고관리자',
       admin: '관리자',
       operator: '오퍼레이터',
       visitor: '방문객',
-      ext_admin: '외부관리자',
-      ext_operator: '외부오퍼레이터',
-      ext_visitor: '외부방문객'
     };
     return <Badge className={styles[role] || styles.visitor}>{labels[role] || role}</Badge>;
   };
@@ -125,21 +122,20 @@ function Dashboard() {
   return (
     <div className="min-h-screen bg-slate-900">
       {/* Header */}
-      <header className="bg-slate-800/80 border-b border-slate-700 px-6 py-4">
+      <header className="bg-slate-800/80 border-b border-slate-700 px-6 py-3">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl flex items-center justify-center">
-            <Zap className="w-6 h-6 text-white" />
+          <div className="w-10 h-10 bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl flex items-center justify-center">
+            <Zap className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-slate-100" data-testid="app-title">GVIC Engine</h1>
-            <p className="text-slate-400 text-sm">7개 특허 모듈 통합 시스템</p>
+            <h1 className="text-lg font-bold text-slate-100" data-testid="app-title">GVIC Engine</h1>
+            <p className="text-slate-400 text-xs">12개 특허 모듈 통합 시스템</p>
           </div>
           <div className="ml-auto flex items-center gap-3">
             <Button variant="outline" size="sm" onClick={fetchData} data-testid="refresh-button">
-              <RefreshCw className="w-4 h-4 mr-1" /> 새로고침
+              <RefreshCw className="w-4 h-4" />
             </Button>
             
-            {/* User Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="flex items-center gap-2" data-testid="user-menu">
@@ -150,7 +146,7 @@ function Dashboard() {
                       <User className="w-4 h-4 text-slate-300" />
                     )}
                   </div>
-                  <span className="max-w-[100px] truncate">{user?.name}</span>
+                  <span className="max-w-[80px] truncate text-xs">{user?.name}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="bg-slate-800 border-slate-700">
@@ -159,8 +155,7 @@ function Dashboard() {
                   <p className="text-xs text-slate-400">{user?.email}</p>
                   <div className="mt-1">{getRoleBadge(user?.role)}</div>
                 </div>
-                <DropdownMenuSeparator className="bg-slate-700" />
-                <DropdownMenuItem onClick={handleLogout} className="text-red-400 focus:text-red-400 cursor-pointer">
+                <DropdownMenuItem onClick={handleLogout} className="text-red-400 cursor-pointer">
                   <LogOut className="w-4 h-4 mr-2" /> 로그아웃
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -170,145 +165,106 @@ function Dashboard() {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-6 py-6">
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="bg-slate-800 border border-slate-700 mb-6 flex-wrap" data-testid="main-tabs">
-            <TabsTrigger value="dashboard" className="data-[state=active]:bg-slate-700">
-              <LayoutDashboard className="w-4 h-4 mr-2" /> 대시보드
-            </TabsTrigger>
-            
-            {hasPermission('write') && (
-              <TabsTrigger value="processing" className="data-[state=active]:bg-slate-700">
-                <Play className="w-4 h-4 mr-2" /> 처리
+      <main className="p-4">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+          {/* 탭 리스트 - 2줄로 구성 */}
+          <div className="space-y-2">
+            {/* 첫 번째 줄: 대시보드 + 특허 탭 (J ~ G) */}
+            <TabsList className="bg-slate-800/50 p-1 flex-wrap h-auto gap-1">
+              <TabsTrigger value="dashboard" className="data-[state=active]:bg-slate-700 gap-1 text-xs px-2 py-1.5">
+                <LayoutDashboard className="w-3.5 h-3.5" /> 대시보드
               </TabsTrigger>
-            )}
-            
-            {hasPermission('write') && (
-              <TabsTrigger value="models" className="data-[state=active]:bg-slate-700">
-                <Layers className="w-4 h-4 mr-2" /> 모델
-              </TabsTrigger>
-            )}
-            
-            {hasPermission('process') && (
-              <TabsTrigger value="prediction" className="data-[state=active]:bg-slate-700">
-                <Brain className="w-4 h-4 mr-2" /> 예측
-              </TabsTrigger>
-            )}
-            
-            {hasPermission('process') && (
-              <TabsTrigger value="pareto" className="data-[state=active]:bg-slate-700">
-                <Target className="w-4 h-4 mr-2" /> 파레토
-              </TabsTrigger>
-            )}
-            
-            <TabsTrigger value="comparison" className="data-[state=active]:bg-slate-700">
-              <GitCompare className="w-4 h-4 mr-2" /> 비교
-            </TabsTrigger>
-            
-            <TabsTrigger value="monitoring" className="data-[state=active]:bg-slate-700">
-              <Radio className="w-4 h-4 mr-2" /> 모니터링
-            </TabsTrigger>
-            
-            {hasPermission('write') && (
-              <TabsTrigger value="integration" className="data-[state=active]:bg-slate-700">
-                <Network className="w-4 h-4 mr-2" /> 통합
-              </TabsTrigger>
-            )}
-            
-            {hasPermission('write') && (
-              <TabsTrigger value="datasources" className="data-[state=active]:bg-slate-700">
-                <Cloud className="w-4 h-4 mr-2" /> 외부소스
-              </TabsTrigger>
-            )}
-            
-            {hasPermission('process') && (
-              <TabsTrigger value="pipeline" className="data-[state=active]:bg-slate-700">
-                <FileText className="w-4 h-4 mr-2" /> 분석
-              </TabsTrigger>
-            )}
-            
-            <TabsTrigger value="showcase" className="data-[state=active]:bg-slate-700 data-[state=active]:bg-amber-600">
-              <Sparkles className="w-4 h-4 mr-2" /> 시그널분석
-            </TabsTrigger>
-            
-            <TabsTrigger value="data" className="data-[state=active]:bg-slate-700">
-              <Database className="w-4 h-4 mr-2" /> 데이터
-            </TabsTrigger>
-            
-            <TabsTrigger value="alerts" className="data-[state=active]:bg-slate-700">
-              <Bell className="w-4 h-4 mr-2" /> 알림
-            </TabsTrigger>
-            
-            {hasRole(['super_admin', 'admin', 'operator']) && (
-              <TabsTrigger value="settings" className="data-[state=active]:bg-slate-700">
-                <Settings className="w-4 h-4 mr-2" /> 설정
-              </TabsTrigger>
-            )}
-            
-            {isAdmin() && (
-              <TabsTrigger value="users" className="data-[state=active]:bg-slate-700">
-                <Users className="w-4 h-4 mr-2" /> 사용자
-              </TabsTrigger>
-            )}
-          </TabsList>
+              
+              {PATENT_TABS.slice(0, 6).map((tab) => (
+                <TabsTrigger 
+                  key={tab.id} 
+                  value={tab.id} 
+                  className={`data-[state=active]:bg-${tab.color}-600/30 gap-1 text-xs px-2 py-1.5`}
+                >
+                  <tab.icon className="w-3.5 h-3.5" />
+                  <span className="font-bold">{tab.code}</span>:{tab.name}
+                </TabsTrigger>
+              ))}
+            </TabsList>
 
+            {/* 두 번째 줄: 특허 탭 (B ~ I) + 설정/사용자 */}
+            <TabsList className="bg-slate-800/50 p-1 flex-wrap h-auto gap-1">
+              {PATENT_TABS.slice(6).map((tab) => (
+                <TabsTrigger 
+                  key={tab.id} 
+                  value={tab.id} 
+                  className={`data-[state=active]:bg-${tab.color}-600/30 gap-1 text-xs px-2 py-1.5`}
+                >
+                  <tab.icon className="w-3.5 h-3.5" />
+                  <span className="font-bold">{tab.code}</span>:{tab.name}
+                </TabsTrigger>
+              ))}
+              
+              <TabsTrigger value="settings" className="data-[state=active]:bg-slate-700 gap-1 text-xs px-2 py-1.5">
+                <Settings className="w-3.5 h-3.5" /> 설정
+              </TabsTrigger>
+              
+              {isAdmin() && (
+                <TabsTrigger value="users" className="data-[state=active]:bg-slate-700 gap-1 text-xs px-2 py-1.5">
+                  <Users className="w-3.5 h-3.5" /> 사용자
+                </TabsTrigger>
+              )}
+            </TabsList>
+          </div>
+
+          {/* 탭 컨텐츠 */}
           <TabsContent value="dashboard">
-            <DashboardTab dashboard={dashboard} systemStatus={systemStatus} onRefresh={fetchData} />
+            <DashboardTab dashboard={dashboard} onRefresh={fetchData} />
           </TabsContent>
 
-          <TabsContent value="processing">
-            <ProcessingTab onProcess={fetchData} />
+          <TabsContent value="j-input">
+            <JInputTab />
           </TabsContent>
 
-          <TabsContent value="models">
-            <ModelsTab onModelChange={fetchData} />
+          <TabsContent value="ll-intent">
+            <LLIntentTab />
           </TabsContent>
 
-          <TabsContent value="prediction">
-            <PredictionTab onUpdate={fetchData} />
+          <TabsContent value="h-core">
+            <HCoreTab onUpdate={fetchData} />
           </TabsContent>
 
-          <TabsContent value="pareto">
-            <ParetoTab onUpdate={fetchData} />
+          <TabsContent value="a-gate">
+            <AGateTab />
           </TabsContent>
 
-          <TabsContent value="comparison">
-            <ComparisonTab />
+          <TabsContent value="e-shield">
+            <EShieldTab />
           </TabsContent>
 
-          <TabsContent value="monitoring">
-            <MonitoringTab />
+          <TabsContent value="g-refine">
+            <GRefineTab />
           </TabsContent>
 
-          <TabsContent value="integration">
-            <IntegrationTab onRefresh={fetchData} />
+          <TabsContent value="b-calc">
+            <BCalcTab />
           </TabsContent>
 
-          <TabsContent value="datasources">
-            <DataSourcesTab onRefresh={fetchData} />
+          <TabsContent value="c-exec">
+            <CExecTab />
           </TabsContent>
 
-          <TabsContent value="pipeline">
-            <PipelineTab />
+          <TabsContent value="f-field">
+            <FFieldTab />
           </TabsContent>
 
-          <TabsContent value="showcase">
-            <GVICShowcaseTab />
+          <TabsContent value="d-ledger">
+            <DLedgerTab />
           </TabsContent>
 
-          <TabsContent value="data">
-            <DataTab logs={logs} onLogsRefresh={fetchData} />
-          </TabsContent>
-
-          <TabsContent value="alerts">
-            <AlertsTab alerts={alerts} onRefresh={fetchData} />
+          <TabsContent value="i-integrity">
+            <IIntegrityTab />
           </TabsContent>
 
           <TabsContent value="settings">
             <SettingsTab 
               sigma={dashboard?.sigma} 
               omega={dashboard?.omega}
-              modules={modules}
               onUpdate={fetchData}
             />
           </TabsContent>
@@ -320,19 +276,17 @@ function Dashboard() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-800 py-6 text-center text-slate-500 text-sm">
-        GVIC Engine v2.0.0 • 7개 특허 모듈 통합 시스템 (특허1-6, 6-J)
+      <footer className="border-t border-slate-800 py-4 text-center text-slate-500 text-xs">
+        GVIC Engine v2.0.0 • 12개 특허 모듈 통합 시스템
       </footer>
     </div>
   );
 }
 
-// App Router Component
+// App Router
 function AppRouter() {
   const location = useLocation();
   
-  // Check for session_id in URL hash (Google OAuth callback)
-  // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
   if (location.hash?.includes('session_id=')) {
     return <AuthCallback />;
   }
