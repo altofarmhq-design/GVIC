@@ -57,6 +57,17 @@ class ConvertPointsRequest(BaseModel):
     points_amount: float = Field(..., gt=0, description="전환할 포인트")
     conversion_type: str = Field("to_cash", description="전환 유형: to_cash")
 
+class AssetPurchaseRequest(BaseModel):
+    asset_id: str = Field(..., description="구매할 자산 ID")
+    purchase_price: float = Field(..., gt=0, description="구매 금액 (원)")
+
+class ContributorReward(BaseModel):
+    user_id: str
+    signal_id: str
+    contribution_ratio: float  # 기여 비율 (0~1)
+    reward_points: float
+    reward_cash_value: float
+
 # ==================== Helper Functions ====================
 
 async def get_current_user(authorization: str = Header(None)):
