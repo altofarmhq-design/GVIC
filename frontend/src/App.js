@@ -333,6 +333,10 @@ function Dashboard() {
             <ConnectorTab />
           </TabsContent>
 
+          <TabsContent value="my-assets">
+            <MyAssetsTab />
+          </TabsContent>
+
           <TabsContent value="users">
             <UsersTab />
           </TabsContent>
