@@ -123,6 +123,63 @@ export const api = {
   getEarningRules: () => axios.get(`${API}/points/earning-rules`)
 };
 
+  // ==================== SaaS APIs ====================
+  // Shop Management
+  registerShop: (data) => axios.post(`${API}/shop/shops`, data),
+  getShops: () => axios.get(`${API}/shop/shops`),
+  getShop: (shopId) => axios.get(`${API}/shop/shops/${shopId}`),
+  updateShop: (shopId, data) => axios.put(`${API}/shop/shops/${shopId}`, data),
+  deleteShop: (shopId) => axios.delete(`${API}/shop/shops/${shopId}`),
+  
+  // Product Management
+  registerProduct: (shopId, data) => axios.post(`${API}/shop/shops/${shopId}/products`, data),
+  getProducts: (shopId) => axios.get(`${API}/shop/shops/${shopId}/products`),
+  getProduct: (shopId, productId) => axios.get(`${API}/shop/shops/${shopId}/products/${productId}`),
+  updateProduct: (shopId, productId, data) => axios.put(`${API}/shop/shops/${shopId}/products/${productId}`, data),
+  deleteProduct: (shopId, productId) => axios.delete(`${API}/shop/shops/${shopId}/products/${productId}`),
+  getAllProducts: () => axios.get(`${API}/shop/products`),
+  
+  // API Key Management
+  createApiKey: (data) => axios.post(`${API}/shop/api-keys`, data),
+  getApiKeys: () => axios.get(`${API}/shop/api-keys`),
+  revokeApiKey: (keyId) => axios.delete(`${API}/shop/api-keys/${keyId}`),
+  
+  // Webhook Management
+  configureWebhook: (shopId, data) => axios.post(`${API}/shop/shops/${shopId}/webhook`, data),
+  getWebhookConfig: (shopId) => axios.get(`${API}/shop/shops/${shopId}/webhook`),
+  testWebhook: (shopId) => axios.post(`${API}/shop/shops/${shopId}/webhook/test`),
+  
+  // 4-Great-Insights Analysis
+  analyzeProduct: (productId, data) => axios.post(`${API}/insights/analyze/${productId}`, data),
+  getProductInsights: (productId) => axios.get(`${API}/insights/product/${productId}`),
+  getInsightHistory: (productId, limit = 10) => axios.get(`${API}/insights/history/${productId}?limit=${limit}`),
+  getDashboardInsights: () => axios.get(`${API}/insights/dashboard`),
+  
+  // Improvement Assets
+  getImprovementAssets: (params) => axios.get(`${API}/assets/list`, { params }),
+  getAssetsByHsCode: (hsCode) => axios.get(`${API}/assets/hs/${hsCode}`),
+  getAssetChecklist: (hsCode) => axios.get(`${API}/assets/checklist/${hsCode}`),
+  getHsCodes: () => axios.get(`${API}/assets/hs-codes`),
+  recommendHsCode: (productName, category) => axios.post(`${API}/assets/recommend-hs`, { product_name: productName, category }),
+  
+  // Payment & Subscription
+  getPaymentPlans: () => axios.get(`${API}/payments/plans`),
+  getSubscriptionStatus: () => axios.get(`${API}/payments/subscription/status`),
+  createCheckoutSession: (planId, paymentProvider) => axios.post(`${API}/payments/subscription/checkout`, { plan_id: planId, payment_provider: paymentProvider }),
+  cancelSubscription: () => axios.post(`${API}/payments/subscription/cancel`),
+  getUsageCheck: () => axios.get(`${API}/payments/usage/check`),
+  
+  // Unified Payment
+  getPaymentMethods: () => axios.get(`${API}/payments/methods`),
+  createUnifiedCheckout: (data) => axios.post(`${API}/payments/unified/checkout`, data),
+  verifyPayment: (data) => axios.post(`${API}/payments/unified/verify`, data),
+  getPaymentStatus: (orderId) => axios.get(`${API}/payments/unified/status/${orderId}`),
+  getRequiredPaymentKeys: () => axios.get(`${API}/payments/config/required-keys`),
+
+  // SaaS Dashboard
+  getSaasDashboard: () => axios.get(`${API}/saas-dashboard/summary`),
+};
+
 // Export individual functions for easier imports
 export const runPipeline = (config) => api.runPipeline(config).then(res => res.data);
 export const getAnalysisFiles = () => api.getAnalysisFiles().then(res => res.data);
