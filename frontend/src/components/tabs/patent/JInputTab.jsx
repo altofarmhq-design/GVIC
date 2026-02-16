@@ -468,13 +468,13 @@ export const JInputTab = ({ onSignalSubmit }) => {
                     <Upload className="w-8 h-8 text-slate-500 mx-auto mb-2" />
                     <p className="text-slate-400 text-sm">클릭하여 파일 선택</p>
                     <p className="text-slate-500 text-xs mt-2">
-                      지원 형식: PDF, HWP, HWPX, DOCX, TXT, Excel, CSV, 이미지
+                      지원: 문서, 코드, 스프레드시트, 이미지
                     </p>
                     <input
                       ref={fileInputRef}
                       type="file"
                       multiple
-                      accept=".pdf,.hwp,.hwpx,.docx,.txt,.xlsx,.xls,.csv,.jpg,.jpeg,.png,.gif,.webp,.bmp"
+                      accept=".pdf,.hwp,.hwpx,.docx,.txt,.xlsx,.xls,.csv,.jpg,.jpeg,.png,.gif,.webp,.bmp,.py,.js,.ts,.jsx,.tsx,.java,.c,.cpp,.cs,.go,.rs,.rb,.php,.swift,.kt,.html,.css,.scss,.sql,.json,.xml,.yaml,.yml,.sh,.bat,.md"
                       onChange={handleFileSelect}
                       className="hidden"
                     />
@@ -483,13 +483,17 @@ export const JInputTab = ({ onSignalSubmit }) => {
                   {/* 지원 형식 상세 안내 */}
                   <div className="bg-slate-900/50 rounded-lg p-3 text-xs">
                     <p className="text-slate-400 mb-2 font-medium">📁 지원하는 파일 형식:</p>
-                    <div className="grid grid-cols-3 gap-2 text-slate-500">
+                    <div className="grid grid-cols-4 gap-2 text-slate-500">
                       <div>
                         <span className="text-blue-400">문서:</span>
                         <p>.pdf .hwp .hwpx .docx .txt</p>
                       </div>
                       <div>
-                        <span className="text-green-400">스프레드시트:</span>
+                        <span className="text-green-400">코드:</span>
+                        <p>.py .js .ts .java .c .cpp .go 등</p>
+                      </div>
+                      <div>
+                        <span className="text-purple-400">스프레드시트:</span>
                         <p>.xlsx .xls .csv</p>
                       </div>
                       <div>
