@@ -282,7 +282,7 @@ export const MyAssetsTab = () => {
               <div className="bg-slate-900/50 rounded-lg p-3">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-slate-400">환율</span>
-                  <span className="text-green-400 font-medium">₩1 = 0.01P</span>
+                  <span className="text-green-400 font-medium">1000P = ₩1</span>
                 </div>
                 <div className="flex items-center justify-between text-sm mt-1">
                   <span className="text-slate-400">전환 가능</span>
@@ -309,7 +309,7 @@ export const MyAssetsTab = () => {
                 </div>
                 {convertAmount && parseFloat(convertAmount) > 0 && (
                   <p className="text-xs text-green-400 mt-2">
-                    → ₩{(parseFloat(convertAmount) / 0.01).toLocaleString()} 환산
+                    → ₩{(parseFloat(convertAmount) * 0.001).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 3})} 환산
                   </p>
                 )}
               </div>
