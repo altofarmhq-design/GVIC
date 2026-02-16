@@ -128,6 +128,127 @@ export const DashboardTab = ({ dashboard, systemStatus }) => {
         </Button>
       </div>
 
+      {/* 파이프라인 모니터링 */}
+      {pipelineStats && (
+        <Card className="bg-gradient-to-r from-slate-800/80 to-slate-900/80 border-slate-700">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-slate-100 flex items-center gap-2">
+              <Activity className="w-5 h-5 text-blue-400" />
+              파이프라인 모니터링
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {/* 파이프라인 플로우 */}
+            <div className="flex items-center justify-between mb-4 py-3 px-4 bg-slate-900/50 rounded-lg overflow-x-auto">
+              <div className="flex items-center gap-2 text-xs">
+                <div className="flex flex-col items-center">
+                  <div className="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center">
+                    <Upload className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="text-slate-400 mt-1">입력</span>
+                  <span className="text-blue-400 font-bold">{pipelineStats.stage_counts?.j_input || 0}</span>
+                </div>
+                <ArrowRight className="w-4 h-4 text-slate-600" />
+                <div className="flex flex-col items-center">
+                  <div className="w-10 h-10 rounded-lg bg-violet-600 flex items-center justify-center">
+                    <Brain className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="text-slate-400 mt-1">평가</span>
+                  <span className="text-violet-400 font-bold">{pipelineStats.stage_counts?.ll_evaluate || 0}</span>
+                </div>
+                <ArrowRight className="w-4 h-4 text-slate-600" />
+                <div className="flex flex-col items-center">
+                  <div className="w-10 h-10 rounded-lg bg-purple-600 flex items-center justify-center">
+                    <Cpu className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="text-slate-400 mt-1">코어</span>
+                  <span className="text-purple-400 font-bold">{pipelineStats.stage_counts?.h_core || 0}</span>
+                </div>
+                <ArrowRight className="w-4 h-4 text-slate-600" />
+                <div className="flex flex-col items-center">
+                  <div className="w-10 h-10 rounded-lg bg-emerald-600 flex items-center justify-center">
+                    <Package className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="text-slate-400 mt-1">자산화</span>
+                  <span className="text-emerald-400 font-bold">{pipelineStats.stage_counts?.asset_process || 0}</span>
+                </div>
+                <ArrowRight className="w-4 h-4 text-slate-600" />
+                <div className="flex flex-col items-center">
+                  <div className="w-10 h-10 rounded-lg bg-amber-600 flex items-center justify-center">
+                    <Coins className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="text-slate-400 mt-1">모듈화</span>
+                  <span className="text-amber-400 font-bold">{pipelineStats.stage_counts?.module || 0}</span>
+                </div>
+                <ArrowRight className="w-4 h-4 text-slate-600" />
+                <div className="flex flex-col items-center">
+                  <div className="w-10 h-10 rounded-lg bg-green-600 flex items-center justify-center">
+                    <CheckCircle className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="text-slate-400 mt-1">완료</span>
+                  <span className="text-green-400 font-bold">{pipelineStats.stage_counts?.completed || 0}</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* 통계 카드 */}
+            <div className="grid grid-cols-4 gap-3">
+              <div className="bg-slate-800 rounded-lg p-3 text-center">
+                <p className="text-2xl font-bold text-white">{pipelineStats.total_signals || 0}</p>
+                <p className="text-slate-400 text-xs">총 시그널</p>
+              </div>
+              <div className="bg-blue-900/30 rounded-lg p-3 text-center border border-blue-700">
+                <p className="text-2xl font-bold text-blue-400">{pipelineStats.category_counts?.wanted || 0}</p>
+                <p className="text-slate-400 text-xs">원하는 것</p>
+              </div>
+              <div className="bg-amber-900/30 rounded-lg p-3 text-center border border-amber-700">
+                <p className="text-2xl font-bold text-amber-400">{pipelineStats.category_counts?.unwanted || 0}</p>
+                <p className="text-slate-400 text-xs">자산화 대상</p>
+              </div>
+              <div className="bg-slate-700/50 rounded-lg p-3 text-center">
+                <p className="text-2xl font-bold text-slate-400">{pipelineStats.category_counts?.null || 0}</p>
+                <p className="text-slate-400 text-xs">Null</p>
+              </div>
+            </div>
+
+            {/* 최근 시그널 */}
+            {pipelineStats.recent_signals?.length > 0 && (
+              <div className="mt-4">
+                <p className="text-slate-400 text-xs mb-2">최근 시그널</p>
+                <ScrollArea className="h-[120px]">
+                  <div className="space-y-2">
+                    {pipelineStats.recent_signals.slice(0, 5).map((sig) => (
+                      <div key={sig.signal_id} className="flex items-center justify-between bg-slate-900/50 rounded p-2 text-xs">
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline" className={`
+                            ${sig.category === 'wanted' ? 'text-blue-400 border-blue-600' : 
+                              sig.category === 'unwanted' ? 'text-amber-400 border-amber-600' : 
+                              'text-slate-400 border-slate-600'}
+                          `}>
+                            {sig.category || 'pending'}
+                          </Badge>
+                          <span className="text-slate-300 font-mono">{sig.signal_id?.slice(0, 15)}...</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge className={`
+                            ${sig.status === 'completed' ? 'bg-green-600' : 
+                              sig.status === 'processing' ? 'bg-blue-600' : 
+                              sig.status === 'failed' ? 'bg-red-600' : 'bg-slate-600'}
+                          `}>
+                            {sig.status}
+                          </Badge>
+                          <span className="text-slate-500">{sig.type}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
       {/* Metrics Row - 실제 데이터 */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4" data-testid="metrics-row">
         <MetricCard 
