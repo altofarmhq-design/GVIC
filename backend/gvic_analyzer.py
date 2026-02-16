@@ -543,7 +543,7 @@ async def extract_insights(
     daily_counts = Counter()
     daily_categories = {}
     
-    for signal in recent_signals:
+    for signal in all_signals:
         created = signal.get("created_at", "")[:10]  # YYYY-MM-DD
         daily_counts[created] += 1
         
