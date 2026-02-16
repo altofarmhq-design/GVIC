@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   PieChart, Pie, Cell, ResponsiveContainer, 
   RadialBarChart, RadialBar, Tooltip as RechartsTooltip,
@@ -10,7 +11,8 @@ import {
 import { 
   Activity, CheckCircle, AlertTriangle, Zap, 
   Shield, BarChart3, TrendingUp, PieChart as PieChartIcon,
-  FileDown, RefreshCw, Database, Clock
+  FileDown, RefreshCw, Database, Clock, ArrowRight,
+  Upload, Brain, Cpu, Package, Coins
 } from 'lucide-react';
 import { MetricCard } from "@/components/MetricCard";
 import { api } from "@/lib/api";
@@ -21,25 +23,31 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 export const DashboardTab = ({ dashboard, systemStatus }) => {
   const [generating, setGenerating] = useState(false);
   const [realStats, setRealStats] = useState(null);
+  const [pipelineStats, setPipelineStats] = useState(null);
   const [loading, setLoading] = useState(false);
 
   // 실제 통계 로드
   const loadRealStats = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_URL}/api/dashboard/realstats`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      setRealStats(response.data);
+      const [statsRes, pipelineRes] = await Promise.all([
+        axios.get(`${API_URL}/api/dashboard/realstats`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }),
+        axios.get(`${API_URL}/api/pipeline/stats`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+      ]);
+      setRealStats(statsRes.data);
+      setPipelineStats(pipelineRes.data);
     } catch (error) {
-      console.error("Failed to load real stats:", error);
+      console.error("Failed to load stats:", error);
     }
   }, []);
 
   useEffect(() => {
     loadRealStats();
-    // 10초마다 업데이트
-    const interval = setInterval(loadRealStats, 10000);
+    const interval = setInterval(loadRealStats, 5000);
     return () => clearInterval(interval);
   }, [loadRealStats]);
 
