@@ -842,51 +842,102 @@ async def get_signal_monitoring():
 
 @api_router.get("/dashboard/realstats")
 async def get_real_dashboard_stats():
-    """대시보드 실제 통계"""
-    # 실제 시그널 통계
-    signal_stats = get_realtime_signal_stats()
+    """대시보드 실제 통계 - MongoDB에서 직접 집계"""
+    from datetime import timedelta
     
-    # MongoDB에서 실제 자산 통계
+    try:
+        # pipeline_signals 컬렉션에서 실제 통계 집계
+        total_signals = await db.pipeline_signals.count_documents({})
+        completed_signals = await db.pipeline_signals.count_documents({"status": "completed"})
+        
+        # 카테고리별 통계
+        wanted_count = await db.pipeline_signals.count_documents({"category": "wanted"})
+        unwanted_count = await db.pipeline_signals.count_documents({"category": "unwanted"})
+        null_count = await db.pipeline_signals.count_documents({"category": "null"})
+        
+        # 성공률 계산
+        success_rate = (completed_signals / total_signals * 100) if total_signals > 0 else 0
+        
+        # 최근 1시간 처리량
+        one_hour_ago = datetime.now(timezone.utc) - timedelta(hours=1)
+        last_hour_count = await db.pipeline_signals.count_documents({
+            "created_at": {"$gte": one_hour_ago}
+        })
+        
+        # 분석 유형별 통계
+        analysis_type_pipeline = [
+            {"$group": {"_id": "$metadata.analysis_type", "count": {"$sum": 1}}},
+            {"$sort": {"count": -1}}
+        ]
+        analysis_types = {}
+        async for doc in db.pipeline_signals.aggregate(analysis_type_pipeline):
+            type_name = doc["_id"] or "general"
+            analysis_types[type_name] = doc["count"]
+        
+        # 최근 처리된 시그널
+        recent_cursor = db.pipeline_signals.find(
+            {}, 
+            {"_id": 0, "signal_id": 1, "type": 1, "category": 1, "status": 1, "created_at": 1, "metadata.analysis_type": 1}
+        ).sort("created_at", -1).limit(10)
+        recent_signals = await recent_cursor.to_list(length=10)
+        
+        # 시간별 차트 데이터 (최근 6시간)
+        chart_data = []
+        for i in range(6, 0, -1):
+            hour_start = datetime.now(timezone.utc) - timedelta(hours=i)
+            hour_end = datetime.now(timezone.utc) - timedelta(hours=i-1)
+            count = await db.pipeline_signals.count_documents({
+                "created_at": {"$gte": hour_start, "$lt": hour_end}
+            })
+            chart_data.append({
+                "time": hour_start.strftime("%H:00"),
+                "signals": count
+            })
+        
+        # 상태 결정
+        if last_hour_count > 5:
+            status = "active"
+        elif total_signals > 0:
+            status = "normal"
+        else:
+            status = "idle"
+            
+    except Exception as e:
+        print(f"Dashboard stats error: {e}")
+        total_signals = 0
+        completed_signals = 0
+        wanted_count = 0
+        unwanted_count = 0
+        null_count = 0
+        success_rate = 0
+        last_hour_count = 0
+        analysis_types = {}
+        recent_signals = []
+        chart_data = []
+        status = "error"
+    
+    # gvic_assets에서 자산 통계
     try:
         total_assets = await db.gvic_assets.count_documents({})
         positive_assets = await db.gvic_assets.count_documents({"classification": "긍정"})
         negative_assets = await db.gvic_assets.count_documents({"classification": "부정"})
         mixed_assets = await db.gvic_assets.count_documents({"classification": "혼합"})
         neutral_assets = await db.gvic_assets.count_documents({"classification": "중립"})
-        
-        # 시그널 유형별 통계
-        signal_type_pipeline = [
-            {"$group": {"_id": "$signal_type_label", "count": {"$sum": 1}}},
-            {"$sort": {"count": -1}},
-            {"$limit": 10}
-        ]
-        signal_types = {}
-        async for doc in db.gvic_assets.aggregate(signal_type_pipeline):
-            if doc["_id"]:
-                signal_types[doc["_id"]] = doc["count"]
-        
-        # 최근 처리 이력
-        recent_cursor = db.gvic_assets.find({}, {"_id": 0, "asset_id": 1, "signal_type_label": 1, "classification": 1, "created_at": 1}).sort("created_at", -1).limit(10)
-        recent_assets = await recent_cursor.to_list(length=10)
-        
-    except Exception as e:
+    except:
         total_assets = 0
         positive_assets = 0
         negative_assets = 0
         mixed_assets = 0
         neutral_assets = 0
-        signal_types = {}
-        recent_assets = []
     
     return {
-        # 실시간 분석 현황
         "realtime": {
-            "total_analyzed": signal_stats["total_analyzed"],
-            "last_hour_count": signal_stats["last_hour_count"],
-            "success_rate": signal_stats["success_rate"],
-            "status": signal_stats["status"]
+            "total_analyzed": total_signals,
+            "completed": completed_signals,
+            "last_hour_count": last_hour_count,
+            "success_rate": round(success_rate, 1),
+            "status": status
         },
-        # 자산 현황
         "assets": {
             "total": total_assets,
             "positive": positive_assets,
@@ -894,18 +945,21 @@ async def get_real_dashboard_stats():
             "mixed": mixed_assets,
             "neutral": neutral_assets
         },
-        # 시그널 유형별
-        "by_signal_type": signal_types,
-        # 감성별
-        "by_sentiment": signal_stats["by_sentiment"],
-        # 최근 처리
-        "recent_assets": recent_assets,
-        # 차트 데이터
-        "chart_data": signal_stats["chart_data"],
-        # 최근 시그널
-        "recent_signals": signal_stats["recent_signals"],
-        # 업데이트 시간
-        "last_update": signal_stats["last_update"] or datetime.now(timezone.utc).isoformat()
+        "by_category": {
+            "wanted": wanted_count,
+            "unwanted": unwanted_count,
+            "null": null_count
+        },
+        "by_analysis_type": analysis_types,
+        "by_sentiment": {
+            "positive": positive_assets,
+            "negative": negative_assets,
+            "mixed": mixed_assets,
+            "neutral": neutral_assets
+        },
+        "recent_signals": recent_signals,
+        "chart_data": chart_data,
+        "last_update": datetime.now(timezone.utc).isoformat()
     }
 
 @api_router.get("/monitor/distribution")
