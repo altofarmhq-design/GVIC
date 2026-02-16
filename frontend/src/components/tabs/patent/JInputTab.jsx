@@ -213,12 +213,19 @@ export const JInputTab = ({ onSignalSubmit }) => {
   ];
 
   const supportedFormats = [
-    { ext: "Excel", formats: ".xlsx, .xls" },
-    { ext: "CSV", formats: ".csv" },
-    { ext: "PDF", formats: ".pdf" },
-    { ext: "텍스트", formats: ".txt" },
+    { ext: "문서", formats: ".pdf, .hwp, .hwpx, .docx, .txt" },
+    { ext: "스프레드시트", formats: ".xlsx, .xls, .csv" },
     { ext: "이미지", formats: ".jpg, .png, .gif, .webp" }
   ];
+
+  // 지원하는 파일 확장자 목록
+  const SUPPORTED_EXTENSIONS = ['pdf', 'hwp', 'hwpx', 'docx', 'txt', 'xlsx', 'xls', 'csv', 'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];
+
+  // 파일 확장자 검증
+  const isFileSupported = (filename) => {
+    const ext = filename.split('.').pop().toLowerCase();
+    return SUPPORTED_EXTENSIONS.includes(ext);
+  };
 
   return (
     <div className="space-y-6">
