@@ -171,8 +171,8 @@ async def get_point_balance(current_user: dict = Depends(get_current_user)):
         if "_id" in point_doc:
             del point_doc["_id"]
     
-    # 현금 환산 가치 계산
-    cash_equivalent = point_doc.get("available_points", 0) / CASH_TO_POINT_RATIO
+    # 현금 환산 가치 계산 (1P = ₩0.001)
+    cash_equivalent = point_doc.get("available_points", 0) * POINT_TO_CASH_RATIO
     
     return {
         "user_id": user_id,
