@@ -639,6 +639,7 @@ async def extract_insights(
     insights["clusters"] = sorted(insights["clusters"], key=lambda x: x["count"], reverse=True)
     
     # ===== 5. 핵심 인사이트 생성 =====
+    # 패턴 기반 인사이트
     if insights["patterns"]["dominant_topic"]:
         insights["key_insights"].append({
             "type": "pattern",
@@ -647,13 +648,33 @@ async def extract_insights(
             "importance": "high"
         })
     
-    if trend_direction == "상승" and trend_change > 20:
+    # 빈출 단어 인사이트
+    top_words = insights["patterns"].get("frequent_words", [])[:3]
+    if top_words:
+        word_list = ", ".join([w["word"] for w in top_words])
         insights["key_insights"].append({
-            "type": "trend",
-            "title": "활동 급증",
-            "description": f"최근 7일간 활동이 {trend_change:.0f}% 증가했습니다. 관심도가 높아지고 있습니다.",
-            "importance": "high"
+            "type": "pattern",
+            "title": "자주 등장하는 단어",
+            "description": f"가장 많이 언급된 단어: {word_list}",
+            "importance": "medium"
         })
+    
+    # 트렌드 인사이트
+    if trend_direction == "상승":
+        if trend_change > 20:
+            insights["key_insights"].append({
+                "type": "trend",
+                "title": "활동 급증",
+                "description": f"최근 7일간 활동이 {trend_change:.0f}% 증가했습니다. 관심도가 높아지고 있습니다.",
+                "importance": "high"
+            })
+        else:
+            insights["key_insights"].append({
+                "type": "trend",
+                "title": "활동 증가 추세",
+                "description": f"최근 활동이 증가하고 있습니다. (최근 7일: {recent_7}건)",
+                "importance": "medium"
+            })
     elif trend_direction == "하락" and trend_change < -20:
         insights["key_insights"].append({
             "type": "trend",
@@ -662,6 +683,34 @@ async def extract_insights(
             "importance": "medium"
         })
     
+    # 데이터 규모 인사이트
+    total_signals = insights["data_summary"]["total_signals"]
+    if total_signals > 0:
+        insights["key_insights"].append({
+            "type": "data",
+            "title": "데이터 축적 현황",
+            "description": f"총 {total_signals}개의 시그널이 축적되어 있으며, {len(gvic_analyses)}개의 GVIC 분석이 완료되었습니다.",
+            "importance": "low"
+        })
+    
+    # GVIC 분석 인사이트 (5:3:2 분배 패턴)
+    if gvic_analyses:
+        public_values = []
+        for analysis in gvic_analyses:
+            v532 = analysis.get("result", {}).get("value_breakdown_532", {})
+            if v532:
+                public_values.append(v532.get("public_value", 0))
+        
+        if public_values:
+            avg_public = sum(public_values) / len(public_values)
+            insights["key_insights"].append({
+                "type": "gvic",
+                "title": "공공 가치 분석",
+                "description": f"평균 공공 환원 가치: {avg_public:.1f}점. 분석된 {len(gvic_analyses)}개 시그널 기준.",
+                "importance": "medium"
+            })
+    
+    # 이상치 인사이트
     high_value_anomalies = [a for a in insights["anomalies"] if a["type"] == "high_value"]
     if high_value_anomalies:
         insights["key_insights"].append({
@@ -671,6 +720,7 @@ async def extract_insights(
             "importance": "high"
         })
     
+    # 클러스터 인사이트
     if insights["clusters"]:
         top_cluster = insights["clusters"][0]
         insights["key_insights"].append({
@@ -678,6 +728,15 @@ async def extract_insights(
             "title": "주요 자산 그룹",
             "description": f"'{top_cluster['category']}' 카테고리에 {top_cluster['count']}개의 자산이 집중되어 있습니다.",
             "importance": "medium"
+        })
+    
+    # 인사이트가 없으면 기본 메시지 추가
+    if not insights["key_insights"]:
+        insights["key_insights"].append({
+            "type": "info",
+            "title": "분석 완료",
+            "description": "현재 축적된 데이터를 기반으로 인사이트를 생성했습니다. 더 많은 데이터가 축적되면 더 정확한 인사이트를 제공합니다.",
+            "importance": "low"
         })
     
     return insights
