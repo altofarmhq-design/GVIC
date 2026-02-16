@@ -214,8 +214,8 @@ export const DashboardTab = ({ dashboard, systemStatus }) => {
             {/* 최근 시그널 */}
             {pipelineStats.recent_signals?.length > 0 && (
               <div className="mt-4">
-                <p className="text-slate-400 text-xs mb-2">최근 시그널</p>
-                <ScrollArea className="h-[120px]">
+                <p className="text-slate-400 text-xs mb-2">최근 처리 이력</p>
+                <ScrollArea className="h-[140px]">
                   <div className="space-y-2">
                     {pipelineStats.recent_signals.slice(0, 5).map((sig) => (
                       <div key={sig.signal_id} className="flex items-center justify-between bg-slate-900/50 rounded p-2 text-xs">
@@ -225,9 +225,18 @@ export const DashboardTab = ({ dashboard, systemStatus }) => {
                               sig.category === 'unwanted' ? 'text-amber-400 border-amber-600' : 
                               'text-slate-400 border-slate-600'}
                           `}>
-                            {sig.category || 'pending'}
+                            {sig.category === 'wanted' ? '분석' : sig.category === 'unwanted' ? '자산화' : 'null'}
                           </Badge>
-                          <span className="text-slate-300 font-mono">{sig.signal_id?.slice(0, 15)}...</span>
+                          <span className="text-slate-300 font-mono">{sig.signal_id?.slice(4, 16)}...</span>
+                          {sig.metadata?.analysis_type && (
+                            <Badge className={`text-[10px] px-1.5 ${
+                              sig.metadata.analysis_type === 'code' ? 'bg-green-700' :
+                              sig.metadata.analysis_type === 'patent_idea' ? 'bg-amber-700' : 'bg-blue-700'
+                            }`}>
+                              {sig.metadata.analysis_type === 'code' ? '코드' :
+                               sig.metadata.analysis_type === 'patent_idea' ? '아이디어' : '일반'}
+                            </Badge>
+                          )}
                         </div>
                         <div className="flex items-center gap-2">
                           <Badge className={`
@@ -235,9 +244,14 @@ export const DashboardTab = ({ dashboard, systemStatus }) => {
                               sig.status === 'processing' ? 'bg-blue-600' : 
                               sig.status === 'failed' ? 'bg-red-600' : 'bg-slate-600'}
                           `}>
-                            {sig.status}
+                            {sig.status === 'completed' ? '완료' : sig.status}
                           </Badge>
-                          <span className="text-slate-500">{sig.type}</span>
+                          <span className="text-slate-500">{sig.type === 'text' ? '텍스트' : sig.type === 'file' ? '파일' : sig.type}</span>
+                          {sig.created_at && (
+                            <span className="text-slate-600 text-[10px]">
+                              {new Date(sig.created_at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          )}
                         </div>
                       </div>
                     ))}
