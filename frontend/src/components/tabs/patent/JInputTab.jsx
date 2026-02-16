@@ -569,40 +569,6 @@ export const JInputTab = ({ onSignalSubmit }) => {
                   </p>
                 </div>
               )}
-                        min="0"
-                        max="10"
-                        value={ratioUnwanted}
-                        onChange={(e) => setRatioUnwanted(parseInt(e.target.value))}
-                        className="w-full accent-amber-500"
-                      />
-                      <p className="text-center text-amber-300 font-bold">{ratioUnwanted}</p>
-                    </div>
-                    <div>
-                      <label className="text-xs text-slate-400 mb-1 block">Null (무시)</label>
-                      <input
-                        type="range"
-                        min="0"
-                        max="10"
-                        value={ratioNull}
-                        onChange={(e) => setRatioNull(parseInt(e.target.value))}
-                        className="w-full accent-slate-500"
-                      />
-                      <p className="text-center text-slate-300 font-bold">{ratioNull}</p>
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <p className="text-xs text-slate-500">
-                      현재 비율: <span className="text-slate-300 font-mono">{ratioWanted}:{ratioUnwanted}:{ratioNull}</span>
-                    </p>
-                    <button
-                      onClick={() => { setRatioWanted(5); setRatioUnwanted(3); setRatioNull(2); }}
-                      className="text-xs text-purple-400 hover:text-purple-300"
-                    >
-                      기본값(5:3:2) 복원
-                    </button>
-                  </div>
-                </div>
-              )}
             </CardContent>
           </Card>
 
