@@ -627,7 +627,13 @@ export const JInputTab = ({ onSignalSubmit }) => {
                   )}
                 </div>
               )}
+              </CardContent>
+            </Card>
+          )}
 
+          {/* 에러 메시지 및 제출 버튼 */}
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardContent className="pt-4 space-y-3">
               {error && (
                 <div className="bg-red-900/30 border border-red-600 rounded-lg p-2 text-red-400 text-sm flex items-center gap-2">
                   <AlertCircle className="w-4 h-4" />
@@ -668,7 +674,7 @@ export const JInputTab = ({ onSignalSubmit }) => {
                 <Target className="w-16 h-16 text-slate-600 mx-auto mb-4" />
                 <p className="text-slate-500 text-lg">분석 결과 대기 중</p>
                 <p className="text-slate-600 text-sm mt-2">
-                  질문 목적과 기대 결과를 입력하고<br/>시그널을 전송하세요
+                  질문을 입력하고<br/>분석 시작 버튼을 클릭하세요
                 </p>
               </div>
             </Card>
