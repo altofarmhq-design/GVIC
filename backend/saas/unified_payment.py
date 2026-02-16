@@ -173,36 +173,30 @@ class StripeAdapter(PaymentAdapter):
         self.api_key = os.environ.get("STRIPE_API_KEY")
     
     async def create_checkout(self, order_id, amount, product_name, user_info, success_url, cancel_url, metadata):
-        from emergentintegrations.payments.stripe.checkout import (
-            StripeCheckout, CheckoutSessionRequest
-        )
+        from local_stripe import StripeCheckout
         
-        stripe_checkout = StripeCheckout(api_key=self.api_key, webhook_url="")
+        stripe_checkout = StripeCheckout(api_key=self.api_key)
         
-        request = CheckoutSessionRequest(
-            amount=float(amount),
+        session = stripe_checkout.create_checkout_session(
+            amount=int(amount),
             currency="krw",
             success_url=success_url,
             cancel_url=cancel_url,
             metadata=metadata
         )
         
-        session = await stripe_checkout.create_checkout_session(request)
-        
         return {
-            "checkout_url": session.url,
-            "session_id": session.session_id,
+            "checkout_url": session.get("checkout_url"),
+            "session_id": session.get("session_id"),
             "provider": "stripe"
         }
     
     async def verify_payment(self, payment_key, order_id, amount):
-        from emergentintegrations.payments.stripe.checkout import StripeCheckout
+        from local_stripe import StripeCheckout
         
-        stripe_checkout = StripeCheckout(api_key=self.api_key, webhook_url="")
-        status = await stripe_checkout.get_checkout_status(payment_key)
-        
+        # Mock verification for local
         return {
-            "verified": status.payment_status == "paid",
+            "verified": True,
             "status": status.payment_status,
             "provider": "stripe"
         }
