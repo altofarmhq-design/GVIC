@@ -210,7 +210,7 @@ GVIC는 14개 특허를 기반으로 한 AI 기반 시그널 분석 및 자산�
 - Emergent Integration (Gemini 3 Flash)
 
 ### 배포
-- App Preview: https://intent-exchange.preview.emergentagent.com
+- App Preview: https://reviewhub-46.preview.emergentagent.com
 - 로컬 환경: D:\GVIC
 
 ## 4. API 엔드포인트
