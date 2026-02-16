@@ -309,7 +309,7 @@ export const MyAssetsTab = () => {
                 </div>
                 {convertAmount && parseFloat(convertAmount) > 0 && (
                   <p className="text-xs text-green-400 mt-2">
-                    → ₩{(parseFloat(convertAmount) / 0.1).toLocaleString()} 환산
+                    → ₩{(parseFloat(convertAmount) / 0.01).toLocaleString()} 환산
                   </p>
                 )}
               </div>
