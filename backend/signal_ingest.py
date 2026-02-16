@@ -545,16 +545,33 @@ async def ingest_url_signal(request: UrlSignalRequest, current_user: dict = Depe
                     logging.getLogger(__name__).error(f"Signal creation error: {e}")
                     continue
             
+            # 크롤링된 리뷰들에 대한 종합 AI 분석 수행
+            all_reviews_text = "\n\n".join([
+                f"[리뷰 {i+1}] 평점: {r.rating or 'N/A'}점\n{r.content}"
+                for i, r in enumerate(reviews[:20])
+            ])
+            
+            from core.ai_analyzer import analyze_signal
+            ai_result = await analyze_signal(
+                content=all_reviews_text,
+                purpose=request.purpose or "구매후기 분석",
+                expected_result=request.expected_result or "리뷰에서 주요 의견과 불만사항 추출",
+                analysis_type=request.analysis_type
+            )
+            
             return {
                 "success": True,
                 "input_type": "shopping_url",
                 "platform": platform,
                 "crawl_id": crawl_id,
+                "signal_id": signal_ids[0] if signal_ids else None,
+                "category": ai_result.get("signal_category", "wanted"),
                 "product_name": product_info.product_name if product_info else "상품 정보 없음",
                 "reviews_found": len(reviews),
                 "signals_created": signals_created,
-                "signal_ids": signal_ids[:5],  # 처음 5개만 반환
-                "message": f"{platform} 쇼핑몰에서 {len(reviews)}개 리뷰를 크롤링하고 {signals_created}개 시그널을 생성했습니다."
+                "signal_ids": signal_ids[:5],
+                "ai_analysis": ai_result,
+                "message": f"{platform if platform != 'generic' else '쇼핑몰'}에서 {len(reviews)}개 리뷰를 크롤링하고 분석했습니다."
             }
             
         except Exception as e:
