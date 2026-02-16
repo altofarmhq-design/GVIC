@@ -133,8 +133,9 @@ async def analyze_with_gvic_lens(
     try:
         llm = LlmChat(
             api_key=EMERGENT_LLM_KEY,
-            model="gemini-2.0-flash"
-        )
+            session_id=f"gvic-{content[:8]}",
+            system_message="You are a GVIC analysis expert that evaluates content based on the 5:3:2 theory."
+        ).with_model("gemini", "gemini-2.0-flash")
         
         response = await llm.send_message(
             UserMessage(text=gvic_prompt)
