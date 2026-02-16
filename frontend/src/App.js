@@ -274,6 +274,10 @@ function Dashboard() {
             />
           </TabsContent>
 
+          <TabsContent value="api-webhook">
+            <APIWebhookTab />
+          </TabsContent>
+
           <TabsContent value="users">
             <UsersTab />
           </TabsContent>
