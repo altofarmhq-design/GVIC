@@ -153,14 +153,14 @@ async def get_point_balance(current_user: dict = Depends(get_current_user)):
         # 신규 사용자는 기본 포인트 생성
         point_doc = {
             "user_id": user_id,
-            "total_points": 100.0,  # 신규 가입 보너스
-            "available_points": 100.0,
+            "total_points": 10000.0,  # 신규 가입 보너스 (= ₩10)
+            "available_points": 10000.0,
             "pending_points": 0.0,
-            "total_earned": 100.0,
+            "total_earned": 10000.0,
             "total_spent": 0.0,
             "transactions": [{
                 "type": "earn",
-                "amount": 100.0,
+                "amount": 10000.0,
                 "description": "신규 가입 보너스",
                 "timestamp": datetime.now(timezone.utc).isoformat()
             }],
