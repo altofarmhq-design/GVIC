@@ -26,7 +26,9 @@ import {
   Package,
   Code,
   FileCode,
-  Sparkles
+  Sparkles,
+  Link,
+  Info
 } from 'lucide-react';
 import axios from 'axios';
 
