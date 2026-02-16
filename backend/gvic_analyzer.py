@@ -544,7 +544,12 @@ async def extract_insights(
     daily_categories = {}
     
     for signal in all_signals:
-        created = signal.get("created_at", "")[:10]  # YYYY-MM-DD
+        created_raw = signal.get("created_at", "")
+        # datetime 객체인 경우 문자열로 변환
+        if hasattr(created_raw, 'isoformat'):
+            created = created_raw.isoformat()[:10]
+        else:
+            created = str(created_raw)[:10]  # YYYY-MM-DD
         daily_counts[created] += 1
         
         category = signal.get("metadata", {}).get("ai_analysis", {}).get("signal_category", "general")
