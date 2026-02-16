@@ -8,97 +8,176 @@ echo ========================================
 echo.
 
 set "INSTALL_DIR=%~dp0"
+set "LOG_FILE=%INSTALL_DIR%install_log.txt"
+
+echo 설치 시작: %date% %time% > "%LOG_FILE%"
+echo 설치 경로: %INSTALL_DIR% >> "%LOG_FILE%"
+echo.
+
 echo 설치 경로: %INSTALL_DIR%
+echo 로그 파일: %LOG_FILE%
 echo.
 
-:: 필수 프로그램 확인
-echo [1/7] 필수 프로그램 확인 중...
-echo.
+:: ========================================
+:: 1. Python 확인
+:: ========================================
+echo [1/7] Python 확인 중...
+echo [1/7] Python 확인 >> "%LOG_FILE%"
 
-:: Python 확인
-python --version > nul 2>&1
+where python > nul 2>&1
 if errorlevel 1 (
-    echo   [오류] Python이 설치되어 있지 않습니다.
-    echo   Python 3.10 이상을 설치해주세요: https://www.python.org/downloads/
+    echo   [오류] Python이 설치되어 있지 않습니다!
+    echo   [오류] Python 미설치 >> "%LOG_FILE%"
     echo.
-    pause
-    exit /b 1
-)
-for /f "tokens=2" %%i in ('python --version 2^>^&1') do set PYTHON_VER=%%i
-echo   [OK] Python %PYTHON_VER%
-
-:: Node.js 확인
-node --version > nul 2>&1
-if errorlevel 1 (
-    echo   [오류] Node.js가 설치되어 있지 않습니다.
-    echo   Node.js 18 이상을 설치해주세요: https://nodejs.org/
+    echo   Python 설치 방법:
+    echo   1. https://www.python.org/downloads/ 접속
+    echo   2. "Download Python 3.x" 클릭
+    echo   3. 설치 시 "Add Python to PATH" 반드시 체크!
     echo.
-    pause
-    exit /b 1
+    goto ERROR_END
 )
-for /f %%i in ('node --version') do set NODE_VER=%%i
-echo   [OK] Node.js %NODE_VER%
 
-:: MongoDB 확인
+python --version 2>> "%LOG_FILE%"
+for /f "tokens=2" %%i in ('python --version 2^>^&1') do (
+    echo   [OK] Python %%i
+    echo   [OK] Python %%i >> "%LOG_FILE%"
+)
+
+:: ========================================
+:: 2. Node.js 확인
+:: ========================================
 echo.
-echo [2/7] MongoDB 확인 중...
-mongod --version > nul 2>&1
+echo [2/7] Node.js 확인 중...
+echo [2/7] Node.js 확인 >> "%LOG_FILE%"
+
+where node > nul 2>&1
+if errorlevel 1 (
+    echo   [오류] Node.js가 설치되어 있지 않습니다!
+    echo   [오류] Node.js 미설치 >> "%LOG_FILE%"
+    echo.
+    echo   Node.js 설치 방법:
+    echo   1. https://nodejs.org/ 접속
+    echo   2. LTS 버전 다운로드
+    echo   3. 설치 진행
+    echo.
+    goto ERROR_END
+)
+
+node --version 2>> "%LOG_FILE%"
+for /f %%i in ('node --version 2^>^&1') do (
+    echo   [OK] Node.js %%i
+    echo   [OK] Node.js %%i >> "%LOG_FILE%"
+)
+
+:: ========================================
+:: 3. MongoDB 확인 (경고만)
+:: ========================================
+echo.
+echo [3/7] MongoDB 확인 중...
+echo [3/7] MongoDB 확인 >> "%LOG_FILE%"
+
+where mongod > nul 2>&1
 if errorlevel 1 (
     echo   [경고] MongoDB가 설치되어 있지 않습니다.
+    echo   [경고] MongoDB 미설치 >> "%LOG_FILE%"
     echo.
-    echo   두 가지 옵션이 있습니다:
-    echo   1. MongoDB 로컬 설치: https://www.mongodb.com/try/download/community
-    echo   2. MongoDB Atlas 클라우드 사용 (무료): https://www.mongodb.com/atlas
-    echo.
-    echo   Atlas 사용 시 backend/.env 파일의 MONGO_URL을 수정하세요.
+    echo   MongoDB 설치 후 진행하거나, MongoDB Atlas를 사용하세요.
+    echo   https://www.mongodb.com/try/download/community
     echo.
 ) else (
     echo   [OK] MongoDB 발견
+    echo   [OK] MongoDB 발견 >> "%LOG_FILE%"
 )
 
-:: 백엔드 가상환경 생성
+:: ========================================
+:: 4. 백엔드 가상환경 생성
+:: ========================================
 echo.
-echo [3/7] 백엔드 가상환경 생성 중...
+echo [4/7] 백엔드 가상환경 생성 중...
+echo [4/7] 백엔드 가상환경 생성 >> "%LOG_FILE%"
+
 cd /d "%INSTALL_DIR%backend"
+if errorlevel 1 (
+    echo   [오류] backend 폴더를 찾을 수 없습니다!
+    echo   [오류] backend 폴더 없음 >> "%LOG_FILE%"
+    goto ERROR_END
+)
+
 if not exist "venv" (
-    python -m venv venv
+    echo   가상환경 생성 중...
+    python -m venv venv 2>> "%LOG_FILE%"
     if errorlevel 1 (
-        echo   [오류] 가상환경 생성 실패
-        pause
-        exit /b 1
+        echo   [오류] 가상환경 생성 실패!
+        echo   [오류] venv 생성 실패 >> "%LOG_FILE%"
+        goto ERROR_END
     )
     echo   [OK] 가상환경 생성됨
+    echo   [OK] 가상환경 생성됨 >> "%LOG_FILE%"
 ) else (
     echo   [OK] 가상환경이 이미 존재함
+    echo   [OK] 가상환경 존재 >> "%LOG_FILE%"
 )
 
-:: 백엔드 패키지 설치
+:: ========================================
+:: 5. 백엔드 패키지 설치
+:: ========================================
 echo.
-echo [4/7] 백엔드 패키지 설치 중... (2-3분 소요)
-call venv\Scripts\activate.bat
-pip install --upgrade pip > nul 2>&1
-pip install -r requirements.txt
+echo [5/7] 백엔드 패키지 설치 중... (2-3분 소요)
+echo [5/7] 백엔드 패키지 설치 >> "%LOG_FILE%"
+
+call venv\Scripts\activate.bat 2>> "%LOG_FILE%"
 if errorlevel 1 (
-    echo   [오류] 백엔드 패키지 설치 실패
-    pause
-    exit /b 1
+    echo   [오류] 가상환경 활성화 실패!
+    echo   [오류] venv 활성화 실패 >> "%LOG_FILE%"
+    goto ERROR_END
+)
+
+pip install --upgrade pip >> "%LOG_FILE%" 2>&1
+pip install -r requirements.txt >> "%LOG_FILE%" 2>&1
+if errorlevel 1 (
+    echo   [오류] 백엔드 패키지 설치 실패!
+    echo   [오류] pip install 실패 >> "%LOG_FILE%"
+    echo.
+    echo   로그 파일을 확인하세요: %LOG_FILE%
+    goto ERROR_END
 )
 echo   [OK] 백엔드 패키지 설치 완료
+echo   [OK] 백엔드 패키지 설치 완료 >> "%LOG_FILE%"
 
-:: 프론트엔드 패키지 설치
+:: ========================================
+:: 6. 프론트엔드 패키지 설치
+:: ========================================
 echo.
-echo [5/7] 프론트엔드 패키지 설치 중... (3-5분 소요)
+echo [6/7] 프론트엔드 패키지 설치 중... (3-5분 소요)
+echo [6/7] 프론트엔드 패키지 설치 >> "%LOG_FILE%"
+
 cd /d "%INSTALL_DIR%frontend"
-call npm install
+if errorlevel 1 (
+    echo   [오류] frontend 폴더를 찾을 수 없습니다!
+    echo   [오류] frontend 폴더 없음 >> "%LOG_FILE%"
+    goto ERROR_END
+)
+
+:: npm 시도
+call npm install >> "%LOG_FILE%" 2>&1
 if errorlevel 1 (
     echo   npm 실패, yarn 시도 중...
-    call yarn install
+    call yarn install >> "%LOG_FILE%" 2>&1
+    if errorlevel 1 (
+        echo   [오류] 프론트엔드 패키지 설치 실패!
+        echo   [오류] npm/yarn install 실패 >> "%LOG_FILE%"
+        goto ERROR_END
+    )
 )
 echo   [OK] 프론트엔드 패키지 설치 완료
+echo   [OK] 프론트엔드 패키지 설치 완료 >> "%LOG_FILE%"
 
-:: 환경변수 파일 생성
+:: ========================================
+:: 7. 환경변수 파일 생성
+:: ========================================
 echo.
-echo [6/7] 환경변수 파일 생성 중...
+echo [7/7] 환경변수 파일 생성 중...
+echo [7/7] 환경변수 파일 생성 >> "%LOG_FILE%"
 
 cd /d "%INSTALL_DIR%backend"
 if not exist ".env" (
@@ -110,6 +189,7 @@ if not exist ".env" (
         echo STRIPE_API_KEY=sk_test_your_stripe_key
     ) > .env
     echo   [OK] backend/.env 생성됨
+    echo   [OK] backend/.env 생성 >> "%LOG_FILE%"
 ) else (
     echo   [OK] backend/.env 이미 존재함
 )
@@ -118,36 +198,25 @@ cd /d "%INSTALL_DIR%frontend"
 if not exist ".env" (
     echo REACT_APP_BACKEND_URL=http://localhost:8001> .env
     echo   [OK] frontend/.env 생성됨
+    echo   [OK] frontend/.env 생성 >> "%LOG_FILE%"
 ) else (
     echo   [OK] frontend/.env 이미 존재함
 )
 
-:: MongoDB 초기 데이터 생성
-echo.
-echo [7/7] MongoDB 초기 데이터 설정...
-cd /d "%INSTALL_DIR%backend"
-call venv\Scripts\activate.bat
-python init_db.py
-if errorlevel 1 (
-    echo   [경고] MongoDB 초기화 실패 - MongoDB가 실행 중인지 확인하세요
-) else (
-    echo   [OK] MongoDB 초기 데이터 생성 완료
-)
-
-:: 완료
+:: ========================================
+:: 완료!
+:: ========================================
 echo.
 echo ========================================
 echo   설치가 완료되었습니다!
 echo ========================================
+echo 완료: %date% %time% >> "%LOG_FILE%"
 echo.
 echo 다음 단계:
 echo.
-echo 1. MongoDB 시작 (로컬 사용 시):
-echo    mongod --dbpath "C:\data\db"
-echo.
-echo 2. gvicrun.bat 실행하여 서비스 시작
-echo.
-echo 3. 브라우저에서 http://localhost:3000 접속
+echo 1. gvicrun.bat 실행
+echo 2. [9] MongoDB 시작
+echo 3. [1] 전체 시작
 echo.
 echo 테스트 계정:
 echo   Email:    admin@gvic.com
@@ -155,7 +224,28 @@ echo   Password: gvicgvic!
 echo.
 echo ========================================
 echo.
-
 cd /d "%INSTALL_DIR%"
 echo 아무 키나 누르면 종료됩니다...
 pause > nul
+exit /b 0
+
+:ERROR_END
+echo.
+echo ========================================
+echo   [오류] 설치 중 문제가 발생했습니다!
+echo ========================================
+echo.
+echo 로그 파일: %LOG_FILE%
+echo.
+echo 로그 파일 내용을 확인하시거나,
+echo 아래 사항을 점검해주세요:
+echo.
+echo 1. Python이 PATH에 등록되어 있는지
+echo 2. Node.js가 설치되어 있는지
+echo 3. 인터넷 연결이 정상인지
+echo.
+echo ========================================
+echo.
+echo 아무 키나 누르면 종료됩니다...
+pause > nul
+exit /b 1
