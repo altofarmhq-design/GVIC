@@ -473,6 +473,35 @@ async def ingest_text_signal(request: TextSignalRequest, current_user: dict = De
         logging.getLogger(__name__).error(f"Cross analysis error: {e}")
         result["cross_analysis"] = None
     
+    # 자산 가치 평가 수행 (다차원 스코어링)
+    try:
+        from gvic_analyzer import evaluate_asset_value
+        keywords = ai_result.get("keywords", [])
+        category = ai_result.get("signal_category", "general")
+        
+        valuation_result = await evaluate_asset_value(
+            content=request.content,
+            keywords=keywords,
+            category=category
+        )
+        result["asset_valuation"] = valuation_result
+        
+        # DB에 가치 평가 결과 저장
+        from server import db
+        await db.asset_valuations.update_one(
+            {"signal_id": result.get("signal_id")},
+            {"$set": {
+                **valuation_result,
+                "signal_id": result.get("signal_id"),
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }},
+            upsert=True
+        )
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).error(f"Asset valuation error: {e}")
+        result["asset_valuation"] = None
+    
     return result
 
 def detect_shopping_platform(url: str) -> str:
