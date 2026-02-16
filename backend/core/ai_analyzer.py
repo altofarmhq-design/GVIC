@@ -96,12 +96,12 @@ class GVICAnalyzer:
         )
         
         try:
-            response = await self.llm.send_async(
-                message=UserMessage(text=prompt)
+            response = await self.llm.send_message(
+                UserMessage(text=prompt)
             )
             
             # JSON 파싱
-            response_text = response.text.strip()
+            response_text = response.strip()
             
             # ```json ``` 블록 제거
             if response_text.startswith("```"):
