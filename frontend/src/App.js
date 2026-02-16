@@ -82,6 +82,7 @@ function Dashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [userPoints, setUserPoints] = useState(null);
   
   const { user, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
@@ -90,6 +91,14 @@ function Dashboard() {
     try {
       const dashRes = await api.getDashboard();
       setDashboard(dashRes.data);
+      
+      // 포인트 정보 조회
+      try {
+        const pointsRes = await api.getPointBalance();
+        setUserPoints(pointsRes.data);
+      } catch (e) {
+        console.log("Points fetch optional:", e);
+      }
     } catch (error) {
       console.error("Fetch error:", error);
     }
