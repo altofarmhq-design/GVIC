@@ -289,67 +289,159 @@ class GVICPipeline:
     
     async def _stage_assetize(self, signal_id: str, signal: Dict, 
                              eval_result: Dict, core_result: Dict):
-        """자산화 단계 - 원하지 않는 것 / null 처리"""
+        """자산화 단계 - 원하지 않는 것 / null 처리
         
-        # A, E, G 단계 처리
+        특허 A, E, G 단계:
+        - A: 데이터 라벨링 (분류/태깅)
+        - E: 가치 측정 (신규성, 활용가능성)
+        - G: 저장 및 연결
+        """
+        
         await self._update_stage(signal_id, PipelineStage.ASSET_PROCESS, PipelineStatus.PROCESSING)
         
         category = eval_result.get("category", SignalCategory.NULL.value)
+        content = signal.get("content", "")
+        metadata = signal.get("metadata", {})
+        ai_analysis = metadata.get("ai_analysis", {})
         
-        # 의미 분석 (null이라도 의미 부여 가능한지 확인)
-        can_assetize = True
-        asset_value = 0.0
+        # ===== A단계: 데이터 라벨링 =====
+        labels = []
+        tags = []
         
-        if category == SignalCategory.NULL.value:
-            # null이지만 의미 부여 가능한지 추가 분석
-            content = signal.get("content", "")
-            if len(content.strip()) >= 5:  # 최소 5자 이상이면 의미 부여 시도
-                can_assetize = True
-                asset_value = 0.3
-            else:
-                can_assetize = False
+        # 분석 유형에 따른 태그
+        analysis_type = metadata.get("analysis_type", "general")
+        tags.append(f"type:{analysis_type}")
+        
+        # 내용 기반 키워드 추출 (간단 버전)
+        words = content.split()
+        for word in words:
+            if len(word) >= 3 and word.isalnum():
+                labels.append(word.lower())
+        labels = list(set(labels))[:10]  # 상위 10개만
+        
+        # 카테고리 태그
+        tags.append(f"category:{category}")
+        
+        # ===== E단계: 가치 측정 =====
+        value_score = 0.0
+        novelty_score = 0.0
+        utility_score = 0.0
+        
+        # 길이 기반 기본 가치
+        content_length = len(content.strip())
+        if content_length >= 100:
+            value_score += 0.3
+        elif content_length >= 50:
+            value_score += 0.2
         else:
-            # unwanted: 자산화 대상
-            asset_value = 0.7
+            value_score += 0.1
+        
+        # AI 분석 결과 기반 가치 추가
+        if ai_analysis.get("success"):
+            ai_confidence = ai_analysis.get("confidence", 0.5)
+            value_score += ai_confidence * 0.3
+            
+            # 특허/아이디어 분석의 경우 신규성/실현가능성 점수 활용
+            if analysis_type == "patent_idea":
+                novelty = ai_analysis.get("novelty_assessment", {})
+                novelty_score = novelty.get("novelty_score", 0.5)
+                feasibility = ai_analysis.get("feasibility", {})
+                utility_score = feasibility.get("technical_feasibility_score", 0.5)
+                value_score += (novelty_score + utility_score) * 0.2
+            
+            # 코드 분석의 경우 코드 품질 점수 활용
+            elif analysis_type == "code":
+                code_quality = ai_analysis.get("code_quality", {})
+                overall_score = code_quality.get("overall_score", 0.5)
+                value_score += overall_score * 0.2
+        
+        # 목적/기대결과 명시 시 추가 가치
+        if metadata.get("purpose"):
+            value_score += 0.1
+            tags.append("has_purpose")
+        if metadata.get("expected_result"):
+            value_score += 0.1
+            tags.append("has_expected_result")
+        
+        # 최종 가치 점수 정규화 (0~1)
+        value_score = min(max(value_score, 0), 1.0)
+        
+        # ===== 자산화 가능 여부 판정 =====
+        can_assetize = value_score >= 0.2 or category == SignalCategory.UNWANTED.value
         
         asset_result = {
             "can_assetize": can_assetize,
-            "asset_value": asset_value,
+            "value_score": round(value_score, 2),
+            "novelty_score": round(novelty_score, 2),
+            "utility_score": round(utility_score, 2),
             "category": category,
+            "labels": labels,
+            "tags": tags,
+            "stage_a_labeling": {"labels": labels, "tags": tags},
+            "stage_e_valuation": {
+                "value_score": round(value_score, 2),
+                "novelty_score": round(novelty_score, 2),
+                "utility_score": round(utility_score, 2)
+            }
         }
         
         await self._update_stage(signal_id, PipelineStage.ASSET_PROCESS, PipelineStatus.COMPLETED, asset_result)
         
         if can_assetize:
-            # D:원장 - 자산 저장
+            # ===== G단계 + D:원장 - 자산 저장 =====
             await self._update_stage(signal_id, PipelineStage.D_LEDGER, PipelineStatus.PROCESSING)
             
+            asset_id = self._generate_id("AST")
+            
             asset_doc = {
-                "asset_id": self._generate_id("AST"),
+                "asset_id": asset_id,
                 "signal_id": signal_id,
-                "content": signal.get("content", ""),
+                "content": content,
+                "content_summary": content[:200] + "..." if len(content) > 200 else content,
                 "source": signal.get("source", ""),
                 "category": category,
-                "value": asset_value,
+                "analysis_type": analysis_type,
+                # 가치 측정 결과
+                "value_score": round(value_score, 2),
+                "novelty_score": round(novelty_score, 2),
+                "utility_score": round(utility_score, 2),
+                # 라벨링
+                "labels": labels,
+                "tags": tags,
+                # AI 분석 요약
+                "ai_summary": ai_analysis.get("analysis_summary", ""),
+                # 메타데이터
+                "purpose": metadata.get("purpose", ""),
+                "expected_result": metadata.get("expected_result", ""),
+                # 상태
                 "created_at": datetime.now(timezone.utc),
                 "status": "stored",
-                "module_ready": False  # 모듈화 대기
+                "module_ready": value_score >= 0.5,  # 가치 0.5 이상이면 모듈화 준비
+                "module_status": "pending" if value_score >= 0.5 else "not_ready"
             }
             
             await self.assets_collection.insert_one(asset_doc)
             
             await self._update_stage(signal_id, PipelineStage.D_LEDGER, PipelineStatus.COMPLETED, {
-                "asset_id": asset_doc["asset_id"],
-                "stored": True
+                "asset_id": asset_id,
+                "stored": True,
+                "value_score": round(value_score, 2),
+                "module_ready": asset_doc["module_ready"]
             })
             
-            # 모듈화 단계 (B, C, F, I)
-            await self._update_stage(signal_id, PipelineStage.MODULE, PipelineStatus.PENDING, {
-                "note": "모듈화 대기 중"
-            })
+            # 모듈화 단계로 전달 (가치 충분 시)
+            if asset_doc["module_ready"]:
+                await self._stage_module(signal_id, asset_doc)
+            else:
+                await self._update_stage(signal_id, PipelineStage.MODULE, PipelineStatus.SKIPPED, {
+                    "reason": f"가치 점수 부족 ({value_score:.2f} < 0.5)"
+                })
         else:
             await self._update_stage(signal_id, PipelineStage.D_LEDGER, PipelineStatus.SKIPPED, {
-                "reason": "자산화 불가"
+                "reason": f"자산화 불가 (가치: {value_score:.2f})"
+            })
+            await self._update_stage(signal_id, PipelineStage.MODULE, PipelineStatus.SKIPPED, {
+                "reason": "자산화 단계 스킵됨"
             })
     
     async def _get_stages_summary(self, signal_id: str) -> Dict[str, str]:
