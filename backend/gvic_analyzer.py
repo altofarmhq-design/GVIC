@@ -509,21 +509,36 @@ async def extract_insights(
     all_categories = []
     all_words = []
     
+    # gvic_analyses에서 키워드와 인사이트 수집
+    for analysis in gvic_analyses:
+        result = analysis.get("result", {})
+        
+        # GVIC 인사이트에서 키워드 추출
+        gvic_insight = result.get("gvic_insight", "")
+        if gvic_insight:
+            # 인사이트에서 핵심 단어 추출
+            insight_words = [w for w in gvic_insight.split() if len(w) > 2 and not w.startswith(('이', '그', '저', '및', '등', '을', '를'))]
+            all_keywords.extend(insight_words[:5])  # 인사이트당 최대 5개
+        
+        # recommended_actions에서 키워드 추출
+        actions = result.get("recommended_actions", [])
+        for action in actions:
+            if isinstance(action, str) and len(action) > 3:
+                all_keywords.append(action[:20])  # 액션 문자열 일부
+    
     for signal in all_signals:
-        metadata = signal.get("metadata", {})
-        ai_analysis = metadata.get("ai_analysis", {})
-        
-        # 키워드 수집
-        keywords = ai_analysis.get("keywords", [])
-        all_keywords.extend(keywords)
-        
         # 카테고리 수집
-        category = ai_analysis.get("signal_category", signal.get("category", "general"))
+        category = signal.get("category", "general")
         all_categories.append(category)
         
-        # 단어 빈도 (간단한 토큰화)
+        # 단어 빈도 (개선된 토큰화)
         content = signal.get("content", "")
-        words = [w for w in content.lower().split() if len(w) > 2]
+        # 한글 및 영문 단어 추출
+        import re
+        words = re.findall(r'[가-힣]{2,}|[a-zA-Z]{3,}', content.lower())
+        # 불용어 제거
+        stopwords = {'있는', '하는', '되는', '있다', '하다', '된다', '이다', '그것', '저것', '이것', 'the', 'and', 'for', 'are', 'that', 'this', 'with'}
+        words = [w for w in words if w not in stopwords]
         all_words.extend(words)
     
     # 키워드 빈도
@@ -531,12 +546,16 @@ async def extract_insights(
     category_freq = Counter(all_categories).most_common(10)
     word_freq = Counter(all_words).most_common(30)
     
+    # 빈출 단어를 키워드로도 추가
+    if not keyword_freq and word_freq:
+        keyword_freq = word_freq[:10]
+    
     insights["patterns"] = {
         "top_keywords": [{"keyword": k, "count": c} for k, c in keyword_freq],
         "category_distribution": [{"category": k, "count": c} for k, c in category_freq],
         "frequent_words": [{"word": w, "count": c} for w, c in word_freq[:15]],
         "total_unique_keywords": len(set(all_keywords)),
-        "dominant_topic": keyword_freq[0][0] if keyword_freq else None
+        "dominant_topic": keyword_freq[0][0] if keyword_freq else (word_freq[0][0] if word_freq else None)
     }
     
     # ===== 2. 트렌드 분석 =====
