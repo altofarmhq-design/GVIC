@@ -37,9 +37,9 @@ async def extract_text_from_image(
     """
     Gemini Vision을 사용하여 이미지에서 텍스트 추출
     """
-    from emergentintegrations.llm.chat import LlmChat, UserMessage, ImageContent
+    from local_llm import LlmChat, UserMessage, ImageContent
     
-    EMERGENT_LLM_KEY = os.environ.get("EMERGENT_LLM_KEY")
+    EMERGENT_LLM_KEY = os.environ.get("OPENAI_API_KEY", "")
     
     if not EMERGENT_LLM_KEY:
         raise HTTPException(status_code=500, detail="OCR 서비스가 설정되지 않았습니다")
