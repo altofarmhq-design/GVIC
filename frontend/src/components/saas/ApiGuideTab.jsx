@@ -485,7 +485,9 @@ analyzeProduct('product_123', reviews)
                   className="bg-slate-900 border-slate-700"
                   value={webhookUrl}
                   onChange={(e) => setWebhookUrl(e.target.value)}
+                  onKeyDown={handleWebhookKeyDown}
                 />
+                <p className="text-xs text-slate-500">URL 입력 후 Enter 키를 누르거나 저장 버튼을 클릭하세요</p>
               </div>
               <div className="space-y-2">
                 <Label>이벤트 구독</Label>
