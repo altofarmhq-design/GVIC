@@ -26,7 +26,7 @@ SUBSCRIPTION_PLANS = {
 async def handle_stripe_webhook(request: Request):
     """Stripe 웹훅 처리"""
     from server import db
-    from emergentintegrations.payments.stripe.checkout import StripeCheckout
+    from local_stripe import StripeCheckout
     
     try:
         # 요청 본문 읽기
@@ -34,13 +34,18 @@ async def handle_stripe_webhook(request: Request):
         signature = request.headers.get("Stripe-Signature", "")
         
         # 웹훅 처리
-        stripe_checkout = StripeCheckout(api_key=STRIPE_API_KEY, webhook_url="")
-        webhook_response = await stripe_checkout.handle_webhook(body, signature)
+        stripe_checkout = StripeCheckout(api_key=STRIPE_API_KEY)
+        webhook_secret = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
+        event = stripe_checkout.verify_webhook(body, signature, webhook_secret)
         
-        event_type = webhook_response.event_type
-        session_id = webhook_response.session_id
-        payment_status = webhook_response.payment_status
-        metadata = webhook_response.metadata or {}
+        if not event:
+            raise HTTPException(status_code=400, detail="Invalid webhook")
+        
+        event_type = event.get("type", "")
+        session_data = event.get("data", {}).get("object", {})
+        session_id = session_data.get("id", "")
+        payment_status = session_data.get("payment_status", "")
+        metadata = session_data.get("metadata", {})
         
         logger.info(f"Webhook received: {event_type}, session: {session_id}, status: {payment_status}")
         
