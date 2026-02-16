@@ -297,7 +297,7 @@ export default function BillingTab() {
                 <p className="text-slate-400 text-sm">선택한 플랜</p>
                 <p className="text-xl font-bold text-white">{selectedPlan.name}</p>
                 <p className="text-violet-400">
-                  월 ₩{selectedPlan.price.toLocaleString()}
+                  월 ₩{(selectedPlan.price || 0).toLocaleString()}
                 </p>
               </div>
 
