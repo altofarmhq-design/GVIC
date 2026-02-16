@@ -109,7 +109,7 @@ class AlertResolve(BaseModel):
 
 @api_router.get("/")
 async def root():
-    return {"message": "GVIC Engine API v1.0.0"}
+    return {"message": "GVIC Engine API v2.0.0 - Pipeline Mode"}
 
 @api_router.get("/dashboard")
 async def get_dashboard():
@@ -123,6 +123,9 @@ async def get_dashboard():
     # 데이터 허브에서 통합 데이터 조회
     hub_data = await data_hub.get_dashboard_data()
     
+    # 파이프라인 통계 추가
+    pipeline_stats = await pipeline_engine.get_dashboard_stats()
+    
     return {
         "metrics": {
             "total_processed": hub_data.get("total_records_processed", status.get("total_processed", 0)),
@@ -133,6 +136,7 @@ async def get_dashboard():
             "avg_positive_ratio": hub_data.get("avg_positive_ratio", 0),
             "avg_fairness_index": hub_data.get("avg_fairness_index", 0)
         },
+        "pipeline": pipeline_stats,
         "sigma": sigma,
         "omega": config_mgr.get_omega(),
         "balance_score": balance_score,
