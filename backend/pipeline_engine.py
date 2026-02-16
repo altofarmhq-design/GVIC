@@ -362,10 +362,13 @@ class GVICPipeline:
             count = await self.signals_collection.count_documents({"category": cat.value})
             category_counts[cat.value] = count
         
-        # 단계별 현재 시그널 수
+        # 단계별 통과한 시그널 수 (각 단계가 completed인 시그널 수)
         stage_counts = {}
         for stage in PipelineStage:
-            count = await self.signals_collection.count_documents({"current_stage": stage.value})
+            # stages.{stage}.status가 completed인 시그널 수
+            count = await self.signals_collection.count_documents({
+                f"stages.{stage.value}.status": "completed"
+            })
             stage_counts[stage.value] = count
         
         # 자산 통계
