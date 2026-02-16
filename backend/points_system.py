@@ -2,8 +2,9 @@
 GVIC 포인트 시스템
 - 사용자별 포인트 관리
 - 자산 기여에 따른 포인트 적립
-- 현금:포인트 = 1:0.1 비율
+- 현금:포인트 = 1:0.01 비율
 - 유료 전환 시 포인트로 대체 가능
+- 구매 시 20% 기여자 보상 분배
 """
 from fastapi import APIRouter, HTTPException, Depends, Header
 from pydantic import BaseModel, Field
@@ -20,7 +21,10 @@ logger = logging.getLogger(__name__)
 JWT_SECRET = os.environ.get("JWT_SECRET_KEY", "gvic-engine-secret-key-change-in-production")
 
 # 포인트 환율 설정
-CASH_TO_POINT_RATIO = 0.1  # 현금 1원 = 0.1 포인트
+CASH_TO_POINT_RATIO = 0.01  # 현금 1원 = 0.01 포인트
+
+# 구매 보상 설정
+PURCHASE_CONTRIBUTOR_SHARE = 0.20  # 구매가의 20%를 기여자에게 분배
 
 # ==================== Models ====================
 
