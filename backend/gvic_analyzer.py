@@ -85,10 +85,10 @@ async def analyze_with_gvic_lens(
     ai_category = ai_analysis.get("signal_category", "general")
     
     # LLM 클라이언트 생성
-    from emergentintegrations.llm.chat import LlmChat, UserMessage
+    from local_llm import LlmChat, UserMessage
     import os
     
-    EMERGENT_LLM_KEY = os.environ.get("EMERGENT_LLM_KEY")
+    EMERGENT_LLM_KEY = os.environ.get("OPENAI_API_KEY", "")
     
     if not EMERGENT_LLM_KEY:
         return generate_fallback_gvic_analysis(content, ai_analysis, ai_confidence)
