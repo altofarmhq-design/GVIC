@@ -120,7 +120,7 @@ export const JInputTab = ({ onSignalSubmit }) => {
         <CardContent className="space-y-4">
           {inputType === "text" && (
             <Textarea
-              placeholder="분석할 텍스트를 입력하세요...&#10;&#10;예: 상품 후기, 요구사항, 피드백 등 어떤 형태의 텍스트든 입력 가능합니다."
+              placeholder="시그널을 입력하세요"
               value={textContent}
               onChange={(e) => setTextContent(e.target.value)}
               className="bg-slate-900 border-slate-600 text-slate-100 min-h-[200px]"
@@ -130,14 +130,11 @@ export const JInputTab = ({ onSignalSubmit }) => {
           {inputType === "url" && (
             <div className="space-y-3">
               <Input
-                placeholder="https://example.com/page"
+                placeholder="URL 입력"
                 value={urlInput}
                 onChange={(e) => setUrlInput(e.target.value)}
                 className="bg-slate-900 border-slate-600 text-slate-100"
               />
-              <p className="text-slate-500 text-sm">
-                URL을 입력하면 해당 페이지의 텍스트를 자동으로 추출합니다.
-              </p>
             </div>
           )}
 
@@ -145,7 +142,6 @@ export const JInputTab = ({ onSignalSubmit }) => {
             <div className="border-2 border-dashed border-slate-600 rounded-lg p-8 text-center">
               <Upload className="w-12 h-12 text-slate-500 mx-auto mb-4" />
               <p className="text-slate-400 mb-2">파일을 드래그하거나 클릭하여 업로드</p>
-              <p className="text-slate-500 text-sm">지원 형식: Excel (.xlsx), CSV (.csv)</p>
               <Button variant="outline" className="mt-4">
                 파일 선택
               </Button>
