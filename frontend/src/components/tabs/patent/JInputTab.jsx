@@ -268,11 +268,21 @@ export const JInputTab = ({ onSignalSubmit }) => {
   const supportedFormats = [
     { ext: "문서", formats: ".pdf, .hwp, .hwpx, .docx, .txt" },
     { ext: "스프레드시트", formats: ".xlsx, .xls, .csv" },
-    { ext: "이미지", formats: ".jpg, .png, .gif, .webp" }
+    { ext: "이미지", formats: ".jpg, .png, .gif, .webp" },
+    { ext: "코드", formats: ".py, .js, .ts, .java, .c, .cpp, .go, .html, .css, .sql 등" }
   ];
 
   // 지원하는 파일 확장자 목록
-  const SUPPORTED_EXTENSIONS = ['pdf', 'hwp', 'hwpx', 'docx', 'txt', 'xlsx', 'xls', 'csv', 'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];
+  const SUPPORTED_EXTENSIONS = [
+    // 문서
+    'pdf', 'hwp', 'hwpx', 'docx', 'txt',
+    // 스프레드시트
+    'xlsx', 'xls', 'csv',
+    // 이미지
+    'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp',
+    // 코드
+    ...CODE_EXTENSIONS
+  ];
 
   // 파일 확장자 검증
   const isFileSupported = (filename) => {
