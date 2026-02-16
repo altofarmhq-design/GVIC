@@ -275,6 +275,31 @@ def get_supported_extensions() -> list:
 # API Endpoints - 파이프라인 연동
 # MongoDB와 파이프라인 엔진은 server.py에서 초기화됨
 
+@router.get("/supported-formats")
+async def get_supported_formats():
+    """지원하는 파일 형식 목록 조회"""
+    formats_by_category = {
+        "문서": [
+            {"ext": "pdf", "name": "PDF 문서", "formats": ".pdf"},
+            {"ext": "hwp", "name": "한글 문서", "formats": ".hwp"},
+            {"ext": "hwpx", "name": "한글 문서 (OOXML)", "formats": ".hwpx"},
+            {"ext": "docx", "name": "Word 문서", "formats": ".docx"},
+            {"ext": "txt", "name": "텍스트", "formats": ".txt"}
+        ],
+        "스프레드시트": [
+            {"ext": "xlsx", "name": "Excel", "formats": ".xlsx, .xls"},
+            {"ext": "csv", "name": "CSV", "formats": ".csv"}
+        ],
+        "이미지": [
+            {"ext": "image", "name": "이미지", "formats": ".jpg, .jpeg, .png, .gif, .webp, .bmp"}
+        ]
+    }
+    return {
+        "supported_formats": SUPPORTED_FORMATS,
+        "by_category": formats_by_category,
+        "all_extensions": list(SUPPORTED_FORMATS.keys())
+    }
+
 @router.post("/ingest")
 async def ingest_text_signal(request: TextSignalRequest, current_user: dict = Depends(get_current_user_simple)):
     """텍스트 시그널 입력 → 파이프라인 자동 실행 + AI 분석"""
