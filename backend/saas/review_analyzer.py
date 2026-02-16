@@ -483,9 +483,9 @@ class ReviewAnalyzer:
     ) -> Dict[str, Any]:
         """AI 심층 분석 (LLM 사용)"""
         try:
-            from emergentintegrations.llm.chat import LlmChat, UserMessage
+            from local_llm import LlmChat, UserMessage
             
-            EMERGENT_LLM_KEY = os.environ.get("EMERGENT_LLM_KEY")
+            EMERGENT_LLM_KEY = os.environ.get("OPENAI_API_KEY", "")
             if not EMERGENT_LLM_KEY:
                 return {"summary": "", "recommendations": []}
             
