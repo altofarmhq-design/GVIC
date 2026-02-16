@@ -421,16 +421,128 @@ async def ingest_text_signal(request: TextSignalRequest, current_user: dict = De
     
     return result
 
+def detect_shopping_platform(url: str) -> str:
+    """URL에서 쇼핑몰 플랫폼 감지"""
+    url_lower = url.lower()
+    
+    if "smartstore.naver.com" in url_lower or "brand.naver.com" in url_lower or "shopping.naver.com" in url_lower:
+        return "naver"
+    elif "coupang.com" in url_lower:
+        return "coupang"
+    elif "11st.co.kr" in url_lower or "11번가" in url_lower:
+        return "11st"
+    elif "gmarket.co.kr" in url_lower:
+        return "gmarket"
+    elif "auction.co.kr" in url_lower:
+        return "auction"
+    elif "yes24.com" in url_lower:
+        return "yes24"
+    elif "aliexpress" in url_lower:
+        return "aliexpress"
+    elif "amazon" in url_lower:
+        return "amazon"
+    else:
+        return "generic"
+
 @router.post("/ingest/url")
 async def ingest_url_signal(request: UrlSignalRequest, current_user: dict = Depends(get_current_user_simple)):
-    """URL 시그널 입력 → 파이프라인 자동 실행"""
+    """URL 시그널 입력 → 파이프라인 자동 실행 (쇼핑몰 URL은 리뷰 크롤러로 라우팅)"""
     if not request.url.strip():
         raise HTTPException(status_code=400, detail="URL이 비어있습니다")
     
     if not request.url.startswith(('http://', 'https://')):
         raise HTTPException(status_code=400, detail="올바른 URL 형식이 아닙니다")
     
-    # 텍스트 추출
+    # 쇼핑몰 플랫폼 감지
+    platform = detect_shopping_platform(request.url)
+    
+    # 쇼핑몰 URL인 경우 리뷰 크롤러로 라우팅
+    if platform != "generic":
+        try:
+            from review_crawler import crawl_naver_reviews, crawl_coupang_reviews, crawl_generic_reviews
+            from server import get_pipeline_engine, db
+            import uuid
+            
+            # 플랫폼별 크롤러 선택
+            product_info = None
+            reviews = []
+            
+            if platform == "naver":
+                product_info, reviews = await crawl_naver_reviews(request.url, 20)
+            elif platform == "coupang":
+                product_info, reviews = await crawl_coupang_reviews(request.url, 20)
+            else:
+                product_info, reviews = await crawl_generic_reviews(request.url, 20)
+            
+            # 크롤링 결과가 있으면 시그널로 변환
+            pipeline = get_pipeline_engine()
+            user_id = current_user.get("sub")
+            
+            # 크롤링 결과 저장
+            crawl_id = f"CRL_{uuid.uuid4().hex[:12]}"
+            crawl_record = {
+                "crawl_id": crawl_id,
+                "url": request.url,
+                "platform": platform,
+                "user_id": user_id,
+                "product_info": product_info.dict() if product_info else None,
+                "review_count": len(reviews),
+                "reviews": [r.dict() for r in reviews],
+                "crawled_at": datetime.now(timezone.utc).isoformat()
+            }
+            await db.crawl_results.insert_one(crawl_record)
+            
+            signals_created = 0
+            signal_ids = []
+            
+            for review in reviews[:20]:
+                try:
+                    signal_content = f"[구매후기] {product_info.product_name if product_info else '상품'}\n"
+                    if review.rating:
+                        signal_content += f"평점: {review.rating}점\n"
+                    signal_content += f"내용: {review.content}"
+                    
+                    signal_result = await pipeline.create_signal(
+                        signal_type="text",
+                        content=signal_content,
+                        source=f"crawl:{platform}",
+                        metadata={
+                            "input_method": "url_crawl",
+                            "crawl_id": crawl_id,
+                            "platform": platform,
+                            "review_id": review.review_id,
+                            "product_name": product_info.product_name if product_info else None,
+                            "rating": review.rating,
+                            "analysis_type": request.analysis_type
+                        },
+                        user_id=user_id
+                    )
+                    signals_created += 1
+                    signal_ids.append(signal_result.get("signal_id"))
+                except Exception as e:
+                    import logging
+                    logging.getLogger(__name__).error(f"Signal creation error: {e}")
+                    continue
+            
+            return {
+                "success": True,
+                "input_type": "shopping_url",
+                "platform": platform,
+                "crawl_id": crawl_id,
+                "product_name": product_info.product_name if product_info else "상품 정보 없음",
+                "reviews_found": len(reviews),
+                "signals_created": signals_created,
+                "signal_ids": signal_ids[:5],  # 처음 5개만 반환
+                "message": f"{platform} 쇼핑몰에서 {len(reviews)}개 리뷰를 크롤링하고 {signals_created}개 시그널을 생성했습니다."
+            }
+            
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).error(f"Shopping URL crawl error: {e}")
+            # 크롤링 실패 시 일반 URL 처리로 폴백
+            pass
+    
+    # 일반 URL 처리 (쇼핑몰이 아니거나 크롤링 실패 시)
     extracted_text = await extract_text_from_url(request.url)
     
     if not extracted_text.strip():
@@ -449,6 +561,7 @@ async def ingest_url_signal(request: UrlSignalRequest, current_user: dict = Depe
     )
     
     result["extracted_text"] = extracted_text[:2000]  # 프리뷰용
+    result["input_type"] = "generic_url"
     return result
 
 @router.post("/ingest/files")
