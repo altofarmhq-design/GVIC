@@ -37,6 +37,21 @@ export default function ApiGuideTab() {
     rate_limit: 1000
   });
   const [newKeyValue, setNewKeyValue] = useState(null);
+  
+  // 웹훅 설정 상태
+  const [webhookUrl, setWebhookUrl] = useState('');
+  const [subscribedEvents, setSubscribedEvents] = useState({
+    analysis_complete: true,
+    complaint_alert: true,
+    insight_summary: true
+  });
+
+  const toggleEvent = (event) => {
+    setSubscribedEvents(prev => ({
+      ...prev,
+      [event]: !prev[event]
+    }));
+  };
 
   const fetchApiKeys = async () => {
     setLoading(true);
