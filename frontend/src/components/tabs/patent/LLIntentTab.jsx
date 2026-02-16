@@ -117,28 +117,11 @@ export const LLIntentTab = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <Textarea
-                placeholder="분석할 텍스트를 입력하세요..."
+                placeholder="시그널을 입력하세요"
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 className="bg-slate-900 border-slate-600 text-slate-100 min-h-[200px]"
               />
-              
-              <div>
-                <p className="text-slate-400 text-xs mb-2">샘플:</p>
-                <div className="flex flex-wrap gap-1">
-                  {samples.map((s, i) => (
-                    <Button
-                      key={i}
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setContent(s.content)}
-                      className="text-xs h-7"
-                    >
-                      {s.label}
-                    </Button>
-                  ))}
-                </div>
-              </div>
 
               <div className="flex gap-2">
                 <Button 
