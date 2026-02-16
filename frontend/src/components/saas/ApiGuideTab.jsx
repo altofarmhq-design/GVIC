@@ -53,6 +53,30 @@ export default function ApiGuideTab() {
     }));
   };
 
+  const handleSaveWebhook = () => {
+    if (!webhookUrl.trim()) {
+      toast.error('웹훅 URL을 입력해주세요');
+      return;
+    }
+    const activeEvents = Object.entries(subscribedEvents)
+      .filter(([_, active]) => active)
+      .map(([event]) => event);
+    
+    if (activeEvents.length === 0) {
+      toast.error('최소 1개 이상의 이벤트를 선택해주세요');
+      return;
+    }
+    
+    // TODO: API 호출로 웹훅 저장
+    toast.success(`웹훅이 저장되었습니다 (${activeEvents.length}개 이벤트)`);
+  };
+
+  const handleWebhookKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleSaveWebhook();
+    }
+  };
+
   const fetchApiKeys = async () => {
     setLoading(true);
     try {
