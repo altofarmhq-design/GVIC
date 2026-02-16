@@ -250,7 +250,7 @@ export default function BillingTab() {
                     onClick={() => !isCurrentPlan && handleSelectPlan(plan)}
                     disabled={isCurrentPlan}
                   >
-                    {isCurrentPlan ? '현재 플랜' : plan.price === 0 ? '시작하기' : '업그레이드'}
+                    {isCurrentPlan ? '현재 플랜' : (plan.price === 0 || plan.price === undefined) ? '시작하기' : '업그레이드'}
                   </Button>
                 </CardContent>
               </Card>
