@@ -695,6 +695,56 @@ export const JInputTab = ({ onSignalSubmit }) => {
                   </CardContent>
                 </Card>
 
+                {/* OCR 결과 (이미지 텍스트 추출) */}
+                {result.ocr_result && (
+                  <Card className="bg-gradient-to-br from-orange-900/30 to-slate-900/50 border-orange-600">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-orange-300 text-base flex items-center gap-2">
+                        <Image className="w-5 h-5" />
+                        이미지 OCR 결과
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="grid grid-cols-3 gap-2 text-center">
+                        <div className="bg-slate-800/50 rounded p-2">
+                          <p className="text-lg font-bold text-orange-300">
+                            {Math.round((result.ocr_result.confidence || 0) * 100)}%
+                          </p>
+                          <p className="text-xs text-slate-500">신뢰도</p>
+                        </div>
+                        <div className="bg-slate-800/50 rounded p-2">
+                          <p className="text-lg font-bold text-orange-300">
+                            {result.ocr_result.language?.toUpperCase() || 'N/A'}
+                          </p>
+                          <p className="text-xs text-slate-500">언어</p>
+                        </div>
+                        <div className="bg-slate-800/50 rounded p-2">
+                          <p className="text-lg font-bold text-orange-300">
+                            {result.ocr_result.extracted_text?.length || 0}
+                          </p>
+                          <p className="text-xs text-slate-500">추출 문자</p>
+                        </div>
+                      </div>
+                      
+                      {result.ocr_result.image_description && (
+                        <div className="bg-slate-800/50 rounded p-2">
+                          <p className="text-slate-500 text-xs mb-1">이미지 설명</p>
+                          <p className="text-slate-300 text-sm">{result.ocr_result.image_description}</p>
+                        </div>
+                      )}
+                      
+                      {result.ocr_result.extracted_text && (
+                        <div className="bg-slate-900/50 rounded p-3 border border-slate-700">
+                          <p className="text-slate-500 text-xs mb-2">📝 추출된 텍스트</p>
+                          <p className="text-slate-200 text-sm whitespace-pre-wrap max-h-40 overflow-y-auto">
+                            {result.ocr_result.extracted_text}
+                          </p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+
                 {/* AI 분석 요약 */}
                 {result.ai_analysis?.analysis_summary && (
                   <Card className="bg-blue-900/20 border-blue-600">
