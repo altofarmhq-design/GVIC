@@ -84,8 +84,14 @@ async def analyze_with_gvic_lens(
     ai_keywords = ai_analysis.get("keywords", [])
     ai_category = ai_analysis.get("signal_category", "general")
     
-    # LLM을 사용하여 GVIC 관점 분석
-    from core.ai_analyzer import get_llm_client
+    # LLM 클라이언트 생성
+    from emergentintegrations.llm.chat import LlmChat, UserMessage
+    import os
+    
+    EMERGENT_LLM_KEY = os.environ.get("EMERGENT_LLM_KEY")
+    
+    if not EMERGENT_LLM_KEY:
+        return generate_fallback_gvic_analysis(content, ai_analysis, ai_confidence)
     
     gvic_prompt = f"""
 당신은 GVIC(결이론 기반 가치 분석) 전문가입니다.
@@ -125,24 +131,36 @@ async def analyze_with_gvic_lens(
 """
     
     try:
-        client = get_llm_client()
-        response = await client.chat.completions.create(
-            model="gemini-2.0-flash",
-            messages=[
-                {"role": "system", "content": "당신은 GVIC 결이론 전문 분석가입니다. 항상 JSON 형식으로만 응답합니다."},
-                {"role": "user", "content": gvic_prompt}
-            ],
-            temperature=0.7,
-            max_tokens=2000
+        llm = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            model="gemini-2.0-flash"
         )
         
-        response_text = response.choices[0].message.content.strip()
+        response = await llm.send_message(
+            UserMessage(text=gvic_prompt)
+        )
+        
+        response_text = response.strip()
         
         # JSON 파싱
         import json
         import re
         
         # JSON 블록 추출
+        if response_text.startswith("```"):
+            lines = response_text.split("\n")
+            json_lines = []
+            in_json = False
+            for line in lines:
+                if line.startswith("```") and not in_json:
+                    in_json = True
+                    continue
+                elif line.startswith("```") and in_json:
+                    break
+                elif in_json:
+                    json_lines.append(line)
+            response_text = "\n".join(json_lines)
+        
         json_match = re.search(r'\{[\s\S]*\}', response_text)
         if json_match:
             gvic_result = json.loads(json_match.group())
