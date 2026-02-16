@@ -1107,6 +1107,107 @@ export const JInputTab = ({ onSignalSubmit }) => {
                   </Card>
                 )}
 
+                {/* 크로스 분석 결과 */}
+                {result.cross_analysis && (
+                  <Card className="bg-gradient-to-br from-cyan-900/30 to-slate-900/50 border-cyan-600">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-cyan-300 text-base flex items-center gap-2">
+                        <Link className="w-5 h-5" />
+                        크로스 분석 (자산 연결)
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {/* 분석 요약 */}
+                      <div className="grid grid-cols-4 gap-2 text-center">
+                        <div className="bg-slate-800/50 rounded p-2">
+                          <p className="text-xl font-bold text-cyan-300">
+                            {result.cross_analysis.summary?.total_assets_scanned || 0}
+                          </p>
+                          <p className="text-xs text-slate-500">스캔 자산</p>
+                        </div>
+                        <div className="bg-slate-800/50 rounded p-2">
+                          <p className="text-xl font-bold text-green-300">
+                            {result.cross_analysis.summary?.related_found || 0}
+                          </p>
+                          <p className="text-xs text-slate-500">관련 자산</p>
+                        </div>
+                        <div className="bg-slate-800/50 rounded p-2">
+                          <p className="text-xl font-bold text-amber-300">
+                            {result.cross_analysis.summary?.complementary_found || 0}
+                          </p>
+                          <p className="text-xs text-slate-500">보완 가능</p>
+                        </div>
+                        <div className="bg-slate-800/50 rounded p-2">
+                          <p className="text-xl font-bold text-red-300">
+                            {result.cross_analysis.summary?.duplicates_found || 0}
+                          </p>
+                          <p className="text-xs text-slate-500">중복 가능</p>
+                        </div>
+                      </div>
+
+                      {/* 추천 메시지 */}
+                      {result.cross_analysis.recommendations?.length > 0 && (
+                        <div className="space-y-2">
+                          {result.cross_analysis.recommendations.map((rec, idx) => (
+                            <div 
+                              key={idx} 
+                              className={`p-2 rounded text-sm flex items-center gap-2 ${
+                                rec.type === 'warning' ? 'bg-red-500/10 text-red-300 border border-red-500/30' :
+                                rec.type === 'success' ? 'bg-green-500/10 text-green-300 border border-green-500/30' :
+                                rec.type === 'highlight' ? 'bg-purple-500/10 text-purple-300 border border-purple-500/30' :
+                                'bg-blue-500/10 text-blue-300 border border-blue-500/30'
+                              }`}
+                            >
+                              {rec.type === 'warning' && <AlertCircle className="w-4 h-4 flex-shrink-0" />}
+                              {rec.type === 'success' && <CheckCircle2 className="w-4 h-4 flex-shrink-0" />}
+                              {rec.type === 'highlight' && <Sparkles className="w-4 h-4 flex-shrink-0" />}
+                              {rec.type === 'info' && <Info className="w-4 h-4 flex-shrink-0" />}
+                              {rec.message}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* 관련 자산 목록 */}
+                      {result.cross_analysis.related_assets?.length > 0 && (
+                        <div>
+                          <p className="text-slate-400 text-xs font-medium mb-2">🔗 관련 자산</p>
+                          <div className="space-y-2">
+                            {result.cross_analysis.related_assets.slice(0, 3).map((asset, idx) => (
+                              <div key={idx} className="bg-slate-800/50 rounded p-2 flex items-center justify-between">
+                                <div>
+                                  <Badge variant="outline" className="text-cyan-400 border-cyan-600 text-xs">
+                                    {asset.asset_id}
+                                  </Badge>
+                                  <p className="text-slate-400 text-xs mt-1">{asset.summary}</p>
+                                </div>
+                                <div className="text-right">
+                                  <p className="text-cyan-300 font-bold">{(asset.similarity_score * 100).toFixed(0)}%</p>
+                                  <p className="text-xs text-slate-500">유사도</p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* 보완 가능 자산 */}
+                      {result.cross_analysis.complementary_assets?.length > 0 && (
+                        <div>
+                          <p className="text-slate-400 text-xs font-medium mb-2">🤝 보완 가능 자산</p>
+                          <div className="flex flex-wrap gap-2">
+                            {result.cross_analysis.complementary_assets.slice(0, 5).map((asset, idx) => (
+                              <Badge key={idx} variant="outline" className="text-green-400 border-green-600 text-xs">
+                                {asset.asset_id}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+
                 {/* 관련 자산 추천 */}
                 <Card className="bg-slate-800/30 border-slate-700">
                   <CardHeader className="pb-2">
