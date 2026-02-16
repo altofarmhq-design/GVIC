@@ -365,9 +365,10 @@ class GVICPipeline:
         return signal
     
     async def get_stage_signals(self, stage: str, limit: int = 50) -> List[Dict[str, Any]]:
-        """특정 단계의 시그널 목록"""
+        """특정 단계를 통과한 시그널 목록 (현재 + 완료)"""
+        # 해당 단계를 통과한 모든 시그널 조회
         cursor = self.signals_collection.find(
-            {"current_stage": stage},
+            {f"stages.{stage}": {"$exists": True}},
             {"_id": 0}
         ).sort("created_at", -1).limit(limit)
         
@@ -375,6 +376,8 @@ class GVICPipeline:
         async for doc in cursor:
             if doc.get("created_at"):
                 doc["created_at"] = doc["created_at"].isoformat()
+            if doc.get("completed_at"):
+                doc["completed_at"] = doc["completed_at"].isoformat()
             signals.append(doc)
         
         return signals
