@@ -384,6 +384,7 @@ class GVICPipeline:
                 "category": doc.get("category"),
                 "status": doc.get("status"),
                 "current_stage": doc.get("current_stage"),
+                "metadata": doc.get("metadata", {}),
                 "created_at": doc.get("created_at").isoformat() if doc.get("created_at") else None
             })
         
