@@ -51,7 +51,7 @@ def generate_signal_id():
 async def extract_text_from_url(url: str) -> str:
     """URL에서 텍스트 추출"""
     try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        async with httpx.AsyncClient(timeout=30.0, verify=False) as client:
             response = await client.get(url, follow_redirects=True)
             response.raise_for_status()
             
