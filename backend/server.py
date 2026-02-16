@@ -3359,6 +3359,14 @@ api_router.include_router(auth_router)
 from signal_ingest import router as signal_router
 app.include_router(signal_router)
 
+# Include webhook API router (외부 API 연동)
+from api_webhook import router as webhook_router
+app.include_router(webhook_router)
+
+# Include report generator router (PDF 리포트)
+from report_generator import router as report_router
+app.include_router(report_router)
+
 # ==================== Pipeline API ====================
 
 @api_router.get("/pipeline/stats")
