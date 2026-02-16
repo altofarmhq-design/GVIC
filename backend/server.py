@@ -3375,6 +3375,10 @@ app.include_router(connector_router)
 from points_system import router as points_router
 app.include_router(points_router)
 
+# Include module system router (모듈 및 자산 인덱싱)
+from module_system import router as module_router
+app.include_router(module_router)
+
 # ==================== Pipeline API ====================
 
 @api_router.get("/pipeline/stats")
