@@ -181,7 +181,7 @@ async def create_checkout_session(
     )
     
     # JWT에서 user_id는 'sub' 또는 'user_id'로 저장됨
-    user_id = current_user.get("sub") or current_user.get("user_id") or ""
+    user_id = current_user.get("sub") or current_user.get("sub") or current_user.get("user_id") or ""
     email = current_user.get("email", "")
     
     # 플랜 확인
@@ -274,7 +274,7 @@ async def get_checkout_status(
     from server import db
     from emergentintegrations.payments.stripe.checkout import StripeCheckout
     
-    user_id = current_user.get("user_id")
+    user_id = current_user.get("sub") or current_user.get("user_id")
     
     # 트랜잭션 조회
     transaction = await db.payment_transactions.find_one(
@@ -367,7 +367,7 @@ async def get_subscription_status(
     """현재 구독 상태 조회"""
     from server import db
     
-    user_id = current_user.get("user_id")
+    user_id = current_user.get("sub") or current_user.get("user_id")
     
     subscription = await db.user_subscriptions.find_one(
         {"user_id": user_id},
@@ -413,7 +413,7 @@ async def cancel_subscription(
     """구독 취소"""
     from server import db
     
-    user_id = current_user.get("user_id")
+    user_id = current_user.get("sub") or current_user.get("user_id")
     
     subscription = await db.user_subscriptions.find_one(
         {"user_id": user_id}
@@ -448,7 +448,7 @@ async def get_payment_history(
     """결제 내역 조회"""
     from server import db
     
-    user_id = current_user.get("user_id")
+    user_id = current_user.get("sub") or current_user.get("user_id")
     
     transactions = await db.payment_transactions.find(
         {"user_id": user_id},
@@ -467,7 +467,7 @@ async def record_analysis_usage(
     """분석 사용량 기록 (내부 호출용)"""
     from server import db
     
-    user_id = current_user.get("user_id")
+    user_id = current_user.get("sub") or current_user.get("user_id")
     
     # 구독 정보 조회
     subscription = await db.user_subscriptions.find_one(
@@ -511,7 +511,7 @@ async def check_usage_limit(
     """사용량 한도 확인"""
     from server import db
     
-    user_id = current_user.get("user_id")
+    user_id = current_user.get("sub") or current_user.get("user_id")
     
     subscription = await db.user_subscriptions.find_one(
         {"user_id": user_id},
