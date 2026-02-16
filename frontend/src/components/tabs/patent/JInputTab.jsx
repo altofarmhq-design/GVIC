@@ -323,7 +323,7 @@ export const JInputTab = ({ onSignalSubmit }) => {
       <div className="grid grid-cols-2 gap-6">
         {/* 좌측: 입력 영역 */}
         <div className="space-y-4">
-          {/* 질문 목적 & 기대 결과 */}
+          {/* 통합 질문 입력 카드 */}
           <Card className="bg-gradient-to-r from-slate-800/80 to-blue-900/30 border-blue-700">
             <CardHeader className="pb-3">
               <CardTitle className="text-slate-100 text-lg flex items-center gap-2">
@@ -332,6 +332,28 @@ export const JInputTab = ({ onSignalSubmit }) => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* 입력 방식 슬라이드 탭 */}
+              <div className="flex items-center gap-1 bg-slate-900/50 rounded-lg p-1">
+                {inputTypes.filter(t => t.enabled).map((type) => {
+                  const Icon = type.icon;
+                  return (
+                    <button
+                      key={type.id}
+                      onClick={() => setInputType(type.id)}
+                      className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md transition-all ${
+                        inputType === type.id
+                          ? 'bg-blue-600 text-white'
+                          : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                      }`}
+                    >
+                      <Icon className="w-4 h-4" />
+                      <span className="text-sm">{type.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* 텍스트 입력 */}
               {inputType === "text" && (
                 <div>
                   <Textarea
@@ -340,44 +362,71 @@ export const JInputTab = ({ onSignalSubmit }) => {
                     onChange={(e) => setTextContent(e.target.value)}
                     className="bg-slate-900 border-slate-600 text-slate-100 min-h-[180px] text-base"
                   />
-                  <p className="text-xs text-slate-500 mt-2">
-                    💡 AI가 질문의 목적과 기대결과를 자동으로 분석합니다
-                  </p>
                 </div>
               )}
-              
-              {inputType !== "text" && (
-                <div className="bg-slate-900/50 rounded-lg p-4 text-center text-slate-400 text-sm">
-                  <p>파일 또는 URL 입력 시 아래에서 선택하세요</p>
+
+              {/* URL 입력 */}
+              {inputType === "url" && (
+                <div>
+                  <Input
+                    placeholder="분석할 웹페이지 URL을 입력하세요 (http:// 또는 https://)"
+                    value={urlInput}
+                    onChange={(e) => setUrlInput(e.target.value)}
+                    className="bg-slate-900 border-slate-600 text-slate-100 text-base py-6"
+                  />
                 </div>
               )}
+
+              {/* 파일 업로드 */}
+              {inputType === "file" && (
+                <div className="space-y-3">
+                  <div 
+                    className="border-2 border-dashed border-slate-600 rounded-lg p-6 text-center cursor-pointer hover:border-blue-500 transition-colors"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <Upload className="w-10 h-10 text-slate-500 mx-auto mb-2" />
+                    <p className="text-slate-300 text-sm">클릭하여 파일 선택</p>
+                    <p className="text-slate-500 text-xs mt-2">
+                      문서, 코드, 스프레드시트, 이미지 지원
+                    </p>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      multiple
+                      accept=".pdf,.hwp,.hwpx,.docx,.txt,.xlsx,.xls,.csv,.jpg,.jpeg,.png,.gif,.webp,.bmp,.py,.js,.ts,.jsx,.tsx,.java,.c,.cpp,.cs,.go,.rs,.rb,.php,.swift,.kt,.html,.css,.scss,.sql,.json,.xml,.yaml,.yml,.sh,.bat,.md"
+                      onChange={handleFileSelect}
+                      className="hidden"
+                    />
+                  </div>
+                  
+                  {/* 선택된 파일 목록 */}
+                  {selectedFiles.length > 0 && (
+                    <div className="space-y-1">
+                      {selectedFiles.map((file, index) => {
+                        const FileIcon = getFileIcon(file);
+                        return (
+                          <div key={index} className="flex items-center justify-between bg-slate-900 rounded p-2">
+                            <div className="flex items-center gap-2">
+                              <FileIcon className="w-4 h-4 text-blue-400" />
+                              <span className="text-slate-200 text-sm truncate max-w-[200px]">{file.name}</span>
+                              <span className="text-slate-500 text-xs">({formatFileSize(file.size)})</span>
+                            </div>
+                            <button onClick={() => removeFile(index)} className="text-slate-500 hover:text-red-400">
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <p className="text-xs text-slate-500">
+                💡 AI가 질문의 목적과 기대결과를 자동으로 분석합니다
+              </p>
             </CardContent>
           </Card>
-
-          {/* 입력 유형 선택 (파일/URL용) */}
-          <Card className="bg-slate-800/50 border-slate-700">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-slate-100 text-base">입력 방식</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-4 gap-2">
-                {inputTypes.map((type) => (
-                  <button
-                    key={type.id}
-                    onClick={() => type.enabled && setInputType(type.id)}
-                    disabled={!type.enabled}
-                    className={`p-3 rounded-lg border-2 transition-all relative ${
-                      !type.enabled 
-                        ? 'border-slate-700 bg-slate-800/30 cursor-not-allowed opacity-50'
-                        : inputType === type.id
-                          ? 'border-blue-500 bg-blue-500/20'
-                          : 'border-slate-600 bg-slate-800/50 hover:border-slate-500'
-                    }`}
-                  >
-                    {!type.enabled && (
-                      <Badge className="absolute -top-1 -right-1 bg-slate-600 text-[8px] px-1 py-0">
-                        준비중
-                      </Badge>
                     )}
                     <type.icon className={`w-6 h-6 mx-auto mb-1 ${
                       !type.enabled ? 'text-slate-600' :
