@@ -58,15 +58,28 @@ export const JInputTab = ({ onSignalSubmit }) => {
     { id: "patent_idea", label: "특허/아이디어", icon: Lightbulb, desc: "신규성/실현가능성", color: "amber" }
   ];
 
+  // 코드 파일 확장자
+  const CODE_EXTENSIONS = ['py', 'js', 'ts', 'jsx', 'tsx', 'java', 'c', 'cpp', 'cs', 'go', 'rs', 'rb', 'php', 'swift', 'kt', 'html', 'css', 'scss', 'sql', 'json', 'xml', 'yaml', 'yml', 'sh', 'bat', 'md'];
+
+  // 파일이 코드인지 확인
+  const isCodeFile = (filename) => {
+    const ext = filename.split('.').pop().toLowerCase();
+    return CODE_EXTENSIONS.includes(ext);
+  };
+
   // 파일 선택 처리
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files);
     const validFiles = [];
     const invalidFiles = [];
+    let hasCodeFile = false;
     
     files.forEach(file => {
       if (isFileSupported(file.name)) {
         validFiles.push(file);
+        if (isCodeFile(file.name)) {
+          hasCodeFile = true;
+        }
       } else {
         const ext = file.name.split('.').pop().toLowerCase();
         invalidFiles.push({ name: file.name, ext });
@@ -75,13 +88,17 @@ export const JInputTab = ({ onSignalSubmit }) => {
     
     if (invalidFiles.length > 0) {
       const invalidExts = [...new Set(invalidFiles.map(f => `.${f.ext}`))].join(', ');
-      setError(`지원하지 않는 파일 형식입니다: ${invalidExts}\n\n✅ 지원 형식: .pdf, .hwp, .hwpx, .docx, .txt, .xlsx, .xls, .csv, .jpg, .png, .gif, .webp`);
+      setError(`지원하지 않는 파일 형식입니다: ${invalidExts}\n\n✅ 지원 형식: 문서(.pdf, .hwp, .docx, .txt), 코드(.py, .js, .java 등), 스프레드시트, 이미지`);
     } else {
       setError(null);
     }
     
     if (validFiles.length > 0) {
       setSelectedFiles(prev => [...prev, ...validFiles]);
+      // 코드 파일이면 자동으로 코드 분석 모드로 전환
+      if (hasCodeFile && analysisType === "general") {
+        setAnalysisType("code");
+      }
     }
   };
 
@@ -98,6 +115,7 @@ export const JInputTab = ({ onSignalSubmit }) => {
     if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'].includes(ext)) return Image;
     if (['hwp', 'hwpx'].includes(ext)) return FileText;
     if (ext === 'docx') return FileText;
+    if (CODE_EXTENSIONS.includes(ext)) return FileCode;
     return File;
   };
 
