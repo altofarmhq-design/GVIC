@@ -162,29 +162,91 @@ class GVICPipeline:
         )
     
     async def _stage_evaluate(self, signal_id: str, signal: Dict) -> Dict[str, Any]:
-        """LL:의도 - 시그널 평가 단계"""
+        """LL:의도 - 시그널 평가 단계 (5:3:2 비율 적용)"""
         await self._update_stage(signal_id, PipelineStage.LL_EVALUATE, PipelineStatus.PROCESSING)
         
         content = signal.get("content", "")
+        metadata = signal.get("metadata", {})
         
-        # 평가 로직 (AI 분석 또는 규칙 기반)
-        # 현재는 기본 규칙 적용 (추후 AI 연동)
+        # 사용자 설정 비율 가져오기 (기본값: 5:3:2)
+        ratio = metadata.get("classification_ratio", {"wanted": 5, "unwanted": 3, "null": 2})
+        wanted_ratio = ratio.get("wanted", 5)
+        unwanted_ratio = ratio.get("unwanted", 3)
+        null_ratio = ratio.get("null", 2)
+        total_ratio = wanted_ratio + unwanted_ratio + null_ratio
+        
+        # AI 분석 결과에서 신뢰도 가져오기
+        ai_analysis = metadata.get("ai_analysis", {})
+        ai_confidence = ai_analysis.get("confidence", 0.5)
+        analysis_type = metadata.get("analysis_type", "general")
+        
+        # 분류 기준:
+        # 1. 내용이 충분하고 목적이 명확하면 wanted
+        # 2. 내용은 있지만 숨겨진 가치가 있으면 unwanted (자산화 대상)
+        # 3. 내용이 부족하거나 가치가 없으면 null
+        
         evaluation = {
-            "category": SignalCategory.WANTED.value,  # 기본값: 분석 대상
-            "confidence": 0.8,
+            "category": SignalCategory.WANTED.value,
+            "confidence": ai_confidence,
             "keywords": [],
             "intent_detected": True,
-            "analysis_notes": "자동 평가 완료"
+            "analysis_notes": "",
+            "ratio_applied": f"{wanted_ratio}:{unwanted_ratio}:{null_ratio}"
         }
         
-        # 간단한 분류 규칙 (예시)
-        content_lower = content.lower() if content else ""
+        content_length = len(content.strip())
+        purpose = metadata.get("purpose", "")
+        expected_result = metadata.get("expected_result", "")
         
-        # null 판정 조건
-        if len(content.strip()) < 10:
+        # 분류 로직 (비율 기반 확률적 분류)
+        import random
+        
+        # 기본 점수 계산
+        base_score = 0
+        
+        # 1. 내용 길이 점수
+        if content_length < 10:
+            base_score -= 3
+        elif content_length < 50:
+            base_score += 1
+        else:
+            base_score += 3
+        
+        # 2. 목적/기대결과 명시 여부
+        if purpose and len(purpose) > 5:
+            base_score += 2
+        if expected_result and len(expected_result) > 5:
+            base_score += 2
+        
+        # 3. AI 신뢰도
+        if ai_confidence >= 0.8:
+            base_score += 2
+        elif ai_confidence >= 0.5:
+            base_score += 1
+        
+        # 4. 분석 유형 (코드, 특허는 wanted 가능성 높음)
+        if analysis_type in ["code", "patent_idea"]:
+            base_score += 1
+        
+        # 비율 기반 임계값 계산
+        wanted_threshold = (wanted_ratio / total_ratio) * 10  # 5:3:2 → 5
+        null_threshold = -((null_ratio / total_ratio) * 5)    # 5:3:2 → -2
+        
+        # 최종 분류
+        if base_score >= wanted_threshold:
+            evaluation["category"] = SignalCategory.WANTED.value
+            evaluation["analysis_notes"] = f"직접 분석 대상 (점수: {base_score}, 임계: {wanted_threshold:.1f})"
+        elif base_score <= null_threshold:
             evaluation["category"] = SignalCategory.NULL.value
-            evaluation["analysis_notes"] = "내용 부족 (10자 미만)"
-            evaluation["confidence"] = 0.95
+            evaluation["analysis_notes"] = f"가치 판정 불가 (점수: {base_score})"
+        else:
+            evaluation["category"] = SignalCategory.UNWANTED.value
+            evaluation["analysis_notes"] = f"자산화 대상 - 숨겨진 가치 추출 (점수: {base_score})"
+        
+        # 추가 랜덤 요소 (비율 반영)
+        if evaluation["category"] == SignalCategory.WANTED.value and random.random() > (wanted_ratio / total_ratio * 1.2):
+            evaluation["category"] = SignalCategory.UNWANTED.value
+            evaluation["analysis_notes"] += " [비율 조정 적용]"
         
         await self._update_stage(signal_id, PipelineStage.LL_EVALUATE, PipelineStatus.COMPLETED, evaluation)
         
