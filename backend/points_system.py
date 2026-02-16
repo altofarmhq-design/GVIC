@@ -491,7 +491,7 @@ async def get_asset_summary(current_user: dict = Depends(get_current_user)):
         "points": {
             "total": total_points,
             "available": available_points,
-            "cash_equivalent": available_points / CASH_TO_POINT_RATIO
+            "cash_equivalent": available_points * POINT_TO_CASH_RATIO
         },
         "evaluation": {
             "contribution_level": get_contribution_level(total_signals, total_assets, available_points),
