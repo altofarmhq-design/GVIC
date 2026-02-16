@@ -270,7 +270,7 @@ async def get_checkout_status(
 ):
     """결제 상태 조회"""
     from server import db
-    from emergentintegrations.payments.stripe.checkout import StripeCheckout
+    from local_stripe import StripeCheckout
     
     user_id = current_user.get("sub") or current_user.get("user_id")
     
