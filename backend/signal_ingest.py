@@ -60,9 +60,13 @@ async def get_current_user_simple(authorization: str = Header(None)):
 class TextSignalRequest(BaseModel):
     type: str = "text"
     content: str
+    purpose: str = ""           # 왜 질문하는지
+    expected_result: str = ""   # 기대하는 결과
 
 class UrlSignalRequest(BaseModel):
     url: str
+    purpose: str = ""
+    expected_result: str = ""
 
 # Helper Functions
 def generate_signal_id():
