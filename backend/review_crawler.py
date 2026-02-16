@@ -747,3 +747,204 @@ async def create_sample_crawl_data(
         "signals_created": signals_created,
         "message": "테스트 샘플 데이터가 생성되었습니다"
     }
+
+
+
+# ==================== SaaS 분석기 연동 API ====================
+
+@router.post("/crawl-and-analyze")
+async def crawl_and_analyze(
+    request: CrawlRequest,
+    analysis_depth: str = "standard",
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    크롤링 + SaaS 리뷰 분석 통합 API
+    
+    1. URL에서 리뷰 크롤링
+    2. SaaS ReviewAnalyzer로 자동 분석
+    3. 인사이트 도출 및 저장
+    """
+    from server import db
+    from saas.review_analyzer import ReviewAnalyzer, ReviewInput
+    
+    user_id = current_user.get("user_id")
+    platform = detect_platform(request.url)
+    
+    logger.info(f"Crawl & Analyze: {platform} - {request.url}")
+    
+    # 1. 크롤링
+    product_info = None
+    reviews = []
+    
+    try:
+        if platform == "naver":
+            product_info, reviews = await crawl_naver_reviews(request.url, request.max_reviews)
+        elif platform == "coupang":
+            product_info, reviews = await crawl_coupang_reviews(request.url, request.max_reviews)
+        else:
+            product_info, reviews = await crawl_generic_reviews(request.url, request.max_reviews)
+    except Exception as e:
+        logger.error(f"Crawl error: {e}")
+        raise HTTPException(status_code=500, detail=f"크롤링 오류: {str(e)}")
+    
+    if not reviews:
+        raise HTTPException(status_code=400, detail="리뷰를 찾을 수 없습니다. URL을 확인해주세요.")
+    
+    # 크롤링 결과 저장
+    crawl_id = f"CRL_{uuid.uuid4().hex[:12]}"
+    crawl_record = {
+        "crawl_id": crawl_id,
+        "url": request.url,
+        "platform": platform,
+        "user_id": user_id,
+        "product_info": product_info.dict() if product_info else None,
+        "review_count": len(reviews),
+        "reviews": [r.dict() for r in reviews],
+        "crawled_at": datetime.now(timezone.utc).isoformat(),
+        "analyzed": True
+    }
+    
+    await db.crawl_results.insert_one(crawl_record)
+    
+    # 2. SaaS 분석
+    analyzer = ReviewAnalyzer(db)
+    
+    # ReviewData를 ReviewInput으로 변환
+    review_inputs = [
+        ReviewInput(
+            content=r.content,
+            rating=r.rating,
+            platform=platform,
+            product_name=product_info.product_name if product_info else None,
+            author=r.author,
+            date=r.date
+        )
+        for r in reviews
+    ]
+    
+    analysis_result = await analyzer.analyze_reviews(
+        reviews=review_inputs,
+        analysis_depth=analysis_depth
+    )
+    
+    # 분석 결과 저장
+    await db.review_analyses.insert_one({
+        "analysis_id": analysis_result.analysis_id,
+        "crawl_id": crawl_id,
+        "user_id": user_id,
+        "product_id": None,
+        "product_info": product_info.dict() if product_info else None,
+        "total_reviews": analysis_result.total_reviews,
+        "sentiment": analysis_result.sentiment,
+        "keywords": analysis_result.keywords,
+        "issues": analysis_result.issues,
+        "strengths": analysis_result.strengths,
+        "insights_532": analysis_result.insights_532.dict(),
+        "summary": analysis_result.summary,
+        "recommendations": analysis_result.recommendations,
+        "analyzed_at": analysis_result.analyzed_at
+    })
+    
+    return {
+        "success": True,
+        "crawl_id": crawl_id,
+        "analysis_id": analysis_result.analysis_id,
+        "platform": platform,
+        "product_info": product_info.dict() if product_info else None,
+        "reviews_crawled": len(reviews),
+        "analysis": {
+            "sentiment": analysis_result.sentiment,
+            "keywords": analysis_result.keywords[:10],
+            "top_issues": analysis_result.issues[:5],
+            "top_strengths": analysis_result.strengths[:5],
+            "insights_532": analysis_result.insights_532.dict(),
+            "summary": analysis_result.summary,
+            "recommendations": analysis_result.recommendations
+        },
+        "crawled_at": crawl_record["crawled_at"]
+    }
+
+
+@router.post("/analyze-existing/{crawl_id}")
+async def analyze_existing_crawl(
+    crawl_id: str,
+    analysis_depth: str = "standard",
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    기존 크롤링 결과 재분석
+    """
+    from server import db
+    from saas.review_analyzer import ReviewAnalyzer, ReviewInput
+    
+    user_id = current_user.get("user_id")
+    
+    # 크롤링 결과 조회
+    crawl_result = await db.crawl_results.find_one(
+        {"crawl_id": crawl_id, "user_id": user_id},
+        {"_id": 0}
+    )
+    
+    if not crawl_result:
+        raise HTTPException(status_code=404, detail="크롤링 결과를 찾을 수 없습니다")
+    
+    reviews_data = crawl_result.get("reviews", [])
+    product_info = crawl_result.get("product_info")
+    platform = crawl_result.get("platform", "unknown")
+    
+    if not reviews_data:
+        raise HTTPException(status_code=400, detail="분석할 리뷰가 없습니다")
+    
+    # SaaS 분석
+    analyzer = ReviewAnalyzer(db)
+    
+    review_inputs = [
+        ReviewInput(
+            content=r.get("content", ""),
+            rating=r.get("rating"),
+            platform=platform,
+            product_name=product_info.get("product_name") if product_info else None,
+            author=r.get("author"),
+            date=r.get("date")
+        )
+        for r in reviews_data
+    ]
+    
+    analysis_result = await analyzer.analyze_reviews(
+        reviews=review_inputs,
+        analysis_depth=analysis_depth
+    )
+    
+    # 분석 결과 저장
+    await db.review_analyses.insert_one({
+        "analysis_id": analysis_result.analysis_id,
+        "crawl_id": crawl_id,
+        "user_id": user_id,
+        "product_info": product_info,
+        "total_reviews": analysis_result.total_reviews,
+        "sentiment": analysis_result.sentiment,
+        "keywords": analysis_result.keywords,
+        "issues": analysis_result.issues,
+        "strengths": analysis_result.strengths,
+        "insights_532": analysis_result.insights_532.dict(),
+        "summary": analysis_result.summary,
+        "recommendations": analysis_result.recommendations,
+        "analyzed_at": analysis_result.analyzed_at
+    })
+    
+    return {
+        "success": True,
+        "crawl_id": crawl_id,
+        "analysis_id": analysis_result.analysis_id,
+        "reviews_analyzed": analysis_result.total_reviews,
+        "analysis": {
+            "sentiment": analysis_result.sentiment,
+            "keywords": analysis_result.keywords[:10],
+            "top_issues": analysis_result.issues[:5],
+            "top_strengths": analysis_result.strengths[:5],
+            "insights_532": analysis_result.insights_532.dict(),
+            "summary": analysis_result.summary,
+            "recommendations": analysis_result.recommendations
+        }
+    }
