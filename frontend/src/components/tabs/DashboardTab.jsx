@@ -438,20 +438,40 @@ export const DashboardTab = ({ dashboard, systemStatus }) => {
           <CardContent>
             <div className="space-y-2">
               {realStats.recent_signals.slice(0, 5).map((signal, idx) => (
-                <div key={idx} className="flex items-center justify-between bg-slate-900/50 rounded p-2">
+                <div key={idx} className="flex items-center justify-between bg-slate-900/50 rounded p-3">
                   <div className="flex items-center gap-3">
-                    <span className="text-slate-500 text-xs">{signal.time_display}</span>
-                    <Badge variant="outline" className="text-xs">{signal.signal_type_label}</Badge>
+                    <span className="text-slate-500 text-xs font-mono">
+                      {signal.created_at ? new Date(signal.created_at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }) : '-'}
+                    </span>
+                    <Badge variant="outline" className={`text-xs ${
+                      signal.category === 'wanted' ? 'border-blue-500 text-blue-400' :
+                      signal.category === 'unwanted' ? 'border-amber-500 text-amber-400' :
+                      'border-slate-500 text-slate-400'
+                    }`}>
+                      {signal.category === 'wanted' ? '분석' : signal.category === 'unwanted' ? '자산화' : 'null'}
+                    </Badge>
+                    {signal.metadata?.analysis_type && (
+                      <Badge className={`text-xs ${
+                        signal.metadata.analysis_type === 'code' ? 'bg-green-700' :
+                        signal.metadata.analysis_type === 'patent_idea' ? 'bg-amber-700' :
+                        'bg-blue-700'
+                      }`}>
+                        {signal.metadata.analysis_type === 'code' ? '💻 코드' :
+                         signal.metadata.analysis_type === 'patent_idea' ? '💡 아이디어' : '📝 일반'}
+                      </Badge>
+                    )}
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-slate-400 text-xs">{signal.signal_count}개 시그널</span>
+                    <span className="text-slate-400 text-xs">
+                      {signal.type === 'text' ? '텍스트' : signal.type === 'file' ? '파일' : signal.type}
+                    </span>
                     <Badge className={`text-xs ${
-                      signal.overall_sentiment === 'positive' ? 'bg-green-600' :
-                      signal.overall_sentiment === 'negative' ? 'bg-red-600' :
-                      signal.overall_sentiment === 'mixed' ? 'bg-purple-600' :
+                      signal.status === 'completed' ? 'bg-green-600' :
+                      signal.status === 'processing' ? 'bg-blue-600' :
+                      signal.status === 'failed' ? 'bg-red-600' :
                       'bg-slate-600'
                     }`}>
-                      {signal.overall_sentiment}
+                      {signal.status === 'completed' ? '완료' : signal.status}
                     </Badge>
                   </div>
                 </div>
