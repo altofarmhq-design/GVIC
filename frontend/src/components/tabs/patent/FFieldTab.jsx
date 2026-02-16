@@ -157,6 +157,7 @@ export const FFieldTab = () => {
         
         <div className="flex items-center gap-2">
           <Button
+            data-testid="f-field-auto-refresh-btn"
             variant="outline"
             size="sm"
             onClick={() => setAutoRefresh(!autoRefresh)}
@@ -165,7 +166,7 @@ export const FFieldTab = () => {
             {autoRefresh ? <Pause className="w-4 h-4 mr-1" /> : <Play className="w-4 h-4 mr-1" />}
             {autoRefresh ? '자동 갱신 중' : '자동 갱신'}
           </Button>
-          <Button variant="outline" size="sm" onClick={loadDashboardData} disabled={loading}>
+          <Button data-testid="f-field-refresh-btn" variant="outline" size="sm" onClick={loadDashboardData} disabled={loading}>
             <RefreshCw className={`w-4 h-4 mr-1 ${loading ? 'animate-spin' : ''}`} />
             새로고침
           </Button>
@@ -303,7 +304,7 @@ export const FFieldTab = () => {
                       재균형 필요
                     </Badge>
                   )}
-                  <Button size="sm" variant="outline" onClick={runRebalance}>
+                  <Button data-testid="f-field-rebalance-btn" size="sm" variant="outline" onClick={runRebalance}>
                     <RefreshCw className="w-3 h-3 mr-1" />
                     재균형
                   </Button>
@@ -639,7 +640,7 @@ export const FFieldTab = () => {
                     <Zap className="w-5 h-5 text-amber-400" />
                     에너지 효율
                   </CardTitle>
-                  <Button size="sm" variant="outline" onClick={runEntropyFeedback}>
+                  <Button data-testid="f-field-entropy-feedback-btn" size="sm" variant="outline" onClick={runEntropyFeedback}>
                     <ArrowRight className="w-3 h-3 mr-1" />
                     G:정제 피드백
                   </Button>
@@ -724,7 +725,7 @@ export const FFieldTab = () => {
                   <BarChart3 className="w-5 h-5 text-pink-400" />
                   1110: 자원 사영 엔진
                 </CardTitle>
-                <Button onClick={runProjectionTest} disabled={projecting}>
+                <Button data-testid="f-field-projection-test-btn" onClick={runProjectionTest} disabled={projecting}>
                   {projecting ? (
                     <RefreshCw className="w-4 h-4 mr-1 animate-spin" />
                   ) : (
