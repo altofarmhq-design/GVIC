@@ -3367,6 +3367,10 @@ app.include_router(webhook_router)
 from report_generator import router as report_router
 app.include_router(report_router)
 
+# Include external connector router (외부 시스템 연동 커넥터)
+from external_connector import router as connector_router
+app.include_router(connector_router)
+
 # ==================== Pipeline API ====================
 
 @api_router.get("/pipeline/stats")
