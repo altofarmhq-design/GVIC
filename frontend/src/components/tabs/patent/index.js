@@ -13,3 +13,4 @@ export { IIntegrityTab } from './IIntegrityTab';
 export { APIWebhookTab } from './APIWebhookTab';
 export { ConnectorTab } from './ConnectorTab';
 export { MyAssetsTab } from './MyAssetsTab';
+export { ModuleMarketTab } from './ModuleMarketTab';
