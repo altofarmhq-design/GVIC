@@ -444,6 +444,24 @@ def detect_shopping_platform(url: str) -> str:
     else:
         return "generic"
 
+def should_crawl_reviews(purpose: str, url: str) -> bool:
+    """사용자 질문에서 리뷰 크롤링 의도 감지"""
+    if not purpose:
+        return False
+    
+    purpose_lower = purpose.lower()
+    review_keywords = ['리뷰', '후기', '크롤링', '구매후기', '상품평', '평가', '별점', 'review', 'crawl']
+    
+    for keyword in review_keywords:
+        if keyword in purpose_lower:
+            return True
+    
+    # URL에 review 관련 해시가 있는 경우
+    if '#review' in url.lower() or 'review' in url.lower():
+        return True
+    
+    return False
+
 @router.post("/ingest/url")
 async def ingest_url_signal(request: UrlSignalRequest, current_user: dict = Depends(get_current_user_simple)):
     """URL 시그널 입력 → 파이프라인 자동 실행 (쇼핑몰 URL은 리뷰 크롤러로 라우팅)"""
@@ -456,8 +474,11 @@ async def ingest_url_signal(request: UrlSignalRequest, current_user: dict = Depe
     # 쇼핑몰 플랫폼 감지
     platform = detect_shopping_platform(request.url)
     
-    # 쇼핑몰 URL인 경우 리뷰 크롤러로 라우팅
-    if platform != "generic":
+    # 사용자가 리뷰 크롤링을 원하는지 확인
+    wants_review_crawl = should_crawl_reviews(request.purpose, request.url)
+    
+    # 쇼핑몰 URL이거나 사용자가 리뷰 크롤링을 원하는 경우
+    if platform != "generic" or wants_review_crawl:
         try:
             from review_crawler import crawl_naver_reviews, crawl_coupang_reviews, crawl_generic_reviews
             from server import get_pipeline_engine, db
