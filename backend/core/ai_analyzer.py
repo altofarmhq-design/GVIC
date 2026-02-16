@@ -8,11 +8,11 @@ import os
 import json
 from typing import Dict, Any, Optional
 from dotenv import load_dotenv
-from emergentintegrations.llm.chat import LlmChat, UserMessage
+from local_llm import LlmChat, UserMessage
 
 load_dotenv()
 
-EMERGENT_LLM_KEY = os.environ.get("EMERGENT_LLM_KEY")
+EMERGENT_LLM_KEY = os.environ.get("OPENAI_API_KEY", "")
 
 # ============== 분석 유형별 프롬프트 ==============
 
