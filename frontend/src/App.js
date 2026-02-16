@@ -13,7 +13,7 @@ import {
 import { 
   LayoutDashboard, RefreshCw, Zap, Users, LogOut, User, Settings,
   Upload, Brain, Cpu, Eye, ShieldAlert, Sparkles, Calculator,
-  Play, Activity, Database, Lock, Key, Plug
+  Play, Activity, Database, Lock, Key, Plug, Coins, Award
 } from 'lucide-react';
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
