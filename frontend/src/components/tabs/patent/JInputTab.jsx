@@ -664,7 +664,6 @@ export const JInputTab = ({ onSignalSubmit }) => {
               )}
               </CardContent>
             </Card>
-          )}
 
           {/* 에러 메시지 및 제출 버튼 */}
           <Card className="bg-slate-800/50 border-slate-700">
