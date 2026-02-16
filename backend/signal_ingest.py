@@ -548,6 +548,23 @@ async def ingest_url_signal(request: UrlSignalRequest, current_user: dict = Depe
     if not extracted_text.strip():
         raise HTTPException(status_code=400, detail="URL에서 텍스트를 추출할 수 없습니다")
     
+    # AI 분석 수행
+    from core.ai_analyzer import analyze_signal
+    ai_result = await analyze_signal(
+        content=extracted_text,
+        purpose=request.purpose,
+        expected_result=request.expected_result,
+        analysis_type=request.analysis_type
+    )
+    
+    # 분류 비율 설정 (기본값: 5:3:2)
+    ratio = request.classification_ratio or ClassificationRatio()
+    classification_ratio = {
+        "wanted": ratio.wanted,
+        "unwanted": ratio.unwanted,
+        "null": ratio.null
+    }
+    
     # 파이프라인 실행
     from server import get_pipeline_engine
     pipeline = get_pipeline_engine()
@@ -556,10 +573,24 @@ async def ingest_url_signal(request: UrlSignalRequest, current_user: dict = Depe
         signal_type="url",
         content=extracted_text,
         source=request.url,
-        metadata={"input_method": "url", "original_url": request.url},
+        metadata={
+            "input_method": "url",
+            "original_url": request.url,
+            "purpose": request.purpose,
+            "expected_result": request.expected_result,
+            "analysis_type": request.analysis_type,
+            "classification_ratio": classification_ratio,
+            "ai_analysis": ai_result
+        },
         user_id=current_user.get("sub")
     )
     
+    # 관련 자산 추천 추가
+    related_assets = await pipeline.find_related_assets(extracted_text, request.purpose)
+    result["related_assets"] = related_assets
+    
+    # AI 분석 결과 추가
+    result["ai_analysis"] = ai_result
     result["extracted_text"] = extracted_text[:2000]  # 프리뷰용
     result["input_type"] = "generic_url"
     return result
