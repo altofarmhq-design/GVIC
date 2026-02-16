@@ -50,6 +50,12 @@ export const JInputTab = ({ onSignalSubmit }) => {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
+  
+  // 5:3:2 비율 설정
+  const [showRatioSettings, setShowRatioSettings] = useState(false);
+  const [ratioWanted, setRatioWanted] = useState(5);      // 원하는 것 (직접 분석)
+  const [ratioUnwanted, setRatioUnwanted] = useState(3);  // 자산화 대상
+  const [ratioNull, setRatioNull] = useState(2);          // Null
 
   // 분석 유형 정의
   const analysisTypes = [
