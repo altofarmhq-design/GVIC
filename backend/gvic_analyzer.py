@@ -267,7 +267,243 @@ def generate_fallback_gvic_analysis(
     }
 
 
+# ==================== 2단계: 크로스 분석 ====================
+
+class CrossAnalysisRequest(BaseModel):
+    """크로스 분석 요청"""
+    signal_id: str
+    content: str
+    keywords: List[str] = []
+    category: str = "general"
+    max_related: int = 10
+
+class AssetRelation(BaseModel):
+    """자산 연결 관계"""
+    source_id: str
+    target_id: str
+    relation_type: str  # similar, complementary, conflicting, duplicate
+    similarity_score: float
+    common_keywords: List[str]
+    description: str
+
+async def calculate_text_similarity(text1: str, text2: str) -> float:
+    """텍스트 유사도 계산 (키워드 기반)"""
+    # 간단한 Jaccard 유사도
+    words1 = set(text1.lower().split())
+    words2 = set(text2.lower().split())
+    
+    if not words1 or not words2:
+        return 0.0
+    
+    intersection = words1 & words2
+    union = words1 | words2
+    
+    return len(intersection) / len(union) if union else 0.0
+
+async def find_keyword_matches(keywords: List[str], asset_keywords: List[str]) -> List[str]:
+    """공통 키워드 찾기"""
+    set1 = set(k.lower() for k in keywords)
+    set2 = set(k.lower() for k in asset_keywords)
+    return list(set1 & set2)
+
+async def cross_analyze_signal(
+    signal_id: str,
+    content: str,
+    keywords: List[str],
+    category: str,
+    max_related: int = 10
+) -> Dict[str, Any]:
+    """
+    신규 시그널과 기존 자산들을 크로스 분석
+    
+    분석 내용:
+    1. 유사 자산 탐색 (similar)
+    2. 보완 자산 탐색 (complementary)
+    3. 충돌 자산 탐색 (conflicting)
+    4. 중복 자산 탐색 (duplicate)
+    """
+    from server import db
+    
+    # 기존 자산들 조회
+    existing_assets = await db.indexed_assets.find(
+        {"status": "indexed"},
+        {"_id": 0}
+    ).to_list(500)
+    
+    # 기존 시그널들도 조회 (자산화되지 않은 것들)
+    existing_signals = await db.pipeline_signals.find(
+        {"signal_id": {"$ne": signal_id}},
+        {"_id": 0, "signal_id": 1, "content": 1, "metadata": 1, "created_at": 1}
+    ).to_list(200)
+    
+    related_assets = []
+    similar_signals = []
+    potential_duplicates = []
+    complementary_assets = []
+    conflicting_assets = []
+    
+    content_lower = content.lower()
+    
+    # 자산 크로스 분석
+    for asset in existing_assets:
+        asset_content = asset.get("original_content", "") or asset.get("content_summary", "")
+        asset_keywords = asset.get("feature_keywords", [])
+        
+        # 텍스트 유사도 계산
+        similarity = await calculate_text_similarity(content, asset_content)
+        
+        # 키워드 매칭
+        common_kw = await find_keyword_matches(keywords, asset_keywords)
+        keyword_score = len(common_kw) / max(len(keywords), 1) if keywords else 0
+        
+        # 카테고리 매칭
+        category_match = 1.0 if asset.get("feature_category") == category else 0.3
+        
+        # 종합 점수
+        total_score = (similarity * 0.4) + (keyword_score * 0.4) + (category_match * 0.2)
+        
+        if total_score > 0.1:  # 최소 임계값
+            relation = {
+                "asset_id": asset.get("asset_id"),
+                "similarity_score": round(total_score, 3),
+                "text_similarity": round(similarity, 3),
+                "keyword_match": round(keyword_score, 3),
+                "common_keywords": common_kw[:5],
+                "category": asset.get("feature_category"),
+                "summary": asset.get("content_summary", "")[:100],
+                "value_score": asset.get("value_score", 0),
+                "created_at": asset.get("created_at")
+            }
+            
+            # 관계 유형 분류
+            if total_score > 0.8:
+                relation["relation_type"] = "duplicate"
+                relation["description"] = "높은 유사도 - 중복 가능성"
+                potential_duplicates.append(relation)
+            elif total_score > 0.5:
+                relation["relation_type"] = "similar"
+                relation["description"] = "유사한 주제/내용"
+                related_assets.append(relation)
+            elif keyword_score > 0.3 and similarity < 0.3:
+                relation["relation_type"] = "complementary"
+                relation["description"] = "관련 키워드 공유 - 보완 가능"
+                complementary_assets.append(relation)
+    
+    # 시그널 크로스 분석
+    for sig in existing_signals:
+        sig_content = sig.get("content", "")
+        similarity = await calculate_text_similarity(content, sig_content)
+        
+        if similarity > 0.3:
+            similar_signals.append({
+                "signal_id": sig.get("signal_id"),
+                "similarity_score": round(similarity, 3),
+                "content_preview": sig_content[:100],
+                "created_at": sig.get("created_at")
+            })
+    
+    # 정렬
+    related_assets.sort(key=lambda x: x["similarity_score"], reverse=True)
+    similar_signals.sort(key=lambda x: x["similarity_score"], reverse=True)
+    complementary_assets.sort(key=lambda x: x["keyword_match"], reverse=True)
+    
+    # 결과 구성
+    cross_analysis = {
+        "signal_id": signal_id,
+        "analysis_type": "cross_analysis",
+        "summary": {
+            "total_assets_scanned": len(existing_assets),
+            "total_signals_scanned": len(existing_signals),
+            "related_found": len(related_assets),
+            "duplicates_found": len(potential_duplicates),
+            "complementary_found": len(complementary_assets),
+            "similar_signals_found": len(similar_signals)
+        },
+        "related_assets": related_assets[:max_related],
+        "potential_duplicates": potential_duplicates[:5],
+        "complementary_assets": complementary_assets[:max_related],
+        "similar_signals": similar_signals[:5],
+        "recommendations": [],
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    # 추천 생성
+    if potential_duplicates:
+        cross_analysis["recommendations"].append({
+            "type": "warning",
+            "message": f"중복 가능성이 있는 자산이 {len(potential_duplicates)}개 발견되었습니다. 확인 후 병합을 고려하세요."
+        })
+    
+    if related_assets:
+        cross_analysis["recommendations"].append({
+            "type": "info",
+            "message": f"관련 자산 {len(related_assets)}개와 연결하여 모듈화할 수 있습니다."
+        })
+    
+    if complementary_assets:
+        cross_analysis["recommendations"].append({
+            "type": "success",
+            "message": f"보완 가능한 자산 {len(complementary_assets)}개가 있습니다. 시너지 효과를 기대할 수 있습니다."
+        })
+    
+    if not related_assets and not complementary_assets:
+        cross_analysis["recommendations"].append({
+            "type": "highlight",
+            "message": "기존 자산과 중복이 없는 새로운 유형입니다. 희소성이 높을 수 있습니다."
+        })
+    
+    return cross_analysis
+
+
 # ==================== API Endpoints ====================
+
+@router.post("/cross-analyze")
+async def cross_analyze_endpoint(request: CrossAnalysisRequest):
+    """
+    신규 시그널과 기존 자산/시그널 크로스 분석
+    
+    분석 결과:
+    - 유사 자산 목록
+    - 중복 가능성 자산
+    - 보완 가능 자산
+    - 유사 시그널 목록
+    - 추천 액션
+    """
+    result = await cross_analyze_signal(
+        signal_id=request.signal_id,
+        content=request.content,
+        keywords=request.keywords,
+        category=request.category,
+        max_related=request.max_related
+    )
+    
+    # DB에 크로스 분석 결과 저장
+    from server import db
+    
+    await db.cross_analyses.update_one(
+        {"signal_id": request.signal_id},
+        {"$set": result},
+        upsert=True
+    )
+    
+    return result
+
+
+@router.get("/cross-analysis/{signal_id}")
+async def get_cross_analysis(signal_id: str):
+    """저장된 크로스 분석 결과 조회"""
+    from server import db
+    
+    analysis = await db.cross_analyses.find_one(
+        {"signal_id": signal_id},
+        {"_id": 0}
+    )
+    
+    if not analysis:
+        raise HTTPException(status_code=404, detail="크로스 분석 결과가 없습니다")
+    
+    return analysis
+
 
 @router.post("/analyze")
 async def gvic_analyze_signal(request: GVICAnalysisRequest):
