@@ -120,8 +120,7 @@ export const api = {
   convertPoints: (pointsAmount) => axios.post(`${API}/points/convert`, { points_amount: pointsAmount }),
   getAssetSummary: () => axios.get(`${API}/points/asset-summary`),
   getExchangeRate: () => axios.get(`${API}/points/exchange-rate`),
-  getEarningRules: () => axios.get(`${API}/points/earning-rules`)
-};
+  getEarningRules: () => axios.get(`${API}/points/earning-rules`),
 
   // ==================== SaaS APIs ====================
   // Shop Management
@@ -177,7 +176,7 @@ export const api = {
   getRequiredPaymentKeys: () => axios.get(`${API}/payments/config/required-keys`),
 
   // SaaS Dashboard
-  getSaasDashboard: () => axios.get(`${API}/saas-dashboard/summary`),
+  getSaasDashboard: () => axios.get(`${API}/saas-dashboard/summary`)
 };
 
 // Export individual functions for easier imports
