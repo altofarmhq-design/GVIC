@@ -37,7 +37,8 @@ import {
   IIntegrityTab,
   APIWebhookTab,
   ConnectorTab,
-  MyAssetsTab
+  MyAssetsTab,
+  ModuleMarketTab
 } from "@/components/tabs/patent";
 
 import LoginPage from "@/pages/LoginPage";
