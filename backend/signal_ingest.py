@@ -363,6 +363,17 @@ async def ingest_file_signals(
             ext = filename.split('.')[-1].lower()
             content = await file.read()
             
+            # 지원하지 않는 형식 체크
+            if ext not in SUPPORTED_FORMATS:
+                supported_list = ', '.join([f'.{e}' for e in SUPPORTED_FORMATS.keys()])
+                results.append({
+                    "filename": filename,
+                    "success": False,
+                    "error": f"지원하지 않는 파일 형식입니다 (.{ext})",
+                    "supported_formats": supported_list
+                })
+                continue
+            
             extracted_text = ""
             file_type = ""
             
@@ -382,6 +393,18 @@ async def ingest_file_signals(
             elif ext == 'txt':
                 extracted_text = extract_text_from_txt(content)
                 file_type = "txt"
+            
+            elif ext == 'hwp':
+                extracted_text = extract_text_from_hwp(content)
+                file_type = "hwp"
+            
+            elif ext == 'hwpx':
+                extracted_text = extract_text_from_hwpx(content)
+                file_type = "hwpx"
+            
+            elif ext == 'docx':
+                extracted_text = extract_text_from_docx(content)
+                file_type = "docx"
             
             elif ext in ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp']:
                 # 이미지는 OCR 처리 필요 (현재는 메타데이터만)
