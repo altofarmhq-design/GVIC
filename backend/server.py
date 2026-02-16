@@ -3383,6 +3383,10 @@ app.include_router(module_router)
 from review_crawler import router as crawl_router
 app.include_router(crawl_router)
 
+# Include GVIC analyzer router (결이론 분석 엔진)
+from gvic_analyzer import router as gvic_analyzer_router
+app.include_router(gvic_analyzer_router)
+
 # ==================== Pipeline API ====================
 
 @api_router.get("/pipeline/stats")
