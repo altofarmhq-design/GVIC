@@ -303,6 +303,47 @@ class GVICPipeline:
         
         return summary
     
+    async def find_related_assets(self, content: str, purpose: str = "") -> List[Dict[str, Any]]:
+        """관련 모듈화 자산 찾기"""
+        try:
+            # 간단한 키워드 매칭으로 관련 자산 찾기
+            # 실제로는 벡터 유사도 검색 등 고도화 필요
+            keywords = set()
+            
+            # 내용에서 키워드 추출 (간단 버전)
+            for word in (content + " " + purpose).split():
+                if len(word) >= 2:
+                    keywords.add(word.lower())
+            
+            # 자산 검색
+            related = []
+            cursor = self.assets_collection.find(
+                {"status": "stored"},
+                {"_id": 0}
+            ).limit(50)
+            
+            async for asset in cursor:
+                asset_content = asset.get("content", "").lower()
+                
+                # 키워드 매칭 점수 계산
+                match_count = sum(1 for kw in keywords if kw in asset_content)
+                if match_count > 0:
+                    relevance = min(match_count / len(keywords), 1.0) if keywords else 0
+                    related.append({
+                        "asset_id": asset.get("asset_id"),
+                        "relevance": round(relevance, 2),
+                        "summary": asset_content[:100] + "..." if len(asset_content) > 100 else asset_content,
+                        "category": asset.get("category")
+                    })
+            
+            # 관련도 순 정렬
+            related.sort(key=lambda x: x["relevance"], reverse=True)
+            return related[:5]  # 상위 5개만 반환
+            
+        except Exception as e:
+            logger.error(f"Error finding related assets: {str(e)}")
+            return []
+    
     async def get_dashboard_stats(self) -> Dict[str, Any]:
         """대시보드용 통계"""
         
