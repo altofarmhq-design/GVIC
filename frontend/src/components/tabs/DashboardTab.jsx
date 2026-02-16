@@ -217,44 +217,46 @@ export const DashboardTab = ({ dashboard, systemStatus }) => {
                 <p className="text-slate-400 text-xs mb-2">최근 처리 이력</p>
                 <ScrollArea className="h-[140px]">
                   <div className="space-y-2">
-                    {pipelineStats.recent_signals.slice(0, 5).map((sig) => (
-                      <div key={sig.signal_id} className="flex items-center justify-between bg-slate-900/50 rounded p-2 text-xs">
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline" className={`
-                            ${sig.category === 'wanted' ? 'text-blue-400 border-blue-600' : 
-                              sig.category === 'unwanted' ? 'text-amber-400 border-amber-600' : 
-                              'text-slate-400 border-slate-600'}
-                          `}>
-                            {sig.category === 'wanted' ? '분석' : sig.category === 'unwanted' ? '자산화' : 'null'}
-                          </Badge>
-                          <span className="text-slate-300 font-mono">{sig.signal_id?.slice(4, 16)}...</span>
-                          {sig.metadata?.analysis_type && (
-                            <Badge className={`text-[10px] px-1.5 ${
-                              sig.metadata.analysis_type === 'code' ? 'bg-green-700' :
-                              sig.metadata.analysis_type === 'patent_idea' ? 'bg-amber-700' : 'bg-blue-700'
-                            }`}>
-                              {sig.metadata.analysis_type === 'code' ? '코드' :
-                               sig.metadata.analysis_type === 'patent_idea' ? '아이디어' : '일반'}
+                    {pipelineStats.recent_signals.slice(0, 5).map((sig) => {
+                      // UTC 시간을 사용자 현지 시각으로 변환
+                      const utcTime = sig.created_at ? (sig.created_at.endsWith('Z') || sig.created_at.includes('+') ? sig.created_at : sig.created_at + 'Z') : null;
+                      const localTime = utcTime ? new Date(utcTime).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }) : '-';
+                      
+                      return (
+                        <div key={sig.signal_id} className="flex items-center justify-between bg-slate-900/50 rounded p-2 text-xs">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className={`
+                              ${sig.category === 'wanted' ? 'text-blue-400 border-blue-600' : 
+                                sig.category === 'unwanted' ? 'text-amber-400 border-amber-600' : 
+                                'text-slate-400 border-slate-600'}
+                            `}>
+                              {sig.category === 'wanted' ? '분석' : sig.category === 'unwanted' ? '자산화' : 'null'}
                             </Badge>
-                          )}
+                            <span className="text-slate-300 font-mono">{sig.signal_id?.slice(4, 16)}...</span>
+                            {sig.metadata?.analysis_type && (
+                              <Badge className={`text-[10px] px-1.5 ${
+                                sig.metadata.analysis_type === 'code' ? 'bg-green-700' :
+                                sig.metadata.analysis_type === 'patent_idea' ? 'bg-amber-700' : 'bg-blue-700'
+                              }`}>
+                                {sig.metadata.analysis_type === 'code' ? '코드' :
+                                 sig.metadata.analysis_type === 'patent_idea' ? '아이디어' : '일반'}
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge className={`
+                              ${sig.status === 'completed' ? 'bg-green-600' : 
+                                sig.status === 'processing' ? 'bg-blue-600' : 
+                                sig.status === 'failed' ? 'bg-red-600' : 'bg-slate-600'}
+                            `}>
+                              {sig.status === 'completed' ? '완료' : sig.status}
+                            </Badge>
+                            <span className="text-slate-500">{sig.type === 'text' ? '텍스트' : sig.type === 'file' ? '파일' : sig.type}</span>
+                            <span className="text-slate-600 text-[10px]">{localTime}</span>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Badge className={`
-                            ${sig.status === 'completed' ? 'bg-green-600' : 
-                              sig.status === 'processing' ? 'bg-blue-600' : 
-                              sig.status === 'failed' ? 'bg-red-600' : 'bg-slate-600'}
-                          `}>
-                            {sig.status === 'completed' ? '완료' : sig.status}
-                          </Badge>
-                          <span className="text-slate-500">{sig.type === 'text' ? '텍스트' : sig.type === 'file' ? '파일' : sig.type}</span>
-                          {sig.created_at && (
-                            <span className="text-slate-600 text-[10px]">
-                              {new Date(sig.created_at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </ScrollArea>
               </div>
