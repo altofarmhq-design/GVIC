@@ -455,7 +455,237 @@ async def cross_analyze_signal(
     return cross_analysis
 
 
+# ==================== 3단계: 인사이트 도출 ====================
+
+async def extract_insights(
+    signal_id: str = None,
+    content: str = None,
+    time_range_days: int = 30
+) -> Dict[str, Any]:
+    """
+    축적된 데이터에서 인사이트 도출
+    
+    분석 내용:
+    1. 반복 패턴 - 자주 등장하는 주제/키워드
+    2. 트렌드 분석 - 시간별 관심사 변화
+    3. 이상치 발견 - 독특한 가치를 가진 항목
+    4. 클러스터 분석 - 유사 그룹 발견
+    """
+    from server import db
+    from collections import Counter
+    from datetime import timedelta
+    
+    cutoff_date = (datetime.now(timezone.utc) - timedelta(days=time_range_days)).isoformat()
+    
+    # 최근 시그널들 조회
+    recent_signals = await db.pipeline_signals.find(
+        {"created_at": {"$gte": cutoff_date}},
+        {"_id": 0, "signal_id": 1, "content": 1, "metadata": 1, "created_at": 1, "category": 1}
+    ).to_list(500)
+    
+    # 최근 자산들 조회
+    recent_assets = await db.indexed_assets.find(
+        {"created_at": {"$gte": cutoff_date}},
+        {"_id": 0}
+    ).to_list(200)
+    
+    # 전체 자산 조회 (이상치 분석용)
+    all_assets = await db.indexed_assets.find({}, {"_id": 0}).to_list(500)
+    
+    insights = {
+        "analysis_type": "insight_extraction",
+        "time_range_days": time_range_days,
+        "data_summary": {
+            "recent_signals": len(recent_signals),
+            "recent_assets": len(recent_assets),
+            "total_assets": len(all_assets)
+        },
+        "patterns": {},
+        "trends": {},
+        "anomalies": [],
+        "clusters": [],
+        "key_insights": [],
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    # ===== 1. 반복 패턴 분석 =====
+    all_keywords = []
+    all_categories = []
+    all_words = []
+    
+    for signal in recent_signals:
+        metadata = signal.get("metadata", {})
+        ai_analysis = metadata.get("ai_analysis", {})
+        
+        # 키워드 수집
+        keywords = ai_analysis.get("keywords", [])
+        all_keywords.extend(keywords)
+        
+        # 카테고리 수집
+        category = ai_analysis.get("signal_category", signal.get("category", "general"))
+        all_categories.append(category)
+        
+        # 단어 빈도 (간단한 토큰화)
+        content = signal.get("content", "")
+        words = [w for w in content.lower().split() if len(w) > 2]
+        all_words.extend(words)
+    
+    # 키워드 빈도
+    keyword_freq = Counter(all_keywords).most_common(20)
+    category_freq = Counter(all_categories).most_common(10)
+    word_freq = Counter(all_words).most_common(30)
+    
+    insights["patterns"] = {
+        "top_keywords": [{"keyword": k, "count": c} for k, c in keyword_freq],
+        "category_distribution": [{"category": k, "count": c} for k, c in category_freq],
+        "frequent_words": [{"word": w, "count": c} for w, c in word_freq[:15]],
+        "total_unique_keywords": len(set(all_keywords)),
+        "dominant_topic": keyword_freq[0][0] if keyword_freq else None
+    }
+    
+    # ===== 2. 트렌드 분석 =====
+    # 일별 시그널 수
+    daily_counts = Counter()
+    daily_categories = {}
+    
+    for signal in recent_signals:
+        created = signal.get("created_at", "")[:10]  # YYYY-MM-DD
+        daily_counts[created] += 1
+        
+        category = signal.get("metadata", {}).get("ai_analysis", {}).get("signal_category", "general")
+        if created not in daily_categories:
+            daily_categories[created] = Counter()
+        daily_categories[created][category] += 1
+    
+    # 최근 7일 vs 이전 7일 비교
+    sorted_dates = sorted(daily_counts.keys(), reverse=True)
+    recent_7 = sum(daily_counts[d] for d in sorted_dates[:7]) if len(sorted_dates) >= 7 else sum(daily_counts.values())
+    prev_7 = sum(daily_counts[d] for d in sorted_dates[7:14]) if len(sorted_dates) >= 14 else 0
+    
+    trend_direction = "상승" if recent_7 > prev_7 else ("하락" if recent_7 < prev_7 else "유지")
+    trend_change = ((recent_7 - prev_7) / prev_7 * 100) if prev_7 > 0 else 0
+    
+    insights["trends"] = {
+        "daily_activity": [{"date": d, "count": c} for d, c in sorted(daily_counts.items())[-14:]],
+        "recent_7_days": recent_7,
+        "previous_7_days": prev_7,
+        "trend_direction": trend_direction,
+        "trend_change_percent": round(trend_change, 1),
+        "peak_day": max(daily_counts.items(), key=lambda x: x[1])[0] if daily_counts else None,
+        "avg_daily": round(sum(daily_counts.values()) / len(daily_counts), 1) if daily_counts else 0
+    }
+    
+    # ===== 3. 이상치 발견 =====
+    # 가치 점수 기준 이상치
+    if all_assets:
+        value_scores = [a.get("value_score", 0.5) for a in all_assets]
+        avg_value = sum(value_scores) / len(value_scores)
+        std_value = (sum((v - avg_value) ** 2 for v in value_scores) / len(value_scores)) ** 0.5
+        
+        for asset in all_assets:
+            score = asset.get("value_score", 0.5)
+            z_score = (score - avg_value) / std_value if std_value > 0 else 0
+            
+            if abs(z_score) > 1.5:  # 1.5 표준편차 이상
+                insights["anomalies"].append({
+                    "asset_id": asset.get("asset_id"),
+                    "type": "high_value" if z_score > 0 else "low_value",
+                    "value_score": round(score, 3),
+                    "z_score": round(z_score, 2),
+                    "summary": asset.get("content_summary", "")[:100],
+                    "reason": "평균보다 매우 높은 가치" if z_score > 0 else "평균보다 매우 낮은 가치"
+                })
+        
+        insights["anomalies"] = sorted(insights["anomalies"], key=lambda x: abs(x["z_score"]), reverse=True)[:10]
+    
+    # ===== 4. 클러스터 분석 (카테고리 기반) =====
+    category_assets = {}
+    for asset in all_assets:
+        cat = asset.get("feature_category", "general")
+        if cat not in category_assets:
+            category_assets[cat] = []
+        category_assets[cat].append(asset)
+    
+    for cat, assets in category_assets.items():
+        if len(assets) >= 2:
+            avg_value = sum(a.get("value_score", 0.5) for a in assets) / len(assets)
+            insights["clusters"].append({
+                "category": cat,
+                "count": len(assets),
+                "avg_value_score": round(avg_value, 3),
+                "sample_assets": [a.get("asset_id") for a in assets[:3]]
+            })
+    
+    insights["clusters"] = sorted(insights["clusters"], key=lambda x: x["count"], reverse=True)
+    
+    # ===== 5. 핵심 인사이트 생성 =====
+    if insights["patterns"]["dominant_topic"]:
+        insights["key_insights"].append({
+            "type": "pattern",
+            "title": "주요 관심사",
+            "description": f"'{insights['patterns']['dominant_topic']}'가 가장 빈번하게 등장하는 키워드입니다.",
+            "importance": "high"
+        })
+    
+    if trend_direction == "상승" and trend_change > 20:
+        insights["key_insights"].append({
+            "type": "trend",
+            "title": "활동 급증",
+            "description": f"최근 7일간 활동이 {trend_change:.0f}% 증가했습니다. 관심도가 높아지고 있습니다.",
+            "importance": "high"
+        })
+    elif trend_direction == "하락" and trend_change < -20:
+        insights["key_insights"].append({
+            "type": "trend",
+            "title": "활동 감소",
+            "description": f"최근 7일간 활동이 {abs(trend_change):.0f}% 감소했습니다.",
+            "importance": "medium"
+        })
+    
+    high_value_anomalies = [a for a in insights["anomalies"] if a["type"] == "high_value"]
+    if high_value_anomalies:
+        insights["key_insights"].append({
+            "type": "anomaly",
+            "title": "고가치 자산 발견",
+            "description": f"평균보다 높은 가치를 가진 자산 {len(high_value_anomalies)}개가 발견되었습니다.",
+            "importance": "high"
+        })
+    
+    if insights["clusters"]:
+        top_cluster = insights["clusters"][0]
+        insights["key_insights"].append({
+            "type": "cluster",
+            "title": "주요 자산 그룹",
+            "description": f"'{top_cluster['category']}' 카테고리에 {top_cluster['count']}개의 자산이 집중되어 있습니다.",
+            "importance": "medium"
+        })
+    
+    return insights
+
+
 # ==================== API Endpoints ====================
+
+@router.get("/insights")
+async def get_platform_insights(time_range_days: int = 30):
+    """
+    플랫폼 전체 인사이트 조회
+    
+    - 반복 패턴 (키워드, 카테고리 빈도)
+    - 트렌드 (일별 활동량, 증감)
+    - 이상치 (고가치/저가치 자산)
+    - 클러스터 (카테고리별 그룹)
+    """
+    insights = await extract_insights(time_range_days=time_range_days)
+    
+    # DB에 저장
+    from server import db
+    await db.platform_insights.insert_one({
+        **insights,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    })
+    
+    return insights
+
 
 @router.post("/cross-analyze")
 async def cross_analyze_endpoint(request: CrossAnalysisRequest):
