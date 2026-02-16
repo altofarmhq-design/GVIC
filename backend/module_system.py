@@ -526,14 +526,31 @@ async def purchase_module(
         
         logger.info(f"Module purchase reward: {contributor_id} +{reward_info['points']}P for {reward_info['asset_count']} assets")
     
-    # 구매 기록 저장
+    # 구매 기록 저장 (5:3:2 분배 내역 포함)
     purchase_record = {
         "purchase_id": f"MPUR_{uuid.uuid4().hex[:12]}",
         "module_id": request.module_id,
         "module_name": module.get("module_name"),
         "buyer_id": buyer_id,
         "purchase_price": request.purchase_price,
-        "contributor_share_total": total_contributor_reward,
+        # 5:3:2 결이론 분배 내역
+        "value_distribution": {
+            "public": {
+                "ratio": PUBLIC_SHARE,
+                "amount": public_share_total,
+                "description": "공공 환원 (기여자 분배)"
+            },
+            "operation": {
+                "ratio": OPERATION_SHARE,
+                "amount": operation_share_total,
+                "description": "운영 (플랫폼 시스템)"
+            },
+            "management": {
+                "ratio": MANAGEMENT_SHARE,
+                "amount": management_share_total,
+                "description": "기획/관리 (GVIC 운영자)"
+            }
+        },
         "asset_count": asset_count,
         "reward_per_asset": reward_per_asset,
         "reward_distribution": reward_distribution,
@@ -542,6 +559,40 @@ async def purchase_module(
     }
     
     await db.module_purchases.insert_one(purchase_record)
+    
+    # 플랫폼 운영 적립금 기록 (3: 운영)
+    await db.platform_funds.update_one(
+        {"fund_type": "operation"},
+        {
+            "$inc": {"total_amount": operation_share_total},
+            "$push": {
+                "transactions": {
+                    "amount": operation_share_total,
+                    "source": "module_purchase",
+                    "module_id": request.module_id,
+                    "timestamp": datetime.now(timezone.utc).isoformat()
+                }
+            }
+        },
+        upsert=True
+    )
+    
+    # GVIC 운영자 보상 기록 (2: 기획/관리)
+    await db.platform_funds.update_one(
+        {"fund_type": "management"},
+        {
+            "$inc": {"total_amount": management_share_total},
+            "$push": {
+                "transactions": {
+                    "amount": management_share_total,
+                    "source": "module_purchase",
+                    "module_id": request.module_id,
+                    "timestamp": datetime.now(timezone.utc).isoformat()
+                }
+            }
+        },
+        upsert=True
+    )
     
     # 모듈 판매 통계 업데이트
     await db.asset_modules.update_one(
@@ -558,15 +609,26 @@ async def purchase_module(
         "module_id": request.module_id,
         "module_name": module.get("module_name"),
         "purchase_price": request.purchase_price,
-        "contributor_share_total": total_contributor_reward,
-        "asset_count": asset_count,
-        "reward_per_asset": {
-            "cash": reward_per_asset,
-            "points": reward_points_per_asset
+        # 5:3:2 분배 결과
+        "value_distribution_532": {
+            "public_5": {
+                "amount": public_share_total,
+                "recipients": len(contributor_rewards),
+                "per_asset": reward_per_asset
+            },
+            "operation_3": {
+                "amount": operation_share_total,
+                "destination": "플랫폼 운영"
+            },
+            "management_2": {
+                "amount": management_share_total,
+                "destination": "GVIC 운영자"
+            }
         },
+        "asset_count": asset_count,
         "unique_contributors": len(contributor_rewards),
         "reward_distribution": reward_distribution,
-        "message": f"₩{request.purchase_price:,.0f} 구매 완료. {len(contributor_rewards)}명의 기여자에게 총 ₩{total_contributor_reward:,.0f} 분배 ({asset_count}개 자산, 각 ₩{reward_per_asset:,.0f})"
+        "message": f"₩{request.purchase_price:,.0f} 구매 완료. 5:3:2 결이론 적용 - 공공 ₩{public_share_total:,.0f} ({len(contributor_rewards)}명), 운영 ₩{operation_share_total:,.0f}, 기획 ₩{management_share_total:,.0f}"
     }
 
 # ==================== 인덱스 조회 ====================
