@@ -186,7 +186,7 @@ function Dashboard() {
                     </div>
                     <div className="flex justify-between">
                       <span>환율</span>
-                      <span className="text-slate-400">₩1 = 0.01P</span>
+                      <span className="text-slate-400">1000P = ₩1</span>
                     </div>
                   </div>
                 </div>
