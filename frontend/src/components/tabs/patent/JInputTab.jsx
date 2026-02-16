@@ -544,55 +544,49 @@ export const JInputTab = ({ onSignalSubmit }) => {
             </CardContent>
           </Card>
 
-          {/* 시그널 입력 */}
-          <Card className="bg-slate-800/50 border-slate-700">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-slate-100 text-base">시그널 내용</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {inputType === "text" && (
-                <Textarea
-                  placeholder="분석할 시그널을 입력하세요"
-                  value={textContent}
-                  onChange={(e) => setTextContent(e.target.value)}
-                  className="bg-slate-900 border-slate-600 text-slate-100 min-h-[120px]"
-                />
-              )}
+          {/* 파일/URL 입력 (텍스트가 아닐 때만 표시) */}
+          {inputType !== "text" && (
+            <Card className="bg-slate-800/50 border-slate-700">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-slate-100 text-base">
+                  {inputType === "file" ? "파일 업로드" : inputType === "url" ? "URL 입력" : "추가 입력"}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {inputType === "url" && (
+                  <Input
+                    placeholder="URL 입력 (http:// 또는 https://)"
+                    value={urlInput}
+                    onChange={(e) => setUrlInput(e.target.value)}
+                    className="bg-slate-900 border-slate-600 text-slate-100"
+                  />
+                )}
 
-              {inputType === "url" && (
-                <Input
-                  placeholder="URL 입력 (http:// 또는 https://)"
-                  value={urlInput}
-                  onChange={(e) => setUrlInput(e.target.value)}
-                  className="bg-slate-900 border-slate-600 text-slate-100"
-                />
-              )}
-
-              {inputType === "file" && (
-                <div className="space-y-3">
-                  <div 
-                    className="border-2 border-dashed border-slate-600 rounded-lg p-4 text-center cursor-pointer hover:border-blue-500 transition-colors"
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    <Upload className="w-8 h-8 text-slate-500 mx-auto mb-2" />
-                    <p className="text-slate-400 text-sm">클릭하여 파일 선택</p>
-                    <p className="text-slate-500 text-xs mt-2">
-                      지원: 문서, 코드, 스프레드시트, 이미지
-                    </p>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      multiple
-                      accept=".pdf,.hwp,.hwpx,.docx,.txt,.xlsx,.xls,.csv,.jpg,.jpeg,.png,.gif,.webp,.bmp,.py,.js,.ts,.jsx,.tsx,.java,.c,.cpp,.cs,.go,.rs,.rb,.php,.swift,.kt,.html,.css,.scss,.sql,.json,.xml,.yaml,.yml,.sh,.bat,.md"
-                      onChange={handleFileSelect}
-                      className="hidden"
-                    />
-                  </div>
-                  
-                  {/* 지원 형식 상세 안내 */}
-                  <div className="bg-slate-900/50 rounded-lg p-3 text-xs">
-                    <p className="text-slate-400 mb-2 font-medium">📁 지원하는 파일 형식:</p>
-                    <div className="grid grid-cols-4 gap-2 text-slate-500">
+                {inputType === "file" && (
+                  <div className="space-y-3">
+                    <div 
+                      className="border-2 border-dashed border-slate-600 rounded-lg p-4 text-center cursor-pointer hover:border-blue-500 transition-colors"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <Upload className="w-8 h-8 text-slate-500 mx-auto mb-2" />
+                      <p className="text-slate-400 text-sm">클릭하여 파일 선택</p>
+                      <p className="text-slate-500 text-xs mt-2">
+                        지원: 문서, 코드, 스프레드시트, 이미지
+                      </p>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        multiple
+                        accept=".pdf,.hwp,.hwpx,.docx,.txt,.xlsx,.xls,.csv,.jpg,.jpeg,.png,.gif,.webp,.bmp,.py,.js,.ts,.jsx,.tsx,.java,.c,.cpp,.cs,.go,.rs,.rb,.php,.swift,.kt,.html,.css,.scss,.sql,.json,.xml,.yaml,.yml,.sh,.bat,.md"
+                        onChange={handleFileSelect}
+                        className="hidden"
+                      />
+                    </div>
+                    
+                    {/* 지원 형식 상세 안내 */}
+                    <div className="bg-slate-900/50 rounded-lg p-3 text-xs">
+                      <p className="text-slate-400 mb-2 font-medium">📁 지원하는 파일 형식:</p>
+                      <div className="grid grid-cols-4 gap-2 text-slate-500">
                       <div>
                         <span className="text-blue-400">문서:</span>
                         <p>.pdf .hwp .hwpx .docx .txt</p>
