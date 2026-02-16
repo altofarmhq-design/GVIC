@@ -374,13 +374,22 @@ export const JInputTab = ({ onSignalSubmit }) => {
 
               {/* URL 입력 */}
               {inputType === "url" && (
-                <div>
+                <div className="space-y-3">
                   <Input
                     placeholder="분석할 웹페이지 URL을 입력하세요 (http:// 또는 https://)"
                     value={urlInput}
                     onChange={(e) => setUrlInput(e.target.value)}
                     className="bg-slate-900 border-slate-600 text-slate-100 text-base py-6"
                   />
+                  <Textarea
+                    placeholder="이 URL에서 무엇을 알고 싶으신가요?&#10;&#10;예시:&#10;• 구매후기를 크롤링해서 분석해줘&#10;• 이 제품의 가격과 특징을 요약해줘&#10;• 고객 리뷰에서 장단점을 추출해줘&#10;• 경쟁사 제품과 비교 분석해줘"
+                    value={purpose}
+                    onChange={(e) => setPurpose(e.target.value)}
+                    className="bg-slate-900 border-slate-600 text-slate-100 min-h-[100px] text-sm"
+                  />
+                  <p className="text-xs text-slate-500">
+                    💡 "리뷰", "후기", "크롤링" 키워드 입력 시 자동으로 구매후기를 수집합니다
+                  </p>
                 </div>
               )}
 
