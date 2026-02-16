@@ -386,6 +386,55 @@ export const JInputTab = ({ onSignalSubmit }) => {
             </CardContent>
           </Card>
 
+          {/* 분석 유형 선택 */}
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-slate-100 text-base flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-amber-400" />
+                AI 분석 유형
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-3 gap-3">
+                {analysisTypes.map((type) => {
+                  const Icon = type.icon;
+                  const isSelected = analysisType === type.id;
+                  const colorClass = {
+                    blue: isSelected ? 'border-blue-500 bg-blue-500/20' : 'hover:border-blue-500/50',
+                    green: isSelected ? 'border-green-500 bg-green-500/20' : 'hover:border-green-500/50',
+                    amber: isSelected ? 'border-amber-500 bg-amber-500/20' : 'hover:border-amber-500/50'
+                  }[type.color];
+                  const iconColor = {
+                    blue: isSelected ? 'text-blue-400' : 'text-slate-400',
+                    green: isSelected ? 'text-green-400' : 'text-slate-400',
+                    amber: isSelected ? 'text-amber-400' : 'text-slate-400'
+                  }[type.color];
+                  
+                  return (
+                    <button
+                      key={type.id}
+                      onClick={() => setAnalysisType(type.id)}
+                      className={`p-4 rounded-lg border-2 transition-all ${
+                        isSelected 
+                          ? colorClass
+                          : `border-slate-600 bg-slate-800/50 ${colorClass}`
+                      }`}
+                    >
+                      <Icon className={`w-6 h-6 mx-auto mb-2 ${iconColor}`} />
+                      <p className={`text-sm font-medium ${isSelected ? 'text-slate-100' : 'text-slate-300'}`}>
+                        {type.label}
+                      </p>
+                      <p className="text-xs text-slate-500 mt-1">{type.desc}</p>
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-slate-500 mt-3 text-center">
+                * 코드 파일 업로드 시 자동으로 "코드 분석" 모드로 전환됩니다
+              </p>
+            </CardContent>
+          </Card>
+
           {/* 시그널 입력 */}
           <Card className="bg-slate-800/50 border-slate-700">
             <CardHeader className="pb-2">
