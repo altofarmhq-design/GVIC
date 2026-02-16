@@ -342,6 +342,10 @@ function Dashboard() {
             <MyAssetsTab />
           </TabsContent>
 
+          <TabsContent value="market">
+            <ModuleMarketTab />
+          </TabsContent>
+
           <TabsContent value="users">
             <UsersTab />
           </TabsContent>
