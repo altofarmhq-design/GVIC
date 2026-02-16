@@ -48,7 +48,7 @@ echo   │    [0] ❌ 종료                                              │
 echo   │                                                             │
 echo   └─────────────────────────────────────────────────────────────┘
 echo.
-set /p choice="  선택하세요 [0-8]: "
+set /p choice="  선택하세요 [0-9]: "
 
 if "%choice%"=="1" goto START_ALL
 if "%choice%"=="2" goto START_BACKEND
@@ -58,6 +58,7 @@ if "%choice%"=="5" goto CHECK_STATUS
 if "%choice%"=="6" goto INSTALL
 if "%choice%"=="7" goto OPEN_BROWSER
 if "%choice%"=="8" goto VIEW_LOGS
+if "%choice%"=="9" goto START_MONGODB
 if "%choice%"=="0" goto EXIT
 goto MENU
 
