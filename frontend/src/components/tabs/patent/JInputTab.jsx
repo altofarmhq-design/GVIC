@@ -378,15 +378,38 @@ export const JInputTab = ({ onSignalSubmit }) => {
                   >
                     <Upload className="w-8 h-8 text-slate-500 mx-auto mb-2" />
                     <p className="text-slate-400 text-sm">클릭하여 파일 선택</p>
+                    <p className="text-slate-500 text-xs mt-2">
+                      지원 형식: PDF, HWP, HWPX, DOCX, TXT, Excel, CSV, 이미지
+                    </p>
                     <input
                       ref={fileInputRef}
                       type="file"
                       multiple
-                      accept=".xlsx,.xls,.csv,.pdf,.txt,.jpg,.jpeg,.png,.gif,.webp,.bmp"
+                      accept=".pdf,.hwp,.hwpx,.docx,.txt,.xlsx,.xls,.csv,.jpg,.jpeg,.png,.gif,.webp,.bmp"
                       onChange={handleFileSelect}
                       className="hidden"
                     />
                   </div>
+                  
+                  {/* 지원 형식 상세 안내 */}
+                  <div className="bg-slate-900/50 rounded-lg p-3 text-xs">
+                    <p className="text-slate-400 mb-2 font-medium">📁 지원하는 파일 형식:</p>
+                    <div className="grid grid-cols-3 gap-2 text-slate-500">
+                      <div>
+                        <span className="text-blue-400">문서:</span>
+                        <p>.pdf .hwp .hwpx .docx .txt</p>
+                      </div>
+                      <div>
+                        <span className="text-green-400">스프레드시트:</span>
+                        <p>.xlsx .xls .csv</p>
+                      </div>
+                      <div>
+                        <span className="text-amber-400">이미지:</span>
+                        <p>.jpg .png .gif .webp</p>
+                      </div>
+                    </div>
+                  </div>
+                  
                   {selectedFiles.length > 0 && (
                     <div className="space-y-1">
                       {selectedFiles.map((file, index) => {
@@ -396,6 +419,7 @@ export const JInputTab = ({ onSignalSubmit }) => {
                             <div className="flex items-center gap-2">
                               <FileIcon className="w-4 h-4 text-blue-400" />
                               <span className="text-slate-200 text-sm truncate max-w-[200px]">{file.name}</span>
+                              <span className="text-slate-500 text-xs">({formatFileSize(file.size)})</span>
                             </div>
                             <button onClick={() => removeFile(index)} className="text-slate-500 hover:text-red-400">
                               <X className="w-4 h-4" />
