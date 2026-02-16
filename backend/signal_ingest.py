@@ -140,22 +140,15 @@ async def ingest_text_signal(request: TextSignalRequest, current_user: dict = De
     )
     
     return result
-        "signal_id": signal_id,
-        "type": "text",
-        "content_length": len(request.content),
-        "message": "텍스트 시그널 수신 완료",
-        "timestamp": datetime.now(timezone.utc).isoformat()
-    }
 
 @router.post("/ingest/url")
 async def ingest_url_signal(request: UrlSignalRequest, current_user: dict = Depends(get_current_user_simple)):
-    """URL 시그널 입력 - 웹페이지 텍스트 추출"""
+    """URL 시그널 입력 → 파이프라인 자동 실행"""
     if not request.url.strip():
         raise HTTPException(status_code=400, detail="URL이 비어있습니다")
     
-    # URL 형식 검증
     if not request.url.startswith(('http://', 'https://')):
-        raise HTTPException(status_code=400, detail="올바른 URL 형식이 아닙니다 (http:// 또는 https://로 시작해야 합니다)")
+        raise HTTPException(status_code=400, detail="올바른 URL 형식이 아닙니다")
     
     # 텍스트 추출
     extracted_text = await extract_text_from_url(request.url)
@@ -163,18 +156,20 @@ async def ingest_url_signal(request: UrlSignalRequest, current_user: dict = Depe
     if not extracted_text.strip():
         raise HTTPException(status_code=400, detail="URL에서 텍스트를 추출할 수 없습니다")
     
-    signal_id = generate_signal_id()
+    # 파이프라인 실행
+    from server import get_pipeline_engine
+    pipeline = get_pipeline_engine()
     
-    return {
-        "success": True,
-        "signal_id": signal_id,
-        "type": "url",
-        "source_url": request.url,
-        "extracted_text": extracted_text[:5000],  # 최대 5000자
-        "content_length": len(extracted_text),
-        "message": "URL 시그널 처리 완료",
-        "timestamp": datetime.now(timezone.utc).isoformat()
-    }
+    result = await pipeline.create_signal(
+        signal_type="url",
+        content=extracted_text,
+        source=request.url,
+        metadata={"input_method": "url", "original_url": request.url},
+        user_id=current_user.get("sub")
+    )
+    
+    result["extracted_text"] = extracted_text[:2000]  # 프리뷰용
+    return result
 
 @router.post("/ingest/files")
 async def ingest_file_signals(
