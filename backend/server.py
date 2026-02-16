@@ -3371,6 +3371,10 @@ app.include_router(report_router)
 from external_connector import router as connector_router
 app.include_router(connector_router)
 
+# Include points system router (포인트 시스템)
+from points_system import router as points_router
+app.include_router(points_router)
+
 # ==================== Pipeline API ====================
 
 @api_router.get("/pipeline/stats")
