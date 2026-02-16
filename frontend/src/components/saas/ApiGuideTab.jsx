@@ -534,7 +534,7 @@ analyzeProduct('product_123', reviews)
 }`}
                 </pre>
               </div>
-              <Button className="bg-violet-600 hover:bg-violet-700">
+              <Button className="bg-violet-600 hover:bg-violet-700" onClick={handleSaveWebhook}>
                 웹훅 저장
               </Button>
             </CardContent>
