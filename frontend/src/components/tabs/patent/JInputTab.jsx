@@ -156,17 +156,14 @@ export const JInputTab = ({ onSignalSubmit }) => {
               />
               <div className="grid grid-cols-2 gap-3">
                 <Input
-                  placeholder="API Key (선택)"
+                  placeholder="API Key"
                   className="bg-slate-900 border-slate-600 text-slate-100"
                 />
                 <Input
-                  placeholder="Header Token (선택)"
+                  placeholder="Header Token"
                   className="bg-slate-900 border-slate-600 text-slate-100"
                 />
               </div>
-              <p className="text-slate-500 text-sm">
-                외부 API에서 데이터를 가져와 시그널로 변환합니다.
-              </p>
             </div>
           )}
 
