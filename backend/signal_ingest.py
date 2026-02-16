@@ -379,6 +379,14 @@ async def ingest_text_signal(request: TextSignalRequest, current_user: dict = De
     from server import get_pipeline_engine
     pipeline = get_pipeline_engine()
     
+    # 분류 비율 설정 (기본값: 5:3:2)
+    ratio = request.classification_ratio or ClassificationRatio()
+    classification_ratio = {
+        "wanted": ratio.wanted,
+        "unwanted": ratio.unwanted,
+        "null": ratio.null
+    }
+    
     # AI 분석 수행 (분석 유형 포함)
     from core.ai_analyzer import analyze_signal
     ai_result = await analyze_signal(
@@ -388,7 +396,7 @@ async def ingest_text_signal(request: TextSignalRequest, current_user: dict = De
         analysis_type=request.analysis_type
     )
     
-    # 파이프라인 실행
+    # 파이프라인 실행 (비율 포함)
     result = await pipeline.create_signal(
         signal_type="text",
         content=request.content,
@@ -398,6 +406,7 @@ async def ingest_text_signal(request: TextSignalRequest, current_user: dict = De
             "purpose": request.purpose,
             "expected_result": request.expected_result,
             "analysis_type": request.analysis_type,
+            "classification_ratio": classification_ratio,
             "ai_analysis": ai_result
         },
         user_id=current_user.get("sub")
