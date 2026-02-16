@@ -3391,6 +3391,32 @@ app.include_router(gvic_analyzer_router)
 from ocr_processor import router as ocr_router
 app.include_router(ocr_router)
 
+# Include 14 Patent-based routers (14개 특허 기반 모듈)
+from patents import (
+    j_platform_router,
+    ll_intelligence_router,
+    h_core_router,
+    a_gate_router,
+    e_shield_router,
+    g_refine_router,
+    b_calc_router,
+    c_exec_router,
+    f_field_router,
+    d_ledger_router,
+    i_integrity_router
+)
+app.include_router(j_platform_router)
+app.include_router(ll_intelligence_router)
+app.include_router(h_core_router)
+app.include_router(a_gate_router)
+app.include_router(e_shield_router)
+app.include_router(g_refine_router)
+app.include_router(b_calc_router)
+app.include_router(c_exec_router)
+app.include_router(f_field_router)
+app.include_router(d_ledger_router)
+app.include_router(i_integrity_router)
+
 # ==================== Pipeline API ====================
 
 @api_router.get("/pipeline/stats")
