@@ -24,7 +24,7 @@ if %errorlevel% equ 0 (
     tasklist /fi "imagename eq mongod.exe" | find /i "mongod.exe" >nul 2>&1
     if %errorlevel% neq 0 (
         echo        MongoDB 직접 시작 중...
-        start "MongoDB" mongod --dbpath "C:\data\db"
+        start "MongoDB" mongod --dbpath "%ROOT_DIR%\data\db"
         timeout /t 3 /nobreak >nul
     ) else (
         echo        MongoDB 이미 실행 중 ✓

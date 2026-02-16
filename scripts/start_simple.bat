@@ -6,7 +6,7 @@ echo.
 set "ROOT_DIR=%~dp0.."
 
 echo [1/3] Starting MongoDB...
-start "MongoDB" mongod --dbpath "C:\data\db"
+start "MongoDB" mongod --dbpath "%ROOT_DIR%\data\db"
 timeout /t 3 /nobreak >nul
 echo MongoDB started.
 echo.

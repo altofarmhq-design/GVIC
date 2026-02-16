@@ -123,9 +123,10 @@ echo.
 
 :: ==================== MongoDB 데이터 디렉토리 ====================
 echo [4/6] MongoDB 데이터 디렉토리 확인...
-if not exist "C:\data\db" (
-    echo        C:\data\db 생성 중...
-    mkdir "C:\data\db" 2>nul
+set "MONGO_DATA_DIR=%ROOT_DIR%\data\db"
+if not exist "%MONGO_DATA_DIR%" (
+    echo        %MONGO_DATA_DIR% 생성 중...
+    mkdir "%MONGO_DATA_DIR%" 2>nul
 )
 echo        MongoDB 데이터 디렉토리 준비 완료 ✓
 echo.
