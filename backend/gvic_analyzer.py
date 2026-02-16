@@ -663,7 +663,315 @@ async def extract_insights(
     return insights
 
 
+# ==================== 4단계: 자산 가치 평가 (다차원 스코어링) ====================
+
+class AssetValuationRequest(BaseModel):
+    """자산 가치 평가 요청"""
+    asset_id: str = None
+    signal_id: str = None
+    content: str = None
+    keywords: List[str] = []
+    category: str = "general"
+
+class MultiDimensionalScore(BaseModel):
+    """다차원 가치 점수"""
+    market_potential: float = Field(description="시장성 (수요/활용 가능성)")
+    scarcity: float = Field(description="희소성 (유사 자산 존재 여부)")
+    freshness: float = Field(description="신선도 (최신성, 트렌드 부합)")
+    connectivity: float = Field(description="연결성 (다른 자산과 시너지)")
+    public_contribution: float = Field(description="공공 기여도 (5:3:2 중 공공 가치)")
+    total_score: float = Field(description="종합 점수")
+    grade: str = Field(description="등급 (S/A/B/C/D)")
+
+async def evaluate_asset_value(
+    content: str,
+    keywords: List[str],
+    category: str,
+    existing_assets: List[Dict] = None
+) -> Dict[str, Any]:
+    """
+    자산의 다차원 가치 평가
+    
+    평가 기준:
+    1. 시장성 (Market Potential): 수요와 활용 가능성
+    2. 희소성 (Scarcity): 유사 자산이 적을수록 높음
+    3. 신선도 (Freshness): 최신 트렌드 부합도
+    4. 연결성 (Connectivity): 다른 자산과의 시너지 가능성
+    5. 공공 기여도 (Public Contribution): 커뮤니티 가치
+    """
+    from server import db
+    
+    # 기존 자산 조회 (비교용)
+    if existing_assets is None:
+        existing_assets = await db.indexed_assets.find({}, {"_id": 0}).to_list(500)
+    
+    # 기존 시그널 조회
+    existing_signals = await db.pipeline_signals.find({}, {"_id": 0}).to_list(300)
+    
+    scores = {
+        "market_potential": 50,
+        "scarcity": 50,
+        "freshness": 50,
+        "connectivity": 50,
+        "public_contribution": 50
+    }
+    
+    content_lower = content.lower()
+    
+    # ===== 1. 시장성 평가 =====
+    market_keywords = {
+        "high": ["마케팅", "비즈니스", "수익", "고객", "시장", "판매", "투자", "성장", "전략", "분석", "데이터", "AI", "플랫폼"],
+        "medium": ["정보", "서비스", "개발", "기술", "혁신", "효율", "관리", "운영"],
+        "low": ["일반", "기타", "테스트"]
+    }
+    
+    market_score = 40
+    for kw in market_keywords["high"]:
+        if kw in content_lower:
+            market_score += 8
+    for kw in market_keywords["medium"]:
+        if kw in content_lower:
+            market_score += 4
+    scores["market_potential"] = min(100, market_score)
+    
+    # ===== 2. 희소성 평가 =====
+    similar_count = 0
+    for asset in existing_assets:
+        asset_content = asset.get("original_content", "") or asset.get("content_summary", "")
+        similarity = await calculate_text_similarity(content, asset_content)
+        if similarity > 0.5:
+            similar_count += 1
+    
+    # 유사 자산이 적을수록 희소성 높음
+    if similar_count == 0:
+        scores["scarcity"] = 95
+    elif similar_count <= 2:
+        scores["scarcity"] = 80
+    elif similar_count <= 5:
+        scores["scarcity"] = 60
+    elif similar_count <= 10:
+        scores["scarcity"] = 40
+    else:
+        scores["scarcity"] = 20
+    
+    # ===== 3. 신선도 평가 =====
+    trend_keywords = ["AI", "GPT", "LLM", "자동화", "데이터", "분석", "클라우드", "메타버스", "NFT", "블록체인", "ESG", "지속가능"]
+    freshness_score = 40
+    for kw in trend_keywords:
+        if kw.lower() in content_lower:
+            freshness_score += 10
+    scores["freshness"] = min(100, freshness_score)
+    
+    # ===== 4. 연결성 평가 =====
+    # 키워드 기반 연결 가능성
+    connectable_count = 0
+    for asset in existing_assets:
+        asset_keywords = asset.get("feature_keywords", [])
+        common = set(k.lower() for k in keywords) & set(k.lower() for k in asset_keywords)
+        if common:
+            connectable_count += 1
+    
+    if connectable_count >= 10:
+        scores["connectivity"] = 90
+    elif connectable_count >= 5:
+        scores["connectivity"] = 75
+    elif connectable_count >= 2:
+        scores["connectivity"] = 60
+    elif connectable_count >= 1:
+        scores["connectivity"] = 45
+    else:
+        scores["connectivity"] = 30
+    
+    # ===== 5. 공공 기여도 평가 =====
+    public_keywords = ["공유", "커뮤니티", "오픈", "무료", "교육", "정보", "가이드", "팁", "리뷰", "후기", "도움", "협업", "참여"]
+    public_score = 40
+    for kw in public_keywords:
+        if kw in content_lower:
+            public_score += 8
+    scores["public_contribution"] = min(100, public_score)
+    
+    # ===== 종합 점수 계산 (가중 평균) =====
+    weights = {
+        "market_potential": 0.25,
+        "scarcity": 0.20,
+        "freshness": 0.15,
+        "connectivity": 0.20,
+        "public_contribution": 0.20
+    }
+    
+    total_score = sum(scores[k] * weights[k] for k in weights)
+    
+    # ===== 등급 산정 =====
+    if total_score >= 85:
+        grade = "S"
+        grade_description = "최상위 가치 자산"
+    elif total_score >= 70:
+        grade = "A"
+        grade_description = "높은 가치 자산"
+    elif total_score >= 55:
+        grade = "B"
+        grade_description = "평균 이상 가치"
+    elif total_score >= 40:
+        grade = "C"
+        grade_description = "평균 가치"
+    else:
+        grade = "D"
+        grade_description = "낮은 가치"
+    
+    # 5:3:2 가치 분해
+    value_532 = {
+        "public_value": total_score * PUBLIC_RATIO,
+        "operation_value": total_score * OPERATION_RATIO,
+        "management_value": total_score * MANAGEMENT_RATIO,
+        "total": total_score
+    }
+    
+    return {
+        "success": True,
+        "scores": {
+            "market_potential": round(scores["market_potential"], 1),
+            "scarcity": round(scores["scarcity"], 1),
+            "freshness": round(scores["freshness"], 1),
+            "connectivity": round(scores["connectivity"], 1),
+            "public_contribution": round(scores["public_contribution"], 1)
+        },
+        "total_score": round(total_score, 1),
+        "grade": grade,
+        "grade_description": grade_description,
+        "value_532": {k: round(v, 1) for k, v in value_532.items()},
+        "analysis_details": {
+            "similar_assets_found": similar_count,
+            "connectable_assets": connectable_count,
+            "market_keywords_matched": sum(1 for kw in market_keywords["high"] if kw in content_lower),
+            "trend_keywords_matched": sum(1 for kw in trend_keywords if kw.lower() in content_lower)
+        },
+        "recommendations": generate_value_recommendations(scores, grade)
+    }
+
+
+def generate_value_recommendations(scores: Dict, grade: str) -> List[Dict]:
+    """가치 평가 기반 추천 생성"""
+    recommendations = []
+    
+    if scores["scarcity"] >= 80:
+        recommendations.append({
+            "type": "highlight",
+            "area": "희소성",
+            "message": "희소성이 높습니다. 프리미엄 모듈로 등록을 권장합니다."
+        })
+    
+    if scores["market_potential"] >= 70:
+        recommendations.append({
+            "type": "success",
+            "area": "시장성",
+            "message": "시장성이 좋습니다. 적극적인 모듈화를 권장합니다."
+        })
+    
+    if scores["connectivity"] >= 70:
+        recommendations.append({
+            "type": "info",
+            "area": "연결성",
+            "message": "다른 자산과의 연결성이 높습니다. 번들 모듈 구성을 고려하세요."
+        })
+    
+    if scores["freshness"] < 40:
+        recommendations.append({
+            "type": "warning",
+            "area": "신선도",
+            "message": "트렌드 키워드가 부족합니다. 최신 정보로 보완을 권장합니다."
+        })
+    
+    if scores["public_contribution"] >= 70:
+        recommendations.append({
+            "type": "success",
+            "area": "공공 기여",
+            "message": "공공 기여도가 높습니다. 5:3:2 분배 시 높은 환원이 예상됩니다."
+        })
+    
+    if grade in ["S", "A"]:
+        recommendations.append({
+            "type": "highlight",
+            "area": "등급",
+            "message": f"{grade}등급 자산입니다. 우선 모듈화 대상입니다."
+        })
+    
+    return recommendations
+
+
 # ==================== API Endpoints ====================
+
+@router.post("/evaluate-value")
+async def evaluate_asset_value_endpoint(request: AssetValuationRequest):
+    """
+    자산/시그널의 다차원 가치 평가
+    
+    평가 항목:
+    - 시장성: 수요/활용 가능성
+    - 희소성: 유사 자산 존재 여부
+    - 신선도: 최신성, 트렌드 부합
+    - 연결성: 다른 자산과 시너지
+    - 공공 기여도: 커뮤니티 가치
+    
+    결과:
+    - 항목별 점수 (0-100)
+    - 종합 점수 및 등급 (S/A/B/C/D)
+    - 5:3:2 가치 분해
+    - 추천 액션
+    """
+    from server import db
+    
+    # 콘텐츠 확보
+    content = request.content
+    keywords = request.keywords
+    category = request.category
+    
+    if not content and request.signal_id:
+        signal = await db.pipeline_signals.find_one(
+            {"signal_id": request.signal_id},
+            {"_id": 0}
+        )
+        if signal:
+            content = signal.get("content", "")
+            keywords = signal.get("metadata", {}).get("ai_analysis", {}).get("keywords", [])
+            category = signal.get("metadata", {}).get("ai_analysis", {}).get("signal_category", "general")
+    
+    if not content and request.asset_id:
+        asset = await db.indexed_assets.find_one(
+            {"asset_id": request.asset_id},
+            {"_id": 0}
+        )
+        if asset:
+            content = asset.get("original_content", "") or asset.get("content_summary", "")
+            keywords = asset.get("feature_keywords", [])
+            category = asset.get("feature_category", "general")
+    
+    if not content:
+        raise HTTPException(status_code=400, detail="평가할 콘텐츠가 없습니다")
+    
+    result = await evaluate_asset_value(
+        content=content,
+        keywords=keywords,
+        category=category
+    )
+    
+    result["asset_id"] = request.asset_id
+    result["signal_id"] = request.signal_id
+    
+    # DB에 저장
+    await db.asset_valuations.update_one(
+        {"$or": [
+            {"asset_id": request.asset_id} if request.asset_id else {"asset_id": None},
+            {"signal_id": request.signal_id} if request.signal_id else {"signal_id": None}
+        ]},
+        {"$set": {
+            **result,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }},
+        upsert=True
+    )
+    
+    return result
+
 
 @router.get("/insights")
 async def get_platform_insights(time_range_days: int = 30):
