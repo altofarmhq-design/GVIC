@@ -359,6 +359,52 @@ if "%logchoice%"=="1" (
 if "%logchoice%"=="2" start http://localhost:8001/docs
 goto MENU
 
+:START_MONGODB
+cls
+echo.
+echo  ════════════════════════════════════════════════════════════════
+echo    MongoDB 시작
+echo  ════════════════════════════════════════════════════════════════
+echo.
+
+:: MongoDB 설치 확인
+mongod --version > nul 2>&1
+if errorlevel 1 (
+    echo    [오류] MongoDB가 설치되어 있지 않습니다!
+    echo.
+    echo    MongoDB 설치 방법:
+    echo    1. https://www.mongodb.com/try/download/community 접속
+    echo    2. Windows x64 MSI 다운로드
+    echo    3. 설치 시 "Complete" 선택
+    echo    4. "Install MongoDB as a Service" 체크
+    echo.
+    echo    또는 MongoDB Atlas (클라우드) 사용:
+    echo    https://www.mongodb.com/atlas
+    echo.
+    pause
+    goto MENU
+)
+
+:: 데이터 폴더 생성
+if not exist "C:\data\db" (
+    echo    데이터 폴더 생성 중...
+    mkdir "C:\data\db" 2>nul
+    if errorlevel 1 (
+        echo    [경고] C:\data\db 생성 실패 - 관리자 권한 필요
+        echo    관리자 권한으로 cmd 실행 후: mkdir C:\data\db
+    )
+)
+
+:: MongoDB 실행
+echo    MongoDB 서버를 새 창에서 시작합니다...
+start "MongoDB Server" cmd /k "mongod --dbpath C:\data\db"
+echo.
+echo    ✓ MongoDB가 시작되었습니다!
+echo    ✓ MongoDB 창을 닫지 마세요!
+echo.
+pause
+goto MENU
+
 :EXIT
 cls
 echo.
