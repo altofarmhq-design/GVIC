@@ -179,7 +179,7 @@ class TestCheckoutSession(TestAuthSetup):
         payload = {
             "plan_id": "starter",
             "billing_cycle": "monthly",
-            "origin_url": "https://reviewhub-46.preview.emergentagent.com"
+            "origin_url": "https://ecom-analyzer-6.preview.emergentagent.com"
         }
         
         response = requests.post(
@@ -217,7 +217,7 @@ class TestCheckoutSession(TestAuthSetup):
         payload = {
             "plan_id": "growth",
             "billing_cycle": "yearly",
-            "origin_url": "https://reviewhub-46.preview.emergentagent.com"
+            "origin_url": "https://ecom-analyzer-6.preview.emergentagent.com"
         }
         
         response = requests.post(
@@ -240,7 +240,7 @@ class TestCheckoutSession(TestAuthSetup):
         payload = {
             "plan_id": "pro",
             "billing_cycle": "monthly",
-            "origin_url": "https://reviewhub-46.preview.emergentagent.com"
+            "origin_url": "https://ecom-analyzer-6.preview.emergentagent.com"
         }
         
         response = requests.post(
@@ -260,7 +260,7 @@ class TestCheckoutSession(TestAuthSetup):
         payload = {
             "plan_id": "free",
             "billing_cycle": "monthly",
-            "origin_url": "https://reviewhub-46.preview.emergentagent.com"
+            "origin_url": "https://ecom-analyzer-6.preview.emergentagent.com"
         }
         
         response = requests.post(
@@ -280,7 +280,7 @@ class TestCheckoutSession(TestAuthSetup):
         payload = {
             "plan_id": "enterprise",
             "billing_cycle": "monthly",
-            "origin_url": "https://reviewhub-46.preview.emergentagent.com"
+            "origin_url": "https://ecom-analyzer-6.preview.emergentagent.com"
         }
         
         response = requests.post(
@@ -301,7 +301,7 @@ class TestCheckoutSession(TestAuthSetup):
         payload = {
             "plan_id": "invalid_plan",
             "billing_cycle": "monthly",
-            "origin_url": "https://reviewhub-46.preview.emergentagent.com"
+            "origin_url": "https://ecom-analyzer-6.preview.emergentagent.com"
         }
         
         response = requests.post(

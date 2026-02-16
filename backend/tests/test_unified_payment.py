@@ -165,7 +165,7 @@ class TestStripeCheckout(TestAuthSetup):
             "plan_id": "starter",
             "payment_method": "stripe",
             "billing_cycle": "monthly",
-            "origin_url": "https://reviewhub-46.preview.emergentagent.com"
+            "origin_url": "https://ecom-analyzer-6.preview.emergentagent.com"
         }
         
         response = requests.post(
@@ -213,7 +213,7 @@ class TestStripeCheckout(TestAuthSetup):
             "plan_id": "growth",
             "payment_method": "stripe",
             "billing_cycle": "yearly",
-            "origin_url": "https://reviewhub-46.preview.emergentagent.com"
+            "origin_url": "https://ecom-analyzer-6.preview.emergentagent.com"
         }
         
         response = requests.post(
@@ -242,7 +242,7 @@ class TestKoreanPaymentMethods(TestAuthSetup):
             "plan_id": "starter",
             "payment_method": "kakaopay",
             "billing_cycle": "monthly",
-            "origin_url": "https://reviewhub-46.preview.emergentagent.com"
+            "origin_url": "https://ecom-analyzer-6.preview.emergentagent.com"
         }
         
         response = requests.post(
@@ -272,7 +272,7 @@ class TestKoreanPaymentMethods(TestAuthSetup):
             "plan_id": "growth",
             "payment_method": "naverpay",
             "billing_cycle": "yearly",
-            "origin_url": "https://reviewhub-46.preview.emergentagent.com"
+            "origin_url": "https://ecom-analyzer-6.preview.emergentagent.com"
         }
         
         response = requests.post(
@@ -300,7 +300,7 @@ class TestKoreanPaymentMethods(TestAuthSetup):
             "plan_id": "pro",
             "payment_method": "tosspayments",
             "billing_cycle": "monthly",
-            "origin_url": "https://reviewhub-46.preview.emergentagent.com"
+            "origin_url": "https://ecom-analyzer-6.preview.emergentagent.com"
         }
         
         response = requests.post(
@@ -328,7 +328,7 @@ class TestKoreanPaymentMethods(TestAuthSetup):
             "plan_id": "starter",
             "payment_method": "samsungpay",
             "billing_cycle": "monthly",
-            "origin_url": "https://reviewhub-46.preview.emergentagent.com"
+            "origin_url": "https://ecom-analyzer-6.preview.emergentagent.com"
         }
         
         response = requests.post(
@@ -356,7 +356,7 @@ class TestKoreanPaymentMethods(TestAuthSetup):
             "plan_id": "growth",
             "payment_method": "payco",
             "billing_cycle": "monthly",
-            "origin_url": "https://reviewhub-46.preview.emergentagent.com"
+            "origin_url": "https://ecom-analyzer-6.preview.emergentagent.com"
         }
         
         response = requests.post(
@@ -391,7 +391,7 @@ class TestPaymentStatus(TestAuthSetup):
             "plan_id": "starter",
             "payment_method": "kakaopay",
             "billing_cycle": "monthly",
-            "origin_url": "https://reviewhub-46.preview.emergentagent.com"
+            "origin_url": "https://ecom-analyzer-6.preview.emergentagent.com"
         }
         
         response = requests.post(
@@ -473,7 +473,7 @@ class TestPaymentVerify(TestAuthSetup):
             "plan_id": "starter",
             "payment_method": "payco",
             "billing_cycle": "monthly",
-            "origin_url": "https://reviewhub-46.preview.emergentagent.com"
+            "origin_url": "https://ecom-analyzer-6.preview.emergentagent.com"
         }
         
         response = requests.post(
@@ -548,7 +548,7 @@ class TestCheckoutErrors(TestAuthSetup):
             "plan_id": "free",
             "payment_method": "stripe",
             "billing_cycle": "monthly",
-            "origin_url": "https://reviewhub-46.preview.emergentagent.com"
+            "origin_url": "https://ecom-analyzer-6.preview.emergentagent.com"
         }
         
         response = requests.post(
@@ -569,7 +569,7 @@ class TestCheckoutErrors(TestAuthSetup):
             "plan_id": "enterprise",
             "payment_method": "stripe",
             "billing_cycle": "monthly",
-            "origin_url": "https://reviewhub-46.preview.emergentagent.com"
+            "origin_url": "https://ecom-analyzer-6.preview.emergentagent.com"
         }
         
         response = requests.post(
@@ -591,7 +591,7 @@ class TestCheckoutErrors(TestAuthSetup):
             "plan_id": "invalid_plan",
             "payment_method": "stripe",
             "billing_cycle": "monthly",
-            "origin_url": "https://reviewhub-46.preview.emergentagent.com"
+            "origin_url": "https://ecom-analyzer-6.preview.emergentagent.com"
         }
         
         response = requests.post(
@@ -609,7 +609,7 @@ class TestCheckoutErrors(TestAuthSetup):
             "plan_id": "starter",
             "payment_method": "invalid_method",
             "billing_cycle": "monthly",
-            "origin_url": "https://reviewhub-46.preview.emergentagent.com"
+            "origin_url": "https://ecom-analyzer-6.preview.emergentagent.com"
         }
         
         response = requests.post(
@@ -692,7 +692,7 @@ class TestDataPersistence(TestAuthSetup):
             "plan_id": "starter",
             "payment_method": "naverpay",
             "billing_cycle": "monthly",
-            "origin_url": "https://reviewhub-46.preview.emergentagent.com"
+            "origin_url": "https://ecom-analyzer-6.preview.emergentagent.com"
         }
         
         response = requests.post(
