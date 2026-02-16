@@ -34,7 +34,8 @@ import {
   CExecTab,
   FFieldTab,
   DLedgerTab,
-  IIntegrityTab
+  IIntegrityTab,
+  APIWebhookTab
 } from "@/components/tabs/patent";
 
 import LoginPage from "@/pages/LoginPage";
