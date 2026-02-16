@@ -2,7 +2,7 @@
 GVIC Signal Ingestion Module
 - 텍스트, URL, 파일 등 다양한 형태의 시그널 입력 처리
 """
-from fastapi import APIRouter, HTTPException, UploadFile, File, Depends
+from fastapi import APIRouter, HTTPException, UploadFile, File, Depends, Header
 from pydantic import BaseModel
 from typing import List, Optional
 import httpx
@@ -13,11 +13,27 @@ import io
 import os
 from datetime import datetime, timezone
 from bson import ObjectId
-
-# Auth dependency
-from auth import get_current_user
+import jwt
 
 router = APIRouter(prefix="/api/signal", tags=["signal"])
+
+# JWT Secret from env
+JWT_SECRET = os.environ.get("JWT_SECRET_KEY", "gvic-secret-key-change-in-production")
+
+# Simple auth dependency for this module
+async def get_current_user_simple(authorization: str = Header(None)):
+    """간단한 인증 확인"""
+    if not authorization:
+        raise HTTPException(status_code=401, detail="인증이 필요합니다")
+    
+    try:
+        token = authorization.replace("Bearer ", "")
+        payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
+        return payload
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="토큰이 만료되었습니다")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="유효하지 않은 토큰입니다")
 
 # Request Models
 class TextSignalRequest(BaseModel):
