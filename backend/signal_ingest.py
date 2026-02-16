@@ -119,7 +119,7 @@ def extract_text_from_txt(file_content: bytes) -> str:
 
 # API Endpoints
 @router.post("/ingest")
-async def ingest_text_signal(request: TextSignalRequest, current_user: dict = Depends(get_current_user)):
+async def ingest_text_signal(request: TextSignalRequest, current_user: dict = Depends(get_current_user_simple)):
     """텍스트 시그널 입력"""
     if not request.content.strip():
         raise HTTPException(status_code=400, detail="내용이 비어있습니다")
