@@ -167,7 +167,7 @@ async def ingest_url_signal(request: UrlSignalRequest, current_user: dict = Depe
 @router.post("/ingest/files")
 async def ingest_file_signals(
     files: List[UploadFile] = File(...),
-    current_user: dict = Depends(get_current_user)
+    current_user: dict = Depends(get_current_user_simple)
 ):
     """파일 시그널 입력 - 다양한 형식 지원"""
     if not files:
