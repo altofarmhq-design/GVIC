@@ -482,33 +482,6 @@ class TestFField(TestAuth):
 class TestDLedger(TestAuth):
     """D:LEDGER - 분산원장 테스트"""
     
-    def test_get_ledger_stats(self, auth_headers):
-        """원장 통계 조회"""
-        response = requests.get(f"{BASE_URL}/api/patent/d/stats", headers=auth_headers)
-        assert response.status_code == 200
-        data = response.json()
-        assert data.get("success") == True
-        assert "stats" in data
-        print(f"✓ D:Ledger - 원장 통계 조회 성공")
-    
-    def test_get_ledger_history(self, auth_headers):
-        """원장 이력 조회"""
-        response = requests.get(f"{BASE_URL}/api/patent/d/history?limit=10", headers=auth_headers)
-        assert response.status_code == 200
-        data = response.json()
-        assert data.get("success") == True
-        assert "transactions" in data
-        print(f"✓ D:Ledger - 원장 이력 조회 성공")
-    
-    def test_verify_chain(self, auth_headers):
-        """체인 무결성 검증"""
-        response = requests.get(f"{BASE_URL}/api/patent/d/verify-chain", headers=auth_headers)
-        assert response.status_code == 200
-        data = response.json()
-        assert data.get("success") == True
-        assert "is_valid" in data
-        print(f"✓ D:Ledger - 체인 검증 성공: is_valid={data.get('is_valid')}")
-    
     def test_record_transaction(self, auth_headers):
         """거래 기록"""
         response = requests.post(
@@ -527,36 +500,105 @@ class TestDLedger(TestAuth):
         assert data.get("success") == True
         assert "transaction_id" in data
         print(f"✓ D:Ledger - 거래 기록 성공: tx_id={data.get('transaction_id')}")
+    
+    def test_query_ledger(self, auth_headers):
+        """원장 조회 (POST /query)"""
+        response = requests.post(
+            f"{BASE_URL}/api/patent/d/query?limit=10",
+            headers=auth_headers,
+            json={}
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data.get("success") == True
+        assert "transactions" in data
+        print(f"✓ D:Ledger - 원장 조회 성공: {len(data.get('transactions', []))}건")
+    
+    def test_verify_chain(self, auth_headers):
+        """체인 무결성 검증"""
+        response = requests.get(f"{BASE_URL}/api/patent/d/verify-chain", headers=auth_headers)
+        assert response.status_code == 200
+        data = response.json()
+        assert data.get("success") == True
+        assert "valid" in data
+        print(f"✓ D:Ledger - 체인 검증 성공: valid={data.get('valid')}")
+    
+    def test_get_account_balance(self, auth_headers):
+        """계정 잔액 조회"""
+        response = requests.get(f"{BASE_URL}/api/patent/d/balance/TEST_USER_B", headers=auth_headers)
+        assert response.status_code == 200
+        data = response.json()
+        assert data.get("success") == True
+        assert "balance" in data
+        print(f"✓ D:Ledger - 계정 잔액 조회 성공: balance={data.get('balance')}")
+    
+    def test_get_latest_blocks(self, auth_headers):
+        """최근 블록 조회"""
+        response = requests.get(f"{BASE_URL}/api/patent/d/latest-blocks?limit=5", headers=auth_headers)
+        assert response.status_code == 200
+        data = response.json()
+        assert data.get("success") == True
+        assert "blocks" in data
+        print(f"✓ D:Ledger - 최근 블록 조회 성공: {len(data.get('blocks', []))}개")
 
 
 class TestIIntegrity(TestAuth):
     """I:INTEGRITY - 무결성 검사 테스트"""
     
-    def test_get_integrity_status(self, auth_headers):
-        """무결성 상태 조회"""
-        response = requests.get(f"{BASE_URL}/api/patent/i/status", headers=auth_headers)
+    def test_get_system_health(self, auth_headers):
+        """시스템 헬스 체크"""
+        response = requests.get(f"{BASE_URL}/api/patent/i/health", headers=auth_headers)
         assert response.status_code == 200
         data = response.json()
         assert data.get("success") == True
-        assert "status" in data
-        print(f"✓ I:Integrity - 무결성 상태 조회 성공")
+        assert "health" in data
+        print(f"✓ I:Integrity - 시스템 헬스 체크 성공")
     
-    def test_run_integrity_check(self, auth_headers):
-        """무결성 검사 실행"""
-        response = requests.post(f"{BASE_URL}/api/patent/i/check", headers=auth_headers)
+    def test_get_integrity_stats(self, auth_headers):
+        """무결성 통계 조회"""
+        response = requests.get(f"{BASE_URL}/api/patent/i/stats", headers=auth_headers)
+        assert response.status_code == 200
+        data = response.json()
+        assert data.get("success") == True
+        assert "stats" in data
+        print(f"✓ I:Integrity - 무결성 통계 조회 성공")
+    
+    def test_run_system_integrity_check(self, auth_headers):
+        """시스템 전체 무결성 검사"""
+        response = requests.post(f"{BASE_URL}/api/patent/i/system-check", headers=auth_headers)
         assert response.status_code == 200
         data = response.json()
         assert data.get("success") == True
         assert "results" in data
-        print(f"✓ I:Integrity - 무결성 검사 실행 성공")
+        print(f"✓ I:Integrity - 시스템 무결성 검사 성공")
     
-    def test_get_integrity_report(self, auth_headers):
-        """무결성 리포트 조회"""
-        response = requests.get(f"{BASE_URL}/api/patent/i/report", headers=auth_headers)
+    def test_get_audit_logs(self, auth_headers):
+        """감사 로그 조회"""
+        response = requests.get(f"{BASE_URL}/api/patent/i/audit-logs?limit=10", headers=auth_headers)
         assert response.status_code == 200
         data = response.json()
         assert data.get("success") == True
-        print(f"✓ I:Integrity - 무결성 리포트 조회 성공")
+        assert "logs" in data
+        print(f"✓ I:Integrity - 감사 로그 조회 성공: {len(data.get('logs', []))}건")
+    
+    def test_create_audit_log(self, auth_headers):
+        """감사 로그 기록"""
+        response = requests.post(
+            f"{BASE_URL}/api/patent/i/audit-log",
+            headers=auth_headers,
+            json={
+                "action": "test_action",
+                "entity_type": "test",
+                "entity_id": "TEST_ENTITY_001",
+                "user_id": "test_user",
+                "details": {"test": True}
+            }
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data.get("success") == True
+        assert "audit_id" in data
+        print(f"✓ I:Integrity - 감사 로그 기록 성공: audit_id={data.get('audit_id')}")
 
 
 if __name__ == "__main__":
