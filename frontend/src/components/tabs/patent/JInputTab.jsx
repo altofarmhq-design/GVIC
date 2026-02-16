@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   Upload, 
   FileText, 
@@ -17,7 +19,11 @@ import {
   File,
   Image,
   FileSpreadsheet,
-  Clock
+  Clock,
+  HelpCircle,
+  Target,
+  Lightbulb,
+  Package
 } from 'lucide-react';
 import axios from 'axios';
 
@@ -25,15 +31,19 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 /**
  * J:입력 - 외부 시그널 유입 (특허 J: PLATFORM)
- * 다양한 형태의 외부 시그널을 시스템으로 유입시키는 입구
  */
 export const JInputTab = ({ onSignalSubmit }) => {
   const [inputType, setInputType] = useState("text");
+  
+  // 새로운 입력 필드들
+  const [purpose, setPurpose] = useState("");        // 왜 질문하는지
+  const [expectedResult, setExpectedResult] = useState("");  // 기대하는 결과
   const [textContent, setTextContent] = useState("");
+  
   const [urlInput, setUrlInput] = useState("");
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [submitting, setSubmitting] = useState(false);
-  const [lastSubmission, setLastSubmission] = useState(null);
+  const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
 
@@ -70,11 +80,11 @@ export const JInputTab = ({ onSignalSubmit }) => {
     
     setSubmitting(true);
     setError(null);
+    setResult(null);
     
     try {
       const token = localStorage.getItem('token');
       
-      // 토큰 검증
       if (!token) {
         setError('로그인이 필요합니다. 페이지를 새로고침 후 다시 로그인해주세요.');
         setSubmitting(false);
@@ -83,28 +93,18 @@ export const JInputTab = ({ onSignalSubmit }) => {
       
       const response = await axios.post(`${API_URL}/api/signal/ingest`, {
         type: 'text',
-        content: textContent
+        content: textContent,
+        purpose: purpose,
+        expected_result: expectedResult
       }, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
-      setLastSubmission({
-        type: 'text',
-        status: 'success',
-        message: response.data.message || '시그널 전송 완료',
-        timestamp: new Date().toISOString()
-      });
-      
+      setResult(response.data);
       if (onSignalSubmit) onSignalSubmit(response.data);
-      setTextContent("");
+      
     } catch (err) {
       setError(err.response?.data?.detail || '전송 실패');
-      setLastSubmission({
-        type: 'text',
-        status: 'error',
-        message: err.response?.data?.detail || '전송 실패',
-        timestamp: new Date().toISOString()
-      });
     }
     setSubmitting(false);
   };
@@ -115,6 +115,7 @@ export const JInputTab = ({ onSignalSubmit }) => {
     
     setSubmitting(true);
     setError(null);
+    setResult(null);
     
     try {
       const token = localStorage.getItem('token');
@@ -126,29 +127,18 @@ export const JInputTab = ({ onSignalSubmit }) => {
       }
       
       const response = await axios.post(`${API_URL}/api/signal/ingest/url`, {
-        url: urlInput
+        url: urlInput,
+        purpose: purpose,
+        expected_result: expectedResult
       }, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
-      setLastSubmission({
-        type: 'url',
-        status: 'success',
-        message: response.data.message || 'URL 처리 완료',
-        extracted_text: response.data.extracted_text,
-        timestamp: new Date().toISOString()
-      });
-      
+      setResult(response.data);
       if (onSignalSubmit) onSignalSubmit(response.data);
-      setUrlInput("");
+      
     } catch (err) {
       setError(err.response?.data?.detail || 'URL 처리 실패');
-      setLastSubmission({
-        type: 'url',
-        status: 'error',
-        message: err.response?.data?.detail || 'URL 처리 실패',
-        timestamp: new Date().toISOString()
-      });
     }
     setSubmitting(false);
   };
@@ -159,13 +149,23 @@ export const JInputTab = ({ onSignalSubmit }) => {
     
     setSubmitting(true);
     setError(null);
+    setResult(null);
     
     try {
       const token = localStorage.getItem('token');
+      
+      if (!token) {
+        setError('로그인이 필요합니다.');
+        setSubmitting(false);
+        return;
+      }
+      
       const formData = new FormData();
       selectedFiles.forEach(file => {
         formData.append('files', file);
       });
+      formData.append('purpose', purpose);
+      formData.append('expected_result', expectedResult);
       
       const response = await axios.post(`${API_URL}/api/signal/ingest/files`, formData, {
         headers: { 
@@ -174,24 +174,12 @@ export const JInputTab = ({ onSignalSubmit }) => {
         }
       });
       
-      setLastSubmission({
-        type: 'file',
-        status: 'success',
-        message: response.data.message || `${selectedFiles.length}개 파일 처리 완료`,
-        results: response.data.results,
-        timestamp: new Date().toISOString()
-      });
-      
+      setResult(response.data);
       if (onSignalSubmit) onSignalSubmit(response.data);
       setSelectedFiles([]);
+      
     } catch (err) {
       setError(err.response?.data?.detail || '파일 처리 실패');
-      setLastSubmission({
-        type: 'file',
-        status: 'error',
-        message: err.response?.data?.detail || '파일 처리 실패',
-        timestamp: new Date().toISOString()
-      });
     }
     setSubmitting(false);
   };
@@ -204,6 +192,17 @@ export const JInputTab = ({ onSignalSubmit }) => {
       case 'file': handleFileSubmit(); break;
       default: break;
     }
+  };
+
+  // 초기화
+  const handleReset = () => {
+    setPurpose("");
+    setExpectedResult("");
+    setTextContent("");
+    setUrlInput("");
+    setSelectedFiles([]);
+    setResult(null);
+    setError(null);
   };
 
   const inputTypes = [
@@ -239,222 +238,291 @@ export const JInputTab = ({ onSignalSubmit }) => {
         </Badge>
       </div>
 
-      {/* 입력 유형 선택 */}
-      <Card className="bg-slate-800/50 border-slate-700">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-slate-100 text-lg">시그널 입력 방식</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-4 gap-3">
-            {inputTypes.map((type) => (
-              <button
-                key={type.id}
-                onClick={() => type.enabled && setInputType(type.id)}
-                disabled={!type.enabled}
-                className={`p-4 rounded-lg border-2 transition-all relative ${
-                  !type.enabled 
-                    ? 'border-slate-700 bg-slate-800/30 cursor-not-allowed opacity-50'
-                    : inputType === type.id
-                      ? 'border-blue-500 bg-blue-500/20'
-                      : 'border-slate-600 bg-slate-800/50 hover:border-slate-500'
-                }`}
-              >
-                {!type.enabled && (
-                  <div className="absolute top-1 right-1">
-                    <Badge className="bg-slate-600 text-[10px] px-1 py-0">
-                      <Clock className="w-2 h-2 mr-0.5" />준비중
-                    </Badge>
-                  </div>
-                )}
-                <type.icon className={`w-8 h-8 mx-auto mb-2 ${
-                  !type.enabled ? 'text-slate-600' :
-                  inputType === type.id ? 'text-blue-400' : 'text-slate-400'
-                }`} />
-                <p className={`font-medium ${
-                  !type.enabled ? 'text-slate-600' :
-                  inputType === type.id ? 'text-blue-300' : 'text-slate-300'
-                }`}>{type.label}</p>
-                <p className="text-xs text-slate-500 mt-1">{type.desc}</p>
-              </button>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* 입력 영역 */}
-      <Card className="bg-slate-800/50 border-slate-700">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-slate-100 text-lg flex items-center gap-2">
-            {inputTypes.find(t => t.id === inputType)?.icon && (
-              <>
-                {(() => {
-                  const Icon = inputTypes.find(t => t.id === inputType).icon;
-                  return <Icon className="w-5 h-5 text-blue-400" />;
-                })()}
-              </>
-            )}
-            시그널 입력
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* 텍스트 입력 */}
-          {inputType === "text" && (
-            <Textarea
-              placeholder="시그널을 입력하세요"
-              value={textContent}
-              onChange={(e) => setTextContent(e.target.value)}
-              className="bg-slate-900 border-slate-600 text-slate-100 min-h-[200px]"
-            />
-          )}
-
-          {/* URL 입력 */}
-          {inputType === "url" && (
-            <div className="space-y-3">
-              <Input
-                placeholder="URL 입력"
-                value={urlInput}
-                onChange={(e) => setUrlInput(e.target.value)}
-                className="bg-slate-900 border-slate-600 text-slate-100"
-              />
-            </div>
-          )}
-
-          {/* 파일 업로드 */}
-          {inputType === "file" && (
-            <div className="space-y-4">
-              <div 
-                className="border-2 border-dashed border-slate-600 rounded-lg p-6 text-center cursor-pointer hover:border-blue-500 transition-colors"
-                onClick={() => fileInputRef.current?.click()}
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  const files = Array.from(e.dataTransfer.files);
-                  setSelectedFiles(prev => [...prev, ...files]);
-                }}
-              >
-                <Upload className="w-10 h-10 text-slate-500 mx-auto mb-3" />
-                <p className="text-slate-400 mb-2">파일을 드래그하거나 클릭하여 업로드</p>
-                <div className="flex flex-wrap justify-center gap-2 mt-3">
-                  {supportedFormats.map((f, i) => (
-                    <Badge key={i} variant="outline" className="text-slate-400 border-slate-600 text-xs">
-                      {f.ext}
-                    </Badge>
-                  ))}
-                </div>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  multiple
-                  accept=".xlsx,.xls,.csv,.pdf,.txt,.jpg,.jpeg,.png,.gif,.webp,.bmp"
-                  onChange={handleFileSelect}
-                  className="hidden"
+      <div className="grid grid-cols-2 gap-6">
+        {/* 좌측: 입력 영역 */}
+        <div className="space-y-4">
+          {/* 질문 목적 & 기대 결과 */}
+          <Card className="bg-gradient-to-r from-slate-800/80 to-blue-900/30 border-blue-700">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-slate-100 text-lg flex items-center gap-2">
+                <Target className="w-5 h-5 text-blue-400" />
+                질문 정의
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label className="text-slate-300 flex items-center gap-2 mb-2">
+                  <HelpCircle className="w-4 h-4 text-amber-400" />
+                  왜 질문하는지 (목적)
+                </Label>
+                <Textarea
+                  placeholder="이 시그널을 분석하는 목적을 입력하세요"
+                  value={purpose}
+                  onChange={(e) => setPurpose(e.target.value)}
+                  className="bg-slate-900 border-slate-600 text-slate-100 min-h-[80px]"
                 />
               </div>
+              <div>
+                <Label className="text-slate-300 flex items-center gap-2 mb-2">
+                  <Lightbulb className="w-4 h-4 text-emerald-400" />
+                  기대하는 결과
+                </Label>
+                <Textarea
+                  placeholder="어떤 결과를 얻고 싶은지 입력하세요"
+                  value={expectedResult}
+                  onChange={(e) => setExpectedResult(e.target.value)}
+                  className="bg-slate-900 border-slate-600 text-slate-100 min-h-[80px]"
+                />
+              </div>
+            </CardContent>
+          </Card>
 
-              {/* 선택된 파일 목록 */}
-              {selectedFiles.length > 0 && (
-                <div className="space-y-2">
-                  <p className="text-slate-400 text-sm">{selectedFiles.length}개 파일 선택됨</p>
-                  <div className="max-h-[200px] overflow-y-auto space-y-2">
-                    {selectedFiles.map((file, index) => {
-                      const FileIcon = getFileIcon(file);
-                      return (
-                        <div 
-                          key={index}
-                          className="flex items-center justify-between bg-slate-900 rounded-lg p-3"
-                        >
-                          <div className="flex items-center gap-3">
-                            <FileIcon className="w-5 h-5 text-blue-400" />
-                            <div>
-                              <p className="text-slate-200 text-sm truncate max-w-[300px]">{file.name}</p>
-                              <p className="text-slate-500 text-xs">{formatFileSize(file.size)}</p>
-                            </div>
-                          </div>
-                          <button 
-                            onClick={() => removeFile(index)}
-                            className="text-slate-500 hover:text-red-400 transition-colors"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                        </div>
-                      );
-                    })}
+          {/* 입력 유형 선택 */}
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-slate-100 text-base">시그널 입력 방식</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-4 gap-2">
+                {inputTypes.map((type) => (
+                  <button
+                    key={type.id}
+                    onClick={() => type.enabled && setInputType(type.id)}
+                    disabled={!type.enabled}
+                    className={`p-3 rounded-lg border-2 transition-all relative ${
+                      !type.enabled 
+                        ? 'border-slate-700 bg-slate-800/30 cursor-not-allowed opacity-50'
+                        : inputType === type.id
+                          ? 'border-blue-500 bg-blue-500/20'
+                          : 'border-slate-600 bg-slate-800/50 hover:border-slate-500'
+                    }`}
+                  >
+                    {!type.enabled && (
+                      <Badge className="absolute -top-1 -right-1 bg-slate-600 text-[8px] px-1 py-0">
+                        준비중
+                      </Badge>
+                    )}
+                    <type.icon className={`w-6 h-6 mx-auto mb-1 ${
+                      !type.enabled ? 'text-slate-600' :
+                      inputType === type.id ? 'text-blue-400' : 'text-slate-400'
+                    }`} />
+                    <p className={`text-xs font-medium ${
+                      !type.enabled ? 'text-slate-600' :
+                      inputType === type.id ? 'text-blue-300' : 'text-slate-300'
+                    }`}>{type.label}</p>
+                  </button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* 시그널 입력 */}
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-slate-100 text-base">시그널 내용</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {inputType === "text" && (
+                <Textarea
+                  placeholder="분석할 시그널을 입력하세요"
+                  value={textContent}
+                  onChange={(e) => setTextContent(e.target.value)}
+                  className="bg-slate-900 border-slate-600 text-slate-100 min-h-[120px]"
+                />
+              )}
+
+              {inputType === "url" && (
+                <Input
+                  placeholder="URL 입력 (http:// 또는 https://)"
+                  value={urlInput}
+                  onChange={(e) => setUrlInput(e.target.value)}
+                  className="bg-slate-900 border-slate-600 text-slate-100"
+                />
+              )}
+
+              {inputType === "file" && (
+                <div className="space-y-3">
+                  <div 
+                    className="border-2 border-dashed border-slate-600 rounded-lg p-4 text-center cursor-pointer hover:border-blue-500 transition-colors"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <Upload className="w-8 h-8 text-slate-500 mx-auto mb-2" />
+                    <p className="text-slate-400 text-sm">클릭하여 파일 선택</p>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      multiple
+                      accept=".xlsx,.xls,.csv,.pdf,.txt,.jpg,.jpeg,.png,.gif,.webp,.bmp"
+                      onChange={handleFileSelect}
+                      className="hidden"
+                    />
                   </div>
+                  {selectedFiles.length > 0 && (
+                    <div className="space-y-1">
+                      {selectedFiles.map((file, index) => {
+                        const FileIcon = getFileIcon(file);
+                        return (
+                          <div key={index} className="flex items-center justify-between bg-slate-900 rounded p-2">
+                            <div className="flex items-center gap-2">
+                              <FileIcon className="w-4 h-4 text-blue-400" />
+                              <span className="text-slate-200 text-sm truncate max-w-[200px]">{file.name}</span>
+                            </div>
+                            <button onClick={() => removeFile(index)} className="text-slate-500 hover:text-red-400">
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               )}
-            </div>
-          )}
 
-          {/* 에러 메시지 */}
-          {error && (
-            <div className="bg-red-900/30 border border-red-600 rounded-lg p-3 text-red-400 text-sm flex items-center gap-2">
-              <AlertCircle className="w-4 h-4" />
-              {error}
-            </div>
-          )}
-
-          {/* 제출 버튼 */}
-          <div className="flex items-center gap-3">
-            <Button 
-              onClick={handleSubmit}
-              disabled={
-                submitting || 
-                (inputType === "text" && !textContent.trim()) || 
-                (inputType === "url" && !urlInput.trim()) ||
-                (inputType === "file" && selectedFiles.length === 0)
-              }
-              className="flex-1 h-12 bg-blue-600 hover:bg-blue-700"
-            >
-              {submitting ? (
-                <>
-                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  처리 중...
-                </>
-              ) : (
-                <>
-                  <ArrowRight className="w-5 h-5 mr-2" />
-                  LL:의도 모듈로 전송
-                </>
+              {error && (
+                <div className="bg-red-900/30 border border-red-600 rounded-lg p-2 text-red-400 text-sm flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4" />
+                  {error}
+                </div>
               )}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
 
-      {/* 마지막 전송 결과 */}
-      {lastSubmission && (
-        <Card className={`border ${
-          lastSubmission.status === "success" 
-            ? 'bg-green-900/20 border-green-600' 
-            : 'bg-red-900/20 border-red-600'
-        }`}>
-          <CardContent className="py-4">
-            <div className="flex items-center gap-3">
-              {lastSubmission.status === "success" ? (
-                <CheckCircle2 className="w-6 h-6 text-green-400" />
-              ) : (
-                <AlertCircle className="w-6 h-6 text-red-400" />
-              )}
-              <div className="flex-1">
-                <p className={`font-medium ${
-                  lastSubmission.status === "success" ? 'text-green-300' : 'text-red-300'
-                }`}>
-                  {lastSubmission.message}
-                </p>
-                <p className="text-slate-400 text-sm">
-                  {new Date(lastSubmission.timestamp).toLocaleString('ko-KR')}
+              <div className="flex gap-2">
+                <Button 
+                  onClick={handleSubmit}
+                  disabled={
+                    submitting || 
+                    (inputType === "text" && !textContent.trim()) || 
+                    (inputType === "url" && !urlInput.trim()) ||
+                    (inputType === "file" && selectedFiles.length === 0)
+                  }
+                  className="flex-1 bg-blue-600 hover:bg-blue-700"
+                >
+                  {submitting ? (
+                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" />처리 중...</>
+                  ) : (
+                    <><ArrowRight className="w-4 h-4 mr-2" />분석 시작</>
+                  )}
+                </Button>
+                <Button variant="outline" onClick={handleReset}>
+                  초기화
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* 우측: 결과 영역 */}
+        <div className="space-y-4">
+          {!result ? (
+            <Card className="bg-slate-800/30 border-slate-700 border-dashed h-full flex items-center justify-center min-h-[400px]">
+              <div className="text-center py-8">
+                <Target className="w-16 h-16 text-slate-600 mx-auto mb-4" />
+                <p className="text-slate-500 text-lg">분석 결과 대기 중</p>
+                <p className="text-slate-600 text-sm mt-2">
+                  질문 목적과 기대 결과를 입력하고<br/>시그널을 전송하세요
                 </p>
               </div>
-            </div>
-            {lastSubmission.extracted_text && (
-              <div className="mt-3 p-3 bg-slate-800 rounded-lg">
-                <p className="text-slate-400 text-xs mb-1">추출된 텍스트:</p>
-                <p className="text-slate-200 text-sm line-clamp-3">{lastSubmission.extracted_text}</p>
+            </Card>
+          ) : (
+            <ScrollArea className="h-[550px]">
+              <div className="space-y-4 pr-4">
+                {/* 처리 결과 */}
+                <Card className="bg-green-900/20 border-green-600">
+                  <CardContent className="py-4">
+                    <div className="flex items-center gap-3 mb-3">
+                      <CheckCircle2 className="w-6 h-6 text-green-400" />
+                      <div>
+                        <p className="text-green-300 font-medium">파이프라인 처리 완료</p>
+                        <p className="text-slate-400 text-sm">시그널 ID: {result.signal_id}</p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div className="bg-slate-800 rounded p-2">
+                        <p className="text-slate-500">분류</p>
+                        <Badge className={
+                          result.category === 'wanted' ? 'bg-blue-600' :
+                          result.category === 'unwanted' ? 'bg-amber-600' : 'bg-slate-600'
+                        }>
+                          {result.category === 'wanted' ? '원하는 것' :
+                           result.category === 'unwanted' ? '자산화 대상' : 'Null'}
+                        </Badge>
+                      </div>
+                      <div className="bg-slate-800 rounded p-2">
+                        <p className="text-slate-500">처리 단계</p>
+                        <p className="text-slate-200">{Object.keys(result.stages_completed || {}).length}개 완료</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* 요청 결과 */}
+                <Card className="bg-blue-900/20 border-blue-600">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-blue-300 text-base flex items-center gap-2">
+                      <Lightbulb className="w-5 h-5" />
+                      요청하신 결과
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-slate-300 text-sm">
+                      {result.analysis_result || "시그널이 성공적으로 처리되었습니다. 상세 분석 결과는 각 단계별 탭에서 확인할 수 있습니다."}
+                    </p>
+                  </CardContent>
+                </Card>
+
+                {/* 관련 자산 추천 */}
+                <Card className="bg-amber-900/20 border-amber-600">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-amber-300 text-base flex items-center gap-2">
+                      <Package className="w-5 h-5" />
+                      관련 모듈화 자산 추천
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {result.related_assets && result.related_assets.length > 0 ? (
+                      <div className="space-y-2">
+                        {result.related_assets.map((asset, idx) => (
+                          <div key={idx} className="bg-slate-800 rounded p-3">
+                            <div className="flex items-center justify-between mb-1">
+                              <Badge variant="outline" className="text-amber-400 border-amber-600">
+                                {asset.asset_id}
+                              </Badge>
+                              <span className="text-slate-400 text-xs">관련도: {(asset.relevance * 100).toFixed(0)}%</span>
+                            </div>
+                            <p className="text-slate-300 text-sm">{asset.summary}</p>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-slate-400 text-sm">
+                        아직 관련된 모듈화 자산이 없습니다. 시스템이 더 많은 시그널을 학습하면 관련 자산을 추천해 드립니다.
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* 단계별 처리 상태 */}
+                <Card className="bg-slate-800/50 border-slate-700">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-slate-100 text-base">처리 단계</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-1">
+                      {Object.entries(result.stages_completed || {}).map(([stage, status]) => (
+                        <div key={stage} className="flex items-center justify-between text-sm">
+                          <span className="text-slate-400">{stage}</span>
+                          <Badge className={status === 'completed' ? 'bg-green-600' : 'bg-slate-600'}>
+                            {status}
+                          </Badge>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
+            </ScrollArea>
+          )}
+        </div>
+      </div>
 
       {/* 플로우 안내 */}
       <div className="flex items-center justify-center gap-2 text-slate-500 text-sm">
