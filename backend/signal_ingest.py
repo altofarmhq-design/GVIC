@@ -217,16 +217,32 @@ async def ingest_file_signals(
                 file_type = "unknown"
                 extracted_text = f"[지원하지 않는 형식: {ext}]"
             
-            signal_id = generate_signal_id()
+            # 파이프라인 실행
+            from server import get_pipeline_engine
+            pipeline = get_pipeline_engine()
+            
+            pipeline_result = await pipeline.create_signal(
+                signal_type="file",
+                content=extracted_text,
+                source=filename,
+                metadata={
+                    "input_method": "file",
+                    "filename": filename,
+                    "file_type": file_type,
+                    "file_size": len(content)
+                },
+                user_id=current_user.get("sub")
+            )
             
             results.append({
-                "signal_id": signal_id,
+                "signal_id": pipeline_result.get("signal_id"),
                 "filename": filename,
                 "file_type": file_type,
                 "file_size": len(content),
-                "extracted_text": extracted_text[:2000] if extracted_text else "",
-                "content_length": len(extracted_text) if extracted_text else 0,
-                "success": True
+                "category": pipeline_result.get("category"),
+                "stages_completed": pipeline_result.get("stages_completed"),
+                "extracted_text": extracted_text[:500] if extracted_text else "",
+                "success": pipeline_result.get("success", False)
             })
             
         except Exception as e:
@@ -244,6 +260,6 @@ async def ingest_file_signals(
         "processed": success_count,
         "failed": len(files) - success_count,
         "results": results,
-        "message": f"{success_count}개 파일 처리 완료",
+        "message": f"{success_count}개 파일 파이프라인 처리 완료",
         "timestamp": datetime.now(timezone.utc).isoformat()
     }
