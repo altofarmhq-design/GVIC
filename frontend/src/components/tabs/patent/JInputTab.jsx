@@ -154,7 +154,13 @@ export const JInputTab = ({ onSignalSubmit }) => {
         content: textContent,
         purpose: purpose,
         expected_result: expectedResult,
-        analysis_type: analysisType
+        analysis_type: analysisType,
+        // 5:3:2 비율 설정
+        classification_ratio: {
+          wanted: ratioWanted,
+          unwanted: ratioUnwanted,
+          null: ratioNull
+        }
       }, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
