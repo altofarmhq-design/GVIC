@@ -81,12 +81,6 @@ export const LLIntentTab = () => {
     }
   }, [content, result]);
 
-  const samples = [
-    { label: "상품 후기", content: "효과가 정말 좋아요! 포장도 꼼꼼하고 배송도 빨랐어요. 재구매 의사 있습니다." },
-    { label: "요구사항", content: "실제 시그널이 어떻게 gvic에서 가공되고 결과를 얻게 되는 구나를 알 수 있어야 겠지." },
-    { label: "체념적 만족", content: "두 번째 구매할 때 2kg를 주문했는데 키로 수도 맛도 믿음이 안 갔는데. 사장님께서 직접 전화 주시고 친절하게 대응하시기에 미안함도 있고. 맛은 맛있어요. 그냥 그것에 만족할게요." },
-  ];
-
   const handleReset = () => {
     setContent("");
     setResult(null);
