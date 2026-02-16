@@ -210,7 +210,7 @@ export const JInputTab = ({ onSignalSubmit }) => {
     setSubmitting(false);
   };
 
-  // 파일 제출
+  // 파일 제출 (이미지 OCR 지원)
   const handleFileSubmit = async () => {
     if (selectedFiles.length === 0) return;
     
@@ -227,22 +227,57 @@ export const JInputTab = ({ onSignalSubmit }) => {
         return;
       }
       
-      const formData = new FormData();
-      selectedFiles.forEach(file => {
-        formData.append('files', file);
-      });
-      formData.append('purpose', purpose);
-      formData.append('expected_result', expectedResult);
+      const file = selectedFiles[0];
+      const isImage = file.type.startsWith('image/');
       
-      const response = await axios.post(`${API_URL}/api/signal/ingest/files`, formData, {
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
-        }
-      });
+      if (isImage) {
+        // 이미지 파일 → OCR 처리
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('purpose', purpose);
+        formData.append('analysis_type', analysisType);
+        
+        const response = await axios.post(`${API_URL}/api/ocr/extract-and-analyze`, formData, {
+          headers: { 
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+        
+        // OCR 결과를 result 형식에 맞게 변환
+        const ocrData = response.data;
+        setResult({
+          success: ocrData.success,
+          signal_id: ocrData.signal_id,
+          input_type: 'image_ocr',
+          ocr_result: ocrData.ocr_result,
+          ai_analysis: ocrData.ai_analysis,
+          gvic_analysis: ocrData.gvic_analysis,
+          cross_analysis: ocrData.cross_analysis,
+          asset_valuation: ocrData.asset_valuation,
+          message: ocrData.message
+        });
+        
+      } else {
+        // 기타 파일 → 기존 처리
+        const formData = new FormData();
+        selectedFiles.forEach(file => {
+          formData.append('files', file);
+        });
+        formData.append('purpose', purpose);
+        formData.append('expected_result', expectedResult);
+        
+        const response = await axios.post(`${API_URL}/api/signal/ingest/files`, formData, {
+          headers: { 
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+        
+        setResult(response.data);
+      }
       
-      setResult(response.data);
-      if (onSignalSubmit) onSignalSubmit(response.data);
+      if (onSignalSubmit) onSignalSubmit(result);
       setSelectedFiles([]);
       
     } catch (err) {
