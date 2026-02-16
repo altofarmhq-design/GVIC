@@ -50,13 +50,34 @@ export const JInputTab = ({ onSignalSubmit }) => {
   // 파일 선택 처리
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files);
-    setSelectedFiles(prev => [...prev, ...files]);
-    setError(null);
+    const validFiles = [];
+    const invalidFiles = [];
+    
+    files.forEach(file => {
+      if (isFileSupported(file.name)) {
+        validFiles.push(file);
+      } else {
+        const ext = file.name.split('.').pop().toLowerCase();
+        invalidFiles.push({ name: file.name, ext });
+      }
+    });
+    
+    if (invalidFiles.length > 0) {
+      const invalidExts = [...new Set(invalidFiles.map(f => `.${f.ext}`))].join(', ');
+      setError(`지원하지 않는 파일 형식입니다: ${invalidExts}\n\n✅ 지원 형식: .pdf, .hwp, .hwpx, .docx, .txt, .xlsx, .xls, .csv, .jpg, .png, .gif, .webp`);
+    } else {
+      setError(null);
+    }
+    
+    if (validFiles.length > 0) {
+      setSelectedFiles(prev => [...prev, ...validFiles]);
+    }
   };
 
   // 파일 제거
   const removeFile = (index) => {
     setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+    setError(null);
   };
 
   // 파일 아이콘 결정
@@ -64,6 +85,8 @@ export const JInputTab = ({ onSignalSubmit }) => {
     const ext = file.name.split('.').pop().toLowerCase();
     if (['xlsx', 'xls', 'csv'].includes(ext)) return FileSpreadsheet;
     if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'].includes(ext)) return Image;
+    if (['hwp', 'hwpx'].includes(ext)) return FileText;
+    if (ext === 'docx') return FileText;
     return File;
   };
 
