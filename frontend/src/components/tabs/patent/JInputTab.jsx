@@ -147,7 +147,8 @@ export const JInputTab = ({ onSignalSubmit }) => {
         type: 'text',
         content: textContent,
         purpose: purpose,
-        expected_result: expectedResult
+        expected_result: expectedResult,
+        analysis_type: analysisType
       }, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
