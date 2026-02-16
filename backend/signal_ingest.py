@@ -142,6 +142,136 @@ def extract_text_from_txt(file_content: bytes) -> str:
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"TXT 처리 실패: {str(e)}")
 
+def extract_text_from_hwp(file_content: bytes) -> str:
+    """HWP 파일에서 텍스트 추출 (OLE 기반)"""
+    try:
+        import olefile
+        
+        ole = olefile.OleFileIO(io.BytesIO(file_content))
+        
+        # HWP 파일의 텍스트는 'PrvText' 또는 'BodyText/Section0' 등에 저장됨
+        text_parts = []
+        
+        # PrvText (미리보기 텍스트) 추출 시도
+        if ole.exists('PrvText'):
+            prv_text = ole.openstream('PrvText').read()
+            # UTF-16 LE로 디코딩
+            try:
+                decoded = prv_text.decode('utf-16-le', errors='ignore')
+                text_parts.append(decoded)
+            except:
+                pass
+        
+        # BodyText 섹션들 추출 시도
+        for entry in ole.listdir():
+            entry_path = '/'.join(entry)
+            if 'BodyText' in entry_path or 'Section' in entry_path:
+                try:
+                    stream_data = ole.openstream(entry).read()
+                    # 바이너리에서 텍스트 추출 시도
+                    for encoding in ['utf-16-le', 'utf-8', 'cp949']:
+                        try:
+                            decoded = stream_data.decode(encoding, errors='ignore')
+                            # 제어 문자 제거
+                            cleaned = ''.join(c for c in decoded if c.isprintable() or c in '\n\r\t ')
+                            if len(cleaned) > 10:
+                                text_parts.append(cleaned)
+                            break
+                        except:
+                            continue
+                except:
+                    pass
+        
+        ole.close()
+        
+        if text_parts:
+            return '\n'.join(text_parts)
+        else:
+            return "[HWP 파일에서 텍스트를 추출할 수 없습니다. 파일이 암호화되었거나 특수 형식일 수 있습니다.]"
+            
+    except Exception as e:
+        return f"[HWP 처리 실패: {str(e)}]"
+
+def extract_text_from_hwpx(file_content: bytes) -> str:
+    """HWPX 파일에서 텍스트 추출 (ZIP + XML 기반)"""
+    try:
+        import zipfile
+        from lxml import etree
+        
+        # HWPX는 ZIP 압축 파일
+        with zipfile.ZipFile(io.BytesIO(file_content), 'r') as zf:
+            text_parts = []
+            
+            # Contents 폴더 내의 XML 파일들에서 텍스트 추출
+            for filename in zf.namelist():
+                if filename.startswith('Contents/') and filename.endswith('.xml'):
+                    try:
+                        xml_content = zf.read(filename)
+                        root = etree.fromstring(xml_content)
+                        
+                        # 모든 텍스트 노드 추출
+                        for elem in root.iter():
+                            if elem.text and elem.text.strip():
+                                text_parts.append(elem.text.strip())
+                            if elem.tail and elem.tail.strip():
+                                text_parts.append(elem.tail.strip())
+                    except:
+                        continue
+            
+            if text_parts:
+                return '\n'.join(text_parts)
+            else:
+                return "[HWPX 파일에서 텍스트를 추출할 수 없습니다.]"
+                
+    except Exception as e:
+        return f"[HWPX 처리 실패: {str(e)}]"
+
+def extract_text_from_docx(file_content: bytes) -> str:
+    """DOCX 파일에서 텍스트 추출"""
+    try:
+        from docx import Document
+        
+        doc = Document(io.BytesIO(file_content))
+        text_parts = []
+        
+        for para in doc.paragraphs:
+            if para.text.strip():
+                text_parts.append(para.text)
+        
+        # 테이블 내용도 추출
+        for table in doc.tables:
+            for row in table.rows:
+                row_text = ' | '.join(cell.text.strip() for cell in row.cells if cell.text.strip())
+                if row_text:
+                    text_parts.append(row_text)
+        
+        return '\n'.join(text_parts) if text_parts else "[DOCX 파일에서 텍스트를 추출할 수 없습니다.]"
+        
+    except Exception as e:
+        return f"[DOCX 처리 실패: {str(e)}]"
+
+# 지원하는 파일 형식 목록
+SUPPORTED_FORMATS = {
+    'pdf': 'PDF 문서',
+    'xlsx': 'Excel',
+    'xls': 'Excel',
+    'csv': 'CSV',
+    'txt': '텍스트',
+    'hwp': '한글 문서',
+    'hwpx': '한글 문서 (HWPX)',
+    'docx': 'Word 문서',
+    'jpg': '이미지',
+    'jpeg': '이미지',
+    'png': '이미지',
+    'gif': '이미지',
+    'webp': '이미지',
+    'bmp': '이미지'
+}
+
+def get_supported_extensions() -> list:
+    """지원하는 파일 확장자 목록 반환"""
+    return list(SUPPORTED_FORMATS.keys())
+
 # API Endpoints - 파이프라인 연동
 # MongoDB와 파이프라인 엔진은 server.py에서 초기화됨
 
