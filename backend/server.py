@@ -49,8 +49,16 @@ integration_system = MultiDomainIntegrationSystem()
 # Initialize Data Hub (모든 탭 연동)
 data_hub = init_data_hub(db)
 
+# Initialize Pipeline Engine
+from pipeline_engine import GVICPipeline
+pipeline_engine = GVICPipeline(db)
+
+def get_pipeline_engine():
+    """파이프라인 엔진 인스턴스 반환"""
+    return pipeline_engine
+
 # Create the main app
-app = FastAPI(title="GVIC Engine API", version="1.0.0")
+app = FastAPI(title="GVIC Engine API", version="2.0.0")
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
