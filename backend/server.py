@@ -3417,6 +3417,19 @@ app.include_router(f_field_router)
 app.include_router(d_ledger_router)
 app.include_router(i_integrity_router)
 
+# ==================== SaaS Module Routers (Seller Intelligence Hub) ====================
+try:
+    from saas.review_analyzer import router as saas_review_router
+    from saas.qa_manager import router as saas_qa_router
+    from saas.dashboard_service import router as saas_dashboard_router
+    
+    app.include_router(saas_review_router)
+    app.include_router(saas_qa_router)
+    app.include_router(saas_dashboard_router)
+    logger.info("SaaS modules loaded: review_analyzer, qa_manager, dashboard_service")
+except Exception as e:
+    logger.warning(f"SaaS modules not loaded: {e}")
+
 # ==================== Pipeline API ====================
 
 @api_router.get("/pipeline/stats")
