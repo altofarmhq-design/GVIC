@@ -10,3 +10,4 @@ export { CExecTab } from './CExecTab';
 export { FFieldTab } from './FFieldTab';
 export { DLedgerTab } from './DLedgerTab';
 export { IIntegrityTab } from './IIntegrityTab';
+export { APIWebhookTab } from './APIWebhookTab';
