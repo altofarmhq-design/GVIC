@@ -10,7 +10,22 @@ GVIC는 12개 특허를 기반으로 한 AI 기반 시그널 분석 및 자산�
 
 ## CHANGELOG
 
-### 2026-02-16
+### 2026-02-16 (최신)
+- **[FEATURE]** P1: API 연동 기능 구현
+  - 외부 시스템 웹훅 API 엔드포인트 (`/api/webhook/signal`, `/api/webhook/signal/batch`, `/api/webhook/event`)
+  - API 키 생성/관리/삭제 기능
+  - API 키 기반 인증 시스템
+  - 배치 시그널 수신 (최대 100개)
+  - 이벤트 기반 시그널 수신
+  - API 사용 가이드 UI
+- **[FEATURE]** P1: PDF 리포트 생성 기능 구현
+  - 시그널 분석 결과 PDF 다운로드 (`/api/report/signal`)
+  - 대시보드 통계 PDF 리포트 (`/api/report/dashboard`)
+  - 자산 포트폴리오 PDF 리포트 (`/api/report/assets`)
+- **[UI]** API 연동 탭 추가 (API 키 관리 및 사용 가이드)
+- **[UI]** J:입력 탭에 API (준비중) 표시 추가
+
+### 2026-02-16 (이전)
 - **[FIX]** AI Analyzer 초기화 오류 수정 - `LlmChat` 사용법 수정 (`model` 파라미터 → `.with_model()` 메서드)
 - **[FIX]** 시그널 전송 실패 문제 해결
 - **[VERIFIED]** J:입력 탭에서 시그널 분석 및 AI 응답 생성 기능 정상 작동 확인
