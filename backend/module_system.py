@@ -146,6 +146,17 @@ async def extract_assets_from_signal(
         for idx, feature_set in enumerate(features_detected):
             asset_id = f"AST_{uuid.uuid4().hex[:12]}"
             
+            # 자산 가치 계산
+            base_value = feature_set.get("value_score", 0.5) * 100  # 기본 가치 점수
+            
+            # 5:3:2 결이론 기반 가치 분해
+            value_breakdown = {
+                "total_value": base_value,
+                "public_value": base_value * PUBLIC_SHARE,      # 5/10 = 공공
+                "operation_value": base_value * OPERATION_SHARE, # 3/10 = 운영
+                "management_value": base_value * MANAGEMENT_SHARE # 2/10 = 기획/관리
+            }
+            
             asset_doc = {
                 "asset_id": asset_id,
                 "signal_id": request.signal_id,
@@ -157,6 +168,8 @@ async def extract_assets_from_signal(
                 "original_content": content[:500],
                 "value_score": feature_set.get("value_score", 0.5),
                 "novelty_score": feature_set.get("novelty_score", 0.5),
+                # 5:3:2 가치 분해
+                "value_breakdown_532": value_breakdown,
                 "status": "indexed",
                 "module_ids": [],  # 이 자산이 속한 모듈들
                 "created_at": datetime.now(timezone.utc).isoformat()
@@ -167,13 +180,25 @@ async def extract_assets_from_signal(
                 "asset_id": asset_id,
                 "feature_category": feature_set["category"],
                 "keywords": feature_set["keywords"],
-                "summary": feature_set["summary"]
+                "summary": feature_set["summary"],
+                "value_breakdown_532": value_breakdown
             })
             
-            logger.info(f"Asset extracted: {asset_id} from signal {request.signal_id}")
+            logger.info(f"Asset extracted: {asset_id} from signal {request.signal_id} with 5:3:2 value breakdown")
     else:
         # 단일 자산으로 추출
         asset_id = f"AST_{uuid.uuid4().hex[:12]}"
+        
+        # 기본 가치
+        base_value = 50  # 기본 점수
+        
+        # 5:3:2 결이론 기반 가치 분해
+        value_breakdown = {
+            "total_value": base_value,
+            "public_value": base_value * PUBLIC_SHARE,
+            "operation_value": base_value * OPERATION_SHARE,
+            "management_value": base_value * MANAGEMENT_SHARE
+        }
         
         asset_doc = {
             "asset_id": asset_id,
@@ -186,6 +211,8 @@ async def extract_assets_from_signal(
             "original_content": content[:500],
             "value_score": 0.5,
             "novelty_score": 0.5,
+            # 5:3:2 가치 분해
+            "value_breakdown_532": value_breakdown,
             "status": "indexed",
             "module_ids": [],
             "created_at": datetime.now(timezone.utc).isoformat()
@@ -196,7 +223,8 @@ async def extract_assets_from_signal(
             "asset_id": asset_id,
             "feature_category": "general",
             "keywords": [],
-            "summary": content[:200]
+            "summary": content[:200],
+            "value_breakdown_532": value_breakdown
         })
     
     # 시그널에 추출된 자산 ID 기록
