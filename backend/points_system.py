@@ -151,7 +151,8 @@ async def get_point_balance(current_user: dict = Depends(get_current_user)):
             "last_updated": datetime.now(timezone.utc).isoformat()
         }
         await db.user_points.insert_one(point_doc)
-        del point_doc["_id"] if "_id" in point_doc else None
+        if "_id" in point_doc:
+            del point_doc["_id"]
     
     # 현금 환산 가치 계산
     cash_equivalent = point_doc.get("available_points", 0) / CASH_TO_POINT_RATIO
