@@ -376,16 +376,16 @@ async def convert_points(
             detail=f"포인트가 부족합니다. 현재 잔액: {available}"
         )
     
-    # 현금 환산
-    cash_value = request.points_amount / CASH_TO_POINT_RATIO
+    # 현금 환산 (1P = ₩0.001)
+    cash_value = request.points_amount * POINT_TO_CASH_RATIO
     
     # 트랜잭션 기록
     transaction = {
         "type": "convert",
         "amount": -request.points_amount,
-        "description": f"현금 전환 (₩{cash_value:,.0f})",
+        "description": f"현금 전환 (₩{cash_value:,.3f})",
         "cash_value": cash_value,
-        "conversion_rate": CASH_TO_POINT_RATIO,
+        "conversion_rate": POINT_TO_CASH_RATIO,
         "timestamp": datetime.now(timezone.utc).isoformat()
     }
     
