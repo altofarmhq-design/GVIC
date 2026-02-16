@@ -408,9 +408,9 @@ async def convert_points(
         "success": True,
         "points_converted": request.points_amount,
         "cash_value": cash_value,
-        "conversion_rate": CASH_TO_POINT_RATIO,
+        "conversion_rate": POINT_TO_CASH_RATIO,
         "remaining_points": available - request.points_amount,
-        "message": f"{request.points_amount} 포인트가 ₩{cash_value:,.0f}로 전환되었습니다"
+        "message": f"{request.points_amount:,.0f}P가 ₩{cash_value:,.3f}로 전환되었습니다"
     }
 
 # ==================== 자산 통계 ====================
