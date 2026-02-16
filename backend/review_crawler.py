@@ -129,74 +129,191 @@ async def fetch_html(url: str, headers: dict = None) -> str:
 
 # ==================== 플랫폼별 크롤러 ====================
 
-async def crawl_naver_reviews(url: str, max_reviews: int) -> tuple:
-    """네이버 스마트스토어 리뷰 크롤링"""
-    html = await fetch_html(url)
-    if not html:
-        return None, []
+class NaverReviewCrawler:
+    """네이버 스마트스토어 리뷰 크롤러 (페이지네이션 지원)"""
     
-    soup = BeautifulSoup(html, 'html.parser')
-    reviews = []
-    product_info = None
+    REVIEWS_PER_PAGE = 20
+    MAX_PAGES = 50  # 최대 페이지 수 제한
     
-    # 상품 정보 추출
-    try:
-        product_name = soup.select_one('h3._22kNQuEXmb, .product_title, h2.title')
-        if product_name:
-            product_info = ProductInfo(
-                product_name=product_name.get_text(strip=True),
-                url=url
-            )
+    def __init__(self):
+        self.session = None
+    
+    async def extract_product_id(self, url: str) -> Optional[str]:
+        """URL에서 상품 ID 추출"""
+        # smartstore.naver.com/storename/products/12345
+        match = re.search(r'/products/(\d+)', url)
+        if match:
+            return match.group(1)
+        
+        # shopping.naver.com/...productId=12345
+        match = re.search(r'productId=(\d+)', url)
+        if match:
+            return match.group(1)
+        
+        return None
+    
+    async def get_review_api_url(self, store_url: str, product_id: str, page: int) -> str:
+        """리뷰 API URL 생성"""
+        # 네이버 스마트스토어 리뷰 API 패턴
+        return f"{store_url}/reviews?page={page}&size={self.REVIEWS_PER_PAGE}"
+    
+    async def crawl(self, url: str, max_reviews: int) -> tuple:
+        """네이버 리뷰 크롤링 (페이지네이션)"""
+        all_reviews = []
+        product_info = None
+        
+        # 첫 페이지에서 상품 정보 추출
+        html = await fetch_html(url)
+        if html:
+            soup = BeautifulSoup(html, 'html.parser')
+            product_info = await self._extract_product_info(soup, url)
+        
+        # 페이지별 크롤링
+        pages_needed = min((max_reviews // self.REVIEWS_PER_PAGE) + 1, self.MAX_PAGES)
+        
+        for page in range(1, pages_needed + 1):
+            if len(all_reviews) >= max_reviews:
+                break
             
-        # 가격 추출
-        price_elem = soup.select_one('._1LY7DqCnwR, .price_num, span.price')
-        if price_elem and product_info:
-            product_info.price = price_elem.get_text(strip=True)
+            page_reviews = await self._crawl_page(url, page)
+            all_reviews.extend(page_reviews)
             
-    except Exception as e:
-        logger.error(f"Product info extraction error: {e}")
+            # 리뷰가 더 없으면 중단
+            if len(page_reviews) < self.REVIEWS_PER_PAGE:
+                break
+            
+            # 요청 간 딜레이
+            await asyncio.sleep(0.5)
+        
+        return product_info, all_reviews[:max_reviews]
     
-    # 리뷰 추출 (네이버 스마트스토어 구조)
-    review_elements = soup.select('.review_item, ._1YShY6EQ56, .review_list_item, [class*="review"]')[:max_reviews]
-    
-    for idx, elem in enumerate(review_elements):
+    async def _extract_product_info(self, soup: BeautifulSoup, url: str) -> Optional[ProductInfo]:
+        """상품 정보 추출"""
         try:
-            content_elem = elem.select_one('.review_content, ._2FXNMst_ak, .txt, [class*="content"]')
-            content = content_elem.get_text(strip=True) if content_elem else ""
-            
-            if not content or len(content) < 5:
-                continue
-            
-            # 평점 추출
-            rating = None
-            rating_elem = elem.select_one('[class*="star"], [class*="rating"], .score')
-            if rating_elem:
-                rating_text = rating_elem.get_text(strip=True)
-                rating_match = re.search(r'(\d+)', rating_text)
-                if rating_match:
-                    rating = float(rating_match.group(1))
-            
-            # 작성자 추출
-            author_elem = elem.select_one('.reviewer, .user_id, [class*="author"], [class*="nickname"]')
-            author = author_elem.get_text(strip=True) if author_elem else f"사용자{idx+1}"
-            
-            # 날짜 추출
-            date_elem = elem.select_one('.date, .review_date, [class*="date"]')
-            date = date_elem.get_text(strip=True) if date_elem else None
-            
-            reviews.append(ReviewData(
-                review_id=f"naver_{uuid.uuid4().hex[:8]}",
-                author=author,
-                rating=rating,
-                content=content,
-                date=date
-            ))
-            
+            product_name = soup.select_one('h3._22kNQuEXmb, .product_title, h2.title, h1[class*="product"]')
+            if product_name:
+                info = ProductInfo(
+                    product_name=product_name.get_text(strip=True),
+                    url=url
+                )
+                
+                # 가격 추출
+                price_elem = soup.select_one('._1LY7DqCnwR, .price_num, span.price, [class*="price"]')
+                if price_elem:
+                    info.price = price_elem.get_text(strip=True)
+                
+                # 평점 추출
+                rating_elem = soup.select_one('[class*="rating-avg"], .review_score')
+                if rating_elem:
+                    rating_text = rating_elem.get_text(strip=True)
+                    rating_match = re.search(r'(\d+\.?\d*)', rating_text)
+                    if rating_match:
+                        info.rating_avg = float(rating_match.group(1))
+                
+                # 리뷰 수 추출
+                review_count_elem = soup.select_one('[class*="review-count"], .review_cnt')
+                if review_count_elem:
+                    count_text = review_count_elem.get_text(strip=True)
+                    count_match = re.search(r'(\d+)', count_text.replace(',', ''))
+                    if count_match:
+                        info.review_count = int(count_match.group(1))
+                
+                return info
         except Exception as e:
-            logger.error(f"Review parsing error: {e}")
-            continue
+            logger.error(f"Product info extraction error: {e}")
+        
+        return None
     
-    return product_info, reviews
+    async def _crawl_page(self, base_url: str, page: int) -> List[ReviewData]:
+        """단일 페이지 크롤링"""
+        reviews = []
+        
+        # 리뷰 페이지 URL 구성
+        if '?' in base_url:
+            page_url = f"{base_url}&reviewPage={page}"
+        else:
+            page_url = f"{base_url}?reviewPage={page}"
+        
+        html = await fetch_html(page_url)
+        if not html:
+            return reviews
+        
+        soup = BeautifulSoup(html, 'html.parser')
+        
+        # 리뷰 요소 선택자 (여러 버전 지원)
+        review_elements = soup.select(
+            '.review_item, ._1YShY6EQ56, .review_list_item, '
+            '[class*="ReviewItem"], [class*="review-item"], '
+            'article[class*="review"]'
+        )
+        
+        for idx, elem in enumerate(review_elements):
+            try:
+                review = await self._parse_review_element(elem, idx, page)
+                if review:
+                    reviews.append(review)
+            except Exception as e:
+                logger.debug(f"Review parse error: {e}")
+                continue
+        
+        return reviews
+    
+    async def _parse_review_element(self, elem, idx: int, page: int) -> Optional[ReviewData]:
+        """리뷰 요소 파싱"""
+        # 콘텐츠 추출
+        content_elem = elem.select_one(
+            '.review_content, ._2FXNMst_ak, .txt, '
+            '[class*="content"], [class*="text"], p'
+        )
+        content = content_elem.get_text(strip=True) if content_elem else ""
+        
+        if not content or len(content) < 5:
+            return None
+        
+        # 평점 추출
+        rating = None
+        rating_elem = elem.select_one('[class*="star"], [class*="rating"], .score')
+        if rating_elem:
+            rating_text = rating_elem.get_text(strip=True)
+            rating_match = re.search(r'(\d+)', rating_text)
+            if rating_match:
+                rating = float(rating_match.group(1))
+        
+        # 작성자 추출
+        author_elem = elem.select_one('.reviewer, .user_id, [class*="author"], [class*="nickname"]')
+        author = author_elem.get_text(strip=True) if author_elem else f"사용자{page}_{idx+1}"
+        
+        # 날짜 추출
+        date_elem = elem.select_one('.date, .review_date, [class*="date"], time')
+        date = date_elem.get_text(strip=True) if date_elem else None
+        
+        # 구매 옵션 추출
+        option_elem = elem.select_one('[class*="option"], [class*="variant"]')
+        purchase_option = option_elem.get_text(strip=True) if option_elem else None
+        
+        # 이미지 추출
+        images = []
+        img_elems = elem.select('img[class*="review"], img[src*="review"]')
+        for img in img_elems[:3]:  # 최대 3개
+            src = img.get('src') or img.get('data-src')
+            if src:
+                images.append(src)
+        
+        return ReviewData(
+            review_id=f"naver_{page}_{uuid.uuid4().hex[:8]}",
+            author=author,
+            rating=rating,
+            content=content,
+            date=date,
+            purchase_option=purchase_option,
+            images=images
+        )
+
+
+async def crawl_naver_reviews(url: str, max_reviews: int) -> tuple:
+    """네이버 스마트스토어 리뷰 크롤링 (레거시 호환)"""
+    crawler = NaverReviewCrawler()
+    return await crawler.crawl(url, max_reviews)
 
 async def crawl_coupang_reviews(url: str, max_reviews: int) -> tuple:
     """쿠팡 리뷰 크롤링"""
