@@ -500,6 +500,7 @@ class ProductInsightAnalyzer:
 @router.post("/analyze", response_model=FourInsightResult)
 async def analyze_product_insights(
     request: ProductAnalysisRequest,
+    auto_accumulate: bool = True,
     current_user: dict = Depends(get_current_user)
 ):
     """
@@ -509,6 +510,8 @@ async def analyze_product_insights(
     - 건의사항: 서비스 개선 포인트
     - 불만: 개선 또는 드롭 결정
     - 신제품 욕구: 신규 개발 기회
+    
+    auto_accumulate=True: 개선점(건의/불만/신제품욕구)을 품목군 자산으로 자동 축적
     """
     from server import db
     
@@ -551,6 +554,37 @@ async def analyze_product_insights(
             "total_reviews_analyzed": result.total_reviews
         }}
     )
+    
+    # 개선점 자산 자동 축적 (HS Code가 설정된 경우)
+    accumulated_count = 0
+    if auto_accumulate:
+        product = await db.shop_products.find_one(
+            {"product_id": request.product_id},
+            {"_id": 0, "hs_code": 1}
+        )
+        
+        if product and product.get("hs_code"):
+            from saas.improvement_assets import ImprovementAssetManager
+            
+            asset_manager = ImprovementAssetManager(db)
+            analysis_dict = {
+                "suggestions": result.suggestions.dict(),
+                "complaints": result.complaints.dict(),
+                "new_product_needs": result.new_product_needs.dict()
+            }
+            improvements = asset_manager.extract_improvements_from_analysis(analysis_dict)
+            
+            if improvements:
+                accumulate_result = await asset_manager.accumulate_asset(
+                    hs_code=product["hs_code"],
+                    improvements=improvements,
+                    product_id=request.product_id,
+                    analysis_id=result.analysis_id
+                )
+                accumulated_count = accumulate_result.get("accumulated", 0)
+    
+    # 결과에 자산화 정보 추가 (response_model 외부로)
+    logger.info(f"Analysis {result.analysis_id}: {accumulated_count} improvements accumulated to asset DB")
     
     return result
 
