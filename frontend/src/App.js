@@ -36,7 +36,8 @@ import {
   DLedgerTab,
   IIntegrityTab,
   APIWebhookTab,
-  ConnectorTab
+  ConnectorTab,
+  MyAssetsTab
 } from "@/components/tabs/patent";
 
 import LoginPage from "@/pages/LoginPage";
