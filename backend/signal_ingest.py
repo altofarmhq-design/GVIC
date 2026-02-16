@@ -254,21 +254,68 @@ def extract_text_from_docx(file_content: bytes) -> str:
 
 # 지원하는 파일 형식 목록
 SUPPORTED_FORMATS = {
+    # 문서
     'pdf': 'PDF 문서',
-    'xlsx': 'Excel',
-    'xls': 'Excel',
-    'csv': 'CSV',
-    'txt': '텍스트',
     'hwp': '한글 문서',
     'hwpx': '한글 문서 (HWPX)',
     'docx': 'Word 문서',
+    'txt': '텍스트',
+    # 스프레드시트
+    'xlsx': 'Excel',
+    'xls': 'Excel',
+    'csv': 'CSV',
+    # 이미지
     'jpg': '이미지',
     'jpeg': '이미지',
     'png': '이미지',
     'gif': '이미지',
     'webp': '이미지',
-    'bmp': '이미지'
+    'bmp': '이미지',
+    # 코드 파일
+    'py': 'Python',
+    'js': 'JavaScript',
+    'ts': 'TypeScript',
+    'jsx': 'React JSX',
+    'tsx': 'React TSX',
+    'java': 'Java',
+    'c': 'C',
+    'cpp': 'C++',
+    'cs': 'C#',
+    'go': 'Go',
+    'rs': 'Rust',
+    'rb': 'Ruby',
+    'php': 'PHP',
+    'swift': 'Swift',
+    'kt': 'Kotlin',
+    'html': 'HTML',
+    'css': 'CSS',
+    'scss': 'SCSS',
+    'sql': 'SQL',
+    'json': 'JSON',
+    'xml': 'XML',
+    'yaml': 'YAML',
+    'yml': 'YAML',
+    'md': 'Markdown',
+    'sh': 'Shell Script',
+    'bat': 'Batch Script'
 }
+
+# 코드 파일 확장자 목록
+CODE_EXTENSIONS = [
+    'py', 'js', 'ts', 'jsx', 'tsx', 'java', 'c', 'cpp', 'cs', 'go', 'rs', 
+    'rb', 'php', 'swift', 'kt', 'html', 'css', 'scss', 'sql', 'json', 
+    'xml', 'yaml', 'yml', 'sh', 'bat'
+]
+
+def is_code_file(ext: str) -> bool:
+    """코드 파일인지 확인"""
+    return ext.lower() in CODE_EXTENSIONS
+
+def get_recommended_analysis_type(ext: str) -> str:
+    """파일 확장자에 따른 추천 분석 유형"""
+    if is_code_file(ext):
+        return "code"
+    return "general"
 
 def get_supported_extensions() -> list:
     """지원하는 파일 확장자 목록 반환"""
