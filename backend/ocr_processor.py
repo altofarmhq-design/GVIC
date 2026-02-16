@@ -37,7 +37,7 @@ async def extract_text_from_image(
     """
     Gemini Vision을 사용하여 이미지에서 텍스트 추출
     """
-    from emergentintegrations.llm.chat import LlmChat, UserMessage
+    from emergentintegrations.llm.chat import LlmChat, UserMessage, ImageContent
     
     EMERGENT_LLM_KEY = os.environ.get("EMERGENT_LLM_KEY")
     
@@ -46,18 +46,6 @@ async def extract_text_from_image(
     
     # 이미지를 base64로 인코딩
     image_base64 = base64.b64encode(image_data).decode("utf-8")
-    
-    # 파일 확장자로 MIME 타입 결정
-    ext = os.path.splitext(filename)[1].lower()
-    mime_types = {
-        ".png": "image/png",
-        ".jpg": "image/jpeg",
-        ".jpeg": "image/jpeg",
-        ".webp": "image/webp",
-        ".gif": "image/gif",
-        ".bmp": "image/bmp"
-    }
-    mime_type = mime_types.get(ext, "image/png")
     
     ocr_prompt = f"""이 이미지를 분석하고 다음 정보를 JSON 형식으로 추출해주세요:
 
@@ -89,11 +77,13 @@ async def extract_text_from_image(
             system_message="You are an OCR expert that extracts text from images and returns results in JSON format."
         ).with_model("gemini", "gemini-2.0-flash")
         
-        # 이미지와 함께 메시지 전송
+        # ImageContent를 사용하여 이미지 전송
+        image_content = ImageContent(image_base64=image_base64)
+        
         response = await llm.send_message(
             UserMessage(
                 text=ocr_prompt,
-                images=[f"data:{mime_type};base64,{image_base64}"]
+                file_contents=[image_content]
             )
         )
         
