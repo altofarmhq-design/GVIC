@@ -1,15 +1,5 @@
 [
   {
-    "timestamp": "2026-02-14T14:02:42.398423",
-    "phase": "데이터소스",
-    "action": "데이터 수집",
-    "data": {
-      "source_id": "ds_787c194e",
-      "success": false,
-      "value": null
-    }
-  },
-  {
     "timestamp": "2026-02-14T14:02:43.473629",
     "phase": "데이터소스",
     "action": "데이터 수집",
@@ -9961,6 +9951,14 @@
   },
   {
     "timestamp": "2026-02-16T06:10:10.678828",
+    "phase": "리포트",
+    "action": "PDF 생성",
+    "data": {
+      "records": 20
+    }
+  },
+  {
+    "timestamp": "2026-02-16T06:51:05.259247",
     "phase": "리포트",
     "action": "PDF 생성",
     "data": {
