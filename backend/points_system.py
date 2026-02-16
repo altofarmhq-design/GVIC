@@ -555,7 +555,7 @@ async def get_earning_rules():
             {"action": "file_upload", "points": 5, "description": "파일 첨부 보너스"},
             {"action": "asset_created", "points": 50, "description": "자산 생성됨"},
             {"action": "high_value_asset", "points": "최대 50", "description": "고가치 자산 보너스 (가치 점수에 따라)"},
-            {"action": "asset_sold", "points": "판매가 × 0.7 × 0.1", "description": "자산 판매 시 기여자 몫"},
+            {"action": "asset_sold", "points": "구매가 × 20% × 기여비율 × 0.01", "description": "자산 판매 시 기여자 보상"},
             {"action": "daily_login", "points": 5, "description": "일일 출석"},
             {"action": "referral", "points": 200, "description": "추천인 보너스"},
             {"action": "signup_bonus", "points": 100, "description": "신규 가입 보너스"}
@@ -563,5 +563,224 @@ async def get_earning_rules():
         "conversion": {
             "ratio": CASH_TO_POINT_RATIO,
             "note": "유료 전환 시 포인트를 현금으로 대체 가능"
+        },
+        "purchase_reward": {
+            "contributor_share": f"{PURCHASE_CONTRIBUTOR_SHARE * 100}%",
+            "description": "구매가의 20%가 기여자들에게 기여 비율에 따라 분배됩니다"
+        }
+    }
+
+# ==================== 자산 구매 및 기여자 보상 ====================
+
+@router.post("/purchase/asset")
+async def purchase_asset_and_distribute_rewards(
+    request: AssetPurchaseRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    자산 구매 및 기여자 보상 분배
+    
+    - 구매가의 20%를 기여자들에게 분배
+    - 각 기여자는 해당 모듈(시그널)의 기여 비율만큼 받음
+    - 보상은 포인트로 적립됨 (현금 × 0.01)
+    """
+    from server import db
+    
+    buyer_id = current_user.get("user_id")
+    
+    # 자산 조회
+    asset = await db.gvic_assets.find_one(
+        {"asset_id": request.asset_id},
+        {"_id": 0}
+    )
+    
+    if not asset:
+        raise HTTPException(status_code=404, detail="자산을 찾을 수 없습니다")
+    
+    # 기여자 보상 금액 계산 (구매가의 20%)
+    total_contributor_reward = request.purchase_price * PURCHASE_CONTRIBUTOR_SHARE
+    
+    # 관련 시그널들 조회 (기여자 정보)
+    signal_id = asset.get("signal_id")
+    contributors = asset.get("contributors", [])
+    
+    # 기여자가 없는 경우, 원본 시그널 제출자를 기여자로 설정
+    if not contributors and signal_id:
+        signal = await db.pipeline_signals.find_one(
+            {"signal_id": signal_id},
+            {"_id": 0, "user_id": 1, "metadata": 1}
+        )
+        if signal:
+            user_id = signal.get("user_id") or signal.get("metadata", {}).get("user_id")
+            if user_id:
+                contributors = [{
+                    "user_id": user_id,
+                    "signal_id": signal_id,
+                    "contribution_ratio": 1.0  # 단일 기여자는 100%
+                }]
+    
+    # 기여 비율 정규화 (합이 1이 되도록)
+    total_ratio = sum(c.get("contribution_ratio", 0) for c in contributors)
+    if total_ratio == 0:
+        total_ratio = 1
+    
+    # 보상 분배 결과
+    reward_distribution = []
+    
+    for contributor in contributors:
+        contrib_user_id = contributor.get("user_id")
+        contrib_signal_id = contributor.get("signal_id", signal_id)
+        raw_ratio = contributor.get("contribution_ratio", 1.0)
+        
+        # 정규화된 기여 비율
+        normalized_ratio = raw_ratio / total_ratio
+        
+        # 보상 금액 계산
+        reward_cash = total_contributor_reward * normalized_ratio
+        reward_points = reward_cash * CASH_TO_POINT_RATIO
+        
+        if contrib_user_id and reward_points > 0:
+            # 포인트 적립
+            transaction = {
+                "type": "earn",
+                "amount": reward_points,
+                "description": f"자산 구매 보상 (기여도 {normalized_ratio*100:.1f}%)",
+                "reference_id": request.asset_id,
+                "purchase_price": request.purchase_price,
+                "contribution_ratio": normalized_ratio,
+                "cash_value": reward_cash,
+                "timestamp": datetime.now(timezone.utc).isoformat()
+            }
+            
+            await db.user_points.update_one(
+                {"user_id": contrib_user_id},
+                {
+                    "$inc": {
+                        "total_points": reward_points,
+                        "available_points": reward_points,
+                        "total_earned": reward_points
+                    },
+                    "$push": {"transactions": transaction},
+                    "$set": {"last_updated": datetime.now(timezone.utc).isoformat()}
+                },
+                upsert=True
+            )
+            
+            reward_distribution.append({
+                "user_id": contrib_user_id,
+                "signal_id": contrib_signal_id,
+                "contribution_ratio": normalized_ratio,
+                "reward_points": reward_points,
+                "reward_cash_value": reward_cash
+            })
+            
+            logger.info(f"Contributor reward: {contrib_user_id} +{reward_points}P ({normalized_ratio*100:.1f}%)")
+    
+    # 구매 기록 저장
+    purchase_record = {
+        "purchase_id": f"PUR_{uuid.uuid4().hex[:12]}",
+        "asset_id": request.asset_id,
+        "buyer_id": buyer_id,
+        "purchase_price": request.purchase_price,
+        "contributor_share": total_contributor_reward,
+        "reward_distribution": reward_distribution,
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.asset_purchases.insert_one(purchase_record)
+    
+    # 자산 판매 상태 업데이트
+    await db.gvic_assets.update_one(
+        {"asset_id": request.asset_id},
+        {
+            "$set": {
+                "sale_status": "sold",
+                "sold_at": datetime.now(timezone.utc).isoformat(),
+                "buyer_id": buyer_id,
+                "sold_price": request.purchase_price
+            },
+            "$inc": {"sale_count": 1}
+        }
+    )
+    
+    return {
+        "success": True,
+        "purchase_id": purchase_record["purchase_id"],
+        "asset_id": request.asset_id,
+        "purchase_price": request.purchase_price,
+        "contributor_share": total_contributor_reward,
+        "contributor_share_percent": f"{PURCHASE_CONTRIBUTOR_SHARE * 100}%",
+        "reward_distribution": reward_distribution,
+        "total_contributors": len(reward_distribution),
+        "message": f"₩{request.purchase_price:,.0f} 구매 완료. 기여자 {len(reward_distribution)}명에게 총 ₩{total_contributor_reward:,.0f} 분배됨"
+    }
+
+@router.get("/purchase/history")
+async def get_purchase_history(
+    limit: int = 20,
+    current_user: dict = Depends(get_current_user)
+):
+    """구매 내역 조회"""
+    from server import db
+    
+    user_id = current_user.get("user_id")
+    
+    # 내가 구매한 내역
+    purchases = await db.asset_purchases.find(
+        {"buyer_id": user_id},
+        {"_id": 0}
+    ).sort("timestamp", -1).limit(limit).to_list(limit)
+    
+    # 내가 받은 보상 내역
+    rewards_received = await db.asset_purchases.find(
+        {"reward_distribution.user_id": user_id},
+        {"_id": 0}
+    ).sort("timestamp", -1).limit(limit).to_list(limit)
+    
+    # 내 보상만 필터링
+    my_rewards = []
+    for purchase in rewards_received:
+        for reward in purchase.get("reward_distribution", []):
+            if reward.get("user_id") == user_id:
+                my_rewards.append({
+                    "purchase_id": purchase.get("purchase_id"),
+                    "asset_id": purchase.get("asset_id"),
+                    "purchase_price": purchase.get("purchase_price"),
+                    "my_contribution_ratio": reward.get("contribution_ratio"),
+                    "my_reward_points": reward.get("reward_points"),
+                    "my_reward_cash_value": reward.get("reward_cash_value"),
+                    "timestamp": purchase.get("timestamp")
+                })
+    
+    return {
+        "purchases": purchases,
+        "rewards_received": my_rewards,
+        "total_purchases": len(purchases),
+        "total_rewards": len(my_rewards)
+    }
+
+@router.get("/reward-rules")
+async def get_reward_rules():
+    """보상 분배 규칙 조회"""
+    return {
+        "purchase_reward": {
+            "contributor_share": PURCHASE_CONTRIBUTOR_SHARE,
+            "contributor_share_percent": f"{PURCHASE_CONTRIBUTOR_SHARE * 100}%",
+            "description": "구매가의 20%가 기여자들에게 분배됩니다"
+        },
+        "distribution_method": {
+            "method": "contribution_ratio",
+            "description": "각 기여자(질문자)는 해당 모듈이 기여한 비율만큼 보상을 받습니다"
+        },
+        "point_conversion": {
+            "ratio": CASH_TO_POINT_RATIO,
+            "description": f"보상은 포인트로 적립됩니다 (현금 ₩1 = {CASH_TO_POINT_RATIO}P)"
+        },
+        "example": {
+            "purchase_price": 10000,
+            "contributor_share": 10000 * PURCHASE_CONTRIBUTOR_SHARE,
+            "single_contributor_reward_cash": 10000 * PURCHASE_CONTRIBUTOR_SHARE * 1.0,
+            "single_contributor_reward_points": 10000 * PURCHASE_CONTRIBUTOR_SHARE * 1.0 * CASH_TO_POINT_RATIO,
+            "description": "₩10,000 구매 시, 단일 기여자는 ₩2,000 (= 20P) 보상"
         }
     }
