@@ -17,8 +17,8 @@ import jwt
 
 router = APIRouter(prefix="/api/signal", tags=["signal"])
 
-# JWT Secret from env
-JWT_SECRET = os.environ.get("JWT_SECRET_KEY", "gvic-secret-key-change-in-production")
+# JWT Secret from env (must match auth.py)
+JWT_SECRET = os.environ.get("JWT_SECRET_KEY", "gvic-engine-secret-key-change-in-production")
 
 # Simple auth dependency for this module
 async def get_current_user_simple(authorization: str = Header(None)):
