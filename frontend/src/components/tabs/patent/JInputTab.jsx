@@ -493,19 +493,19 @@ export const JInputTab = ({ onSignalSubmit }) => {
             </CardContent>
           </Card>
 
-          {/* 5:3:2 시그널 분류 비율 설정 */}
+          {/* 5:3:2 결이론 가치 분배 안내 */}
           <Card className="bg-slate-800/50 border-slate-700">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-slate-100 text-base flex items-center gap-2">
                   <Target className="w-4 h-4 text-purple-400" />
-                  시그널 분류 비율 (5:3:2)
+                  5:3:2 결이론 (가치 분배)
                 </CardTitle>
                 <button
                   onClick={() => setShowRatioSettings(!showRatioSettings)}
                   className="text-xs text-slate-400 hover:text-slate-200 flex items-center gap-1"
                 >
-                  {showRatioSettings ? '접기' : '조절하기'}
+                  {showRatioSettings ? '접기' : '자세히 보기'}
                   <ArrowRight className={`w-3 h-3 transition-transform ${showRatioSettings ? 'rotate-90' : ''}`} />
                 </button>
               </div>
@@ -514,50 +514,61 @@ export const JInputTab = ({ onSignalSubmit }) => {
               {/* 기본 설명 */}
               <div className="bg-slate-900/50 rounded-lg p-3 mb-3">
                 <p className="text-slate-300 text-sm mb-2">
-                  입력된 시그널은 AI가 자동으로 분류합니다:
+                  자산화된 가치는 5:3:2 결이론에 따라 분배됩니다:
                 </p>
                 <div className="grid grid-cols-3 gap-2 text-xs">
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                    <span className="text-slate-400">원하는 것 <span className="text-blue-400 font-bold">{ratioWanted}</span></span>
+                    <span className="text-slate-400">공공 환원 <span className="text-blue-400 font-bold">50%</span></span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-amber-500"></div>
-                    <span className="text-slate-400">자산화 대상 <span className="text-amber-400 font-bold">{ratioUnwanted}</span></span>
+                    <span className="text-slate-400">플랫폼 운영 <span className="text-amber-400 font-bold">30%</span></span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-slate-500"></div>
-                    <span className="text-slate-400">Null <span className="text-slate-300 font-bold">{ratioNull}</span></span>
+                    <div className="w-3 h-3 rounded-full bg-purple-500"></div>
+                    <span className="text-slate-400">기획/관리 <span className="text-purple-300 font-bold">20%</span></span>
                   </div>
                 </div>
                 <p className="text-slate-500 text-xs mt-2">
-                  {ratioWanted === 5 && ratioUnwanted === 3 && ratioNull === 2 
-                    ? '※ 기본 비율 5:3:2가 적용됩니다. 조절하지 않으면 이 비율을 유지합니다.'
-                    : `※ 사용자 설정 비율 ${ratioWanted}:${ratioUnwanted}:${ratioNull}이 적용됩니다.`
-                  }
+                  ※ 모듈 구매 시 수익이 이 비율로 자동 분배됩니다.
                 </p>
               </div>
 
-              {/* 비율 조절 (토글) */}
+              {/* 상세 설명 (토글) */}
               {showRatioSettings && (
                 <div className="space-y-3 border-t border-slate-700 pt-3">
                   <div className="grid grid-cols-3 gap-4">
-                    <div>
-                      <label className="text-xs text-blue-400 mb-1 block">원하는 것 (직접 분석)</label>
-                      <input
-                        type="range"
-                        min="0"
-                        max="10"
-                        value={ratioWanted}
-                        onChange={(e) => setRatioWanted(parseInt(e.target.value))}
-                        className="w-full accent-blue-500"
-                      />
-                      <p className="text-center text-blue-300 font-bold">{ratioWanted}</p>
+                    <div className="bg-blue-500/10 p-3 rounded-lg border border-blue-500/30">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">5</div>
+                        <span className="text-blue-400 font-medium">공공 환원</span>
+                      </div>
+                      <p className="text-xs text-slate-400">이용자, 주주, 구성원에게 기여 환원</p>
+                      <p className="text-blue-300 font-bold text-lg mt-2">50%</p>
                     </div>
-                    <div>
-                      <label className="text-xs text-amber-400 mb-1 block">자산화 대상</label>
-                      <input
-                        type="range"
+                    <div className="bg-amber-500/10 p-3 rounded-lg border border-amber-500/30">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center text-white text-xs font-bold">3</div>
+                        <span className="text-amber-400 font-medium">플랫폼 운영</span>
+                      </div>
+                      <p className="text-xs text-slate-400">시스템 유지, 발전, 재투자</p>
+                      <p className="text-amber-300 font-bold text-lg mt-2">30%</p>
+                    </div>
+                    <div className="bg-purple-500/10 p-3 rounded-lg border border-purple-500/30">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold">2</div>
+                        <span className="text-purple-400 font-medium">기획/관리</span>
+                      </div>
+                      <p className="text-xs text-slate-400">GVIC 운영자 보상</p>
+                      <p className="text-purple-300 font-bold text-lg mt-2">20%</p>
+                    </div>
+                  </div>
+                  <p className="text-center text-slate-500 text-xs mt-2">
+                    💡 예시: 10,000원 판매 시 → 공공 5,000원 / 운영 3,000원 / 기획 2,000원
+                  </p>
+                </div>
+              )}
                         min="0"
                         max="10"
                         value={ratioUnwanted}
