@@ -28,7 +28,7 @@ async def get_current_user_simple(authorization: str = Header(None)):
     
     if not authorization:
         logger.error("No authorization header")
-        raise HTTPException(status_code=401, detail="인증이 필요합니다")
+        raise HTTPException(status_code=401, detail="인증이 필요합니다. 다시 로그인해주세요.")
     
     try:
         # Bearer 토큰 추출
@@ -37,17 +37,24 @@ async def get_current_user_simple(authorization: str = Header(None)):
         else:
             token = authorization
         
-        logger.info(f"Token received (first 20 chars): {token[:20]}...")
+        # 토큰이 비어있거나 'null', 'undefined'인 경우
+        if not token or token in ('null', 'undefined', ''):
+            logger.error(f"Empty or invalid token: {token}")
+            raise HTTPException(status_code=401, detail="토큰이 없습니다. 다시 로그인해주세요.")
+        
+        # JWT 형식 검증 (3개 세그먼트)
+        if token.count('.') != 2:
+            logger.error(f"Invalid token format: {token[:50]}...")
+            raise HTTPException(status_code=401, detail="토큰 형식이 올바르지 않습니다. 다시 로그인해주세요.")
         
         payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
-        logger.info(f"Token decoded successfully for user: {payload.get('sub')}")
         return payload
     except jwt.ExpiredSignatureError:
         logger.error("Token expired")
-        raise HTTPException(status_code=401, detail="토큰이 만료되었습니다")
+        raise HTTPException(status_code=401, detail="토큰이 만료되었습니다. 다시 로그인해주세요.")
     except jwt.InvalidTokenError as e:
         logger.error(f"Invalid token error: {str(e)}")
-        raise HTTPException(status_code=401, detail=f"유효하지 않은 토큰입니다: {str(e)}")
+        raise HTTPException(status_code=401, detail="유효하지 않은 토큰입니다. 다시 로그인해주세요.")
 
 # Request Models
 class TextSignalRequest(BaseModel):
