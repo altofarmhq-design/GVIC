@@ -136,7 +136,7 @@ async def ingest_text_signal(request: TextSignalRequest, current_user: dict = De
     }
 
 @router.post("/ingest/url")
-async def ingest_url_signal(request: UrlSignalRequest, current_user: dict = Depends(get_current_user)):
+async def ingest_url_signal(request: UrlSignalRequest, current_user: dict = Depends(get_current_user_simple)):
     """URL 시그널 입력 - 웹페이지 텍스트 추출"""
     if not request.url.strip():
         raise HTTPException(status_code=400, detail="URL이 비어있습니다")
