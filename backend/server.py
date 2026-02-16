@@ -3427,6 +3427,7 @@ try:
     from saas.improvement_assets import router as improvement_assets_router
     from saas.payment_service import router as payment_router
     from saas.stripe_webhook import router as stripe_webhook_router
+    from saas.unified_payment import router as unified_payment_router
     
     app.include_router(saas_review_router)
     app.include_router(saas_qa_router)
@@ -3436,7 +3437,8 @@ try:
     app.include_router(improvement_assets_router)
     app.include_router(payment_router)
     app.include_router(stripe_webhook_router)
-    logger.info("SaaS modules loaded: review_analyzer, qa_manager, dashboard_service, shop_manager, product_insights, improvement_assets, payment_service, stripe_webhook")
+    app.include_router(unified_payment_router)
+    logger.info("SaaS modules loaded: review_analyzer, qa_manager, dashboard_service, shop_manager, product_insights, improvement_assets, payment_service, stripe_webhook, unified_payment")
 except Exception as e:
     logger.warning(f"SaaS modules not loaded: {e}")
 
