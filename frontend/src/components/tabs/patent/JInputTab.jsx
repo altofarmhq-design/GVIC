@@ -441,6 +441,108 @@ export const JInputTab = ({ onSignalSubmit }) => {
             </CardContent>
           </Card>
 
+          {/* 5:3:2 시그널 분류 비율 설정 */}
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-slate-100 text-base flex items-center gap-2">
+                  <Target className="w-4 h-4 text-purple-400" />
+                  시그널 분류 비율 (5:3:2)
+                </CardTitle>
+                <button
+                  onClick={() => setShowRatioSettings(!showRatioSettings)}
+                  className="text-xs text-slate-400 hover:text-slate-200 flex items-center gap-1"
+                >
+                  {showRatioSettings ? '접기' : '조절하기'}
+                  <ArrowRight className={`w-3 h-3 transition-transform ${showRatioSettings ? 'rotate-90' : ''}`} />
+                </button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {/* 기본 설명 */}
+              <div className="bg-slate-900/50 rounded-lg p-3 mb-3">
+                <p className="text-slate-300 text-sm mb-2">
+                  입력된 시그널은 AI가 자동으로 분류합니다:
+                </p>
+                <div className="grid grid-cols-3 gap-2 text-xs">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                    <span className="text-slate-400">원하는 것 <span className="text-blue-400 font-bold">{ratioWanted}</span></span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-amber-500"></div>
+                    <span className="text-slate-400">자산화 대상 <span className="text-amber-400 font-bold">{ratioUnwanted}</span></span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-slate-500"></div>
+                    <span className="text-slate-400">Null <span className="text-slate-300 font-bold">{ratioNull}</span></span>
+                  </div>
+                </div>
+                <p className="text-slate-500 text-xs mt-2">
+                  {ratioWanted === 5 && ratioUnwanted === 3 && ratioNull === 2 
+                    ? '※ 기본 비율 5:3:2가 적용됩니다. 조절하지 않으면 이 비율을 유지합니다.'
+                    : `※ 사용자 설정 비율 ${ratioWanted}:${ratioUnwanted}:${ratioNull}이 적용됩니다.`
+                  }
+                </p>
+              </div>
+
+              {/* 비율 조절 (토글) */}
+              {showRatioSettings && (
+                <div className="space-y-3 border-t border-slate-700 pt-3">
+                  <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <label className="text-xs text-blue-400 mb-1 block">원하는 것 (직접 분석)</label>
+                      <input
+                        type="range"
+                        min="0"
+                        max="10"
+                        value={ratioWanted}
+                        onChange={(e) => setRatioWanted(parseInt(e.target.value))}
+                        className="w-full accent-blue-500"
+                      />
+                      <p className="text-center text-blue-300 font-bold">{ratioWanted}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-amber-400 mb-1 block">자산화 대상</label>
+                      <input
+                        type="range"
+                        min="0"
+                        max="10"
+                        value={ratioUnwanted}
+                        onChange={(e) => setRatioUnwanted(parseInt(e.target.value))}
+                        className="w-full accent-amber-500"
+                      />
+                      <p className="text-center text-amber-300 font-bold">{ratioUnwanted}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-slate-400 mb-1 block">Null (무시)</label>
+                      <input
+                        type="range"
+                        min="0"
+                        max="10"
+                        value={ratioNull}
+                        onChange={(e) => setRatioNull(parseInt(e.target.value))}
+                        className="w-full accent-slate-500"
+                      />
+                      <p className="text-center text-slate-300 font-bold">{ratioNull}</p>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <p className="text-xs text-slate-500">
+                      현재 비율: <span className="text-slate-300 font-mono">{ratioWanted}:{ratioUnwanted}:{ratioNull}</span>
+                    </p>
+                    <button
+                      onClick={() => { setRatioWanted(5); setRatioUnwanted(3); setRatioNull(2); }}
+                      className="text-xs text-purple-400 hover:text-purple-300"
+                    >
+                      기본값(5:3:2) 복원
+                    </button>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
           {/* 시그널 입력 */}
           <Card className="bg-slate-800/50 border-slate-700">
             <CardHeader className="pb-2">
