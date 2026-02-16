@@ -81,12 +81,6 @@ export const LLIntentTab = () => {
     }
   }, [content, result]);
 
-  const samples = [
-    { label: "상품 후기", content: "효과가 정말 좋아요! 포장도 꼼꼼하고 배송도 빨랐어요. 재구매 의사 있습니다." },
-    { label: "요구사항", content: "실제 시그널이 어떻게 gvic에서 가공되고 결과를 얻게 되는 구나를 알 수 있어야 겠지." },
-    { label: "체념적 만족", content: "두 번째 구매할 때 2kg를 주문했는데 키로 수도 맛도 믿음이 안 갔는데. 사장님께서 직접 전화 주시고 친절하게 대응하시기에 미안함도 있고. 맛은 맛있어요. 그냥 그것에 만족할게요." },
-  ];
-
   const handleReset = () => {
     setContent("");
     setResult(null);
@@ -123,28 +117,11 @@ export const LLIntentTab = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <Textarea
-                placeholder="분석할 텍스트를 입력하세요..."
+                placeholder="시그널을 입력하세요"
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 className="bg-slate-900 border-slate-600 text-slate-100 min-h-[200px]"
               />
-              
-              <div>
-                <p className="text-slate-400 text-xs mb-2">샘플:</p>
-                <div className="flex flex-wrap gap-1">
-                  {samples.map((s, i) => (
-                    <Button
-                      key={i}
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setContent(s.content)}
-                      className="text-xs h-7"
-                    >
-                      {s.label}
-                    </Button>
-                  ))}
-                </div>
-              </div>
 
               <div className="flex gap-2">
                 <Button 
