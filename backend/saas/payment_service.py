@@ -176,9 +176,7 @@ async def create_checkout_session(
 ):
     """결제 세션 생성"""
     from server import db
-    from emergentintegrations.payments.stripe.checkout import (
-        StripeCheckout, CheckoutSessionRequest, CheckoutSessionResponse
-    )
+    from local_stripe import StripeCheckout
     
     # JWT에서 user_id는 'sub' 또는 'user_id'로 저장됨
     user_id = current_user.get("sub") or current_user.get("sub") or current_user.get("user_id") or ""
