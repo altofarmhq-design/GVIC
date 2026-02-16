@@ -160,12 +160,44 @@ function Dashboard() {
                   <span className="max-w-[80px] truncate text-xs">{user?.name}</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-slate-800 border-slate-700">
-                <div className="px-2 py-1.5">
+              <DropdownMenuContent align="end" className="bg-slate-800 border-slate-700 w-64">
+                <div className="px-3 py-2 border-b border-slate-700">
                   <p className="text-sm font-medium text-slate-100">{user?.name}</p>
                   <p className="text-xs text-slate-400">{user?.email}</p>
                   <div className="mt-1">{getRoleBadge(user?.role)}</div>
                 </div>
+                
+                {/* 포인트 정보 */}
+                <div className="px-3 py-3 border-b border-slate-700 bg-gradient-to-r from-amber-900/20 to-slate-800">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs text-slate-400 flex items-center gap-1">
+                      <Coins className="w-3 h-3 text-amber-400" />
+                      내 포인트
+                    </span>
+                    <Badge variant="outline" className="text-amber-400 border-amber-600 text-xs">
+                      {userPoints ? `${userPoints.available_points?.toLocaleString()}P` : '0P'}
+                    </Badge>
+                  </div>
+                  <div className="text-xs text-slate-500 space-y-1">
+                    <div className="flex justify-between">
+                      <span>현금 환산</span>
+                      <span className="text-green-400">₩{userPoints ? (userPoints.cash_equivalent || 0).toLocaleString() : '0'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>환율</span>
+                      <span className="text-slate-400">₩1 = 0.1P</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 자산 현황 링크 */}
+                <DropdownMenuItem 
+                  onClick={() => setActiveTab("my-assets")} 
+                  className="text-slate-300 cursor-pointer"
+                >
+                  <Award className="w-4 h-4 mr-2 text-purple-400" /> 내 자산 현황
+                </DropdownMenuItem>
+                
                 <DropdownMenuItem onClick={handleLogout} className="text-red-400 cursor-pointer">
                   <LogOut className="w-4 h-4 mr-2" /> 로그아웃
                 </DropdownMenuItem>
