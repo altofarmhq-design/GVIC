@@ -282,7 +282,7 @@ export const MyAssetsTab = () => {
               <div className="bg-slate-900/50 rounded-lg p-3">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-slate-400">환율</span>
-                  <span className="text-green-400 font-medium">₩1 = 0.1P</span>
+                  <span className="text-green-400 font-medium">₩1 = 0.01P</span>
                 </div>
                 <div className="flex items-center justify-between text-sm mt-1">
                   <span className="text-slate-400">전환 가능</span>
